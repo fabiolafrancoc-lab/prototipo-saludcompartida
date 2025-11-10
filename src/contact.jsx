@@ -125,11 +125,19 @@ export default function Contact() {
     let isValid = true;
 
     fieldsToValidate.forEach(field => {
-      if (!validateField(field, formData[field])) isValid = false;
+      if (!validateField(field, formData[field])) {
+        console.log(`Campo inválido: ${field}`, formData[field]);
+        isValid = false;
+      }
     });
 
     if (formData.email && !validateField('email', formData.email)) isValid = false;
-    if (!isValid) return;
+    
+    if (!isValid) {
+      console.log('Formulario inválido. Errores:', errors);
+      alert('Por favor completa todos los campos requeridos y acepta los términos y condiciones');
+      return;
+    }
 
     setIsSubmitting(true);
 

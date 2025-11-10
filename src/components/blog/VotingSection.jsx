@@ -30,7 +30,7 @@ export default function VotingSection() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (selectedTopics.length === 0 && !otherTopic.trim()) {
@@ -47,7 +47,40 @@ export default function VotingSection() {
 
     console.log('Votos enviados:', votingData);
     
-    // Aquí se enviaría a tu backend o Google Sheets
+    try {
+      // Enviar email via API
+      const message = `
+📊 VOTOS PARA NUEVOS TEMAS DE BLOG
+
+--- Temas Seleccionados ---
+${selectedTopics.length > 0 ? selectedTopics.map((topic, i) => `${i + 1}. ${topic}`).join('\n') : 'Ninguno'}
+
+--- Sugerencia Personalizada ---
+${otherTopic || 'Ninguna'}
+
+--- Resumen ---
+Total de votos: ${votingData.totalVotes}
+Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+      `.trim();
+
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: 'Usuario del Blog',
+          message: message,
+          type: 'blog-topic'
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Error al enviar votos');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
     
     setSubmitted(true);
   };
