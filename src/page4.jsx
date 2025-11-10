@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserContext from './contexts/UserContext';
+import { useGeolocation, isUSAUser, isMexicoUser } from './hooks/useGeolocation';
 
 // Premium Professional SVG Icons - Estilo Corporativo Sofisticado
 const DoctorIcon = () => (
@@ -198,6 +199,10 @@ const Page4 = () => {
   // Read family name from context for personalization
   const { familyFirstName, familyLastName } = useContext(UserContext);
   
+  // Geolocation hook
+  const { country, countryCode, loading: geoLoading } = useGeolocation();
+  const [showLocationBanner, setShowLocationBanner] = useState(false);
+  
   // Get user data from localStorage (MX2025 code)
   const [userName, setUserName] = useState('');
   
@@ -214,6 +219,18 @@ const Page4 = () => {
       console.error('Error reading user data:', error);
     }
   }, []);
+
+  // Show location banner when geolocation is detected
+  useEffect(() => {
+    if (!geoLoading && country) {
+      setShowLocationBanner(true);
+      // Auto-hide after 5 seconds
+      const timer = setTimeout(() => {
+        setShowLocationBanner(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [geoLoading, country]);
   
   const services = [
     {
@@ -333,6 +350,33 @@ const Page4 = () => {
           </button>
         </div>
       </header>
+
+      {/* Location Detection Banner */}
+      {showLocationBanner && country && (
+        <div className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white py-3 px-4 shadow-lg animate-slide-down">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <p className="text-sm md:text-base font-medium">
+                📍 Ubicación detectada: <span className="font-bold">{country}</span>
+                {isUSAUser(countryCode) && ' - Mostrando información para usuarios en USA'}
+                {isMexicoUser(countryCode) && ' - Mostrando información para usuarios en México'}
+              </p>
+            </div>
+            <button 
+              onClick={() => setShowLocationBanner(false)}
+              className="text-white hover:text-gray-200 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-6xl mx-auto px-6 py-12">
         <div className="text-center mb-12">

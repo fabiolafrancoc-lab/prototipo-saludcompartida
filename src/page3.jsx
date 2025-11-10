@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGeolocation } from './hooks/useGeolocation';
 
 export default function Page3() {
   const navigate = useNavigate();
+  const { countryCode: detectedCountry, loading: geoLoading } = useGeolocation();
+  
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [motherLastName, setMotherLastName] = useState('');
@@ -11,6 +14,17 @@ export default function Page3() {
   const [accessCode, setAccessCode] = useState('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Auto-select country code based on geolocation
+  useEffect(() => {
+    if (!geoLoading && detectedCountry) {
+      if (detectedCountry === 'US') {
+        setCountryCode('+1');
+      } else if (detectedCountry === 'MX') {
+        setCountryCode('+52');
+      }
+    }
+  }, [detectedCountry, geoLoading]);
 
   const handleAccessCode = () => {
     // Validar campos
