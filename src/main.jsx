@@ -17,6 +17,7 @@ import Account from './account.jsx'
 import Blog from './pages/Blog'
 import Migrant from './migrant.jsx'
 import MigrantContact from './migrantcontact.jsx'
+import WhatsAppDemo from './pages/WhatsAppDemo.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/contact" element={<Contact />} /> {/* 👈 Contáctanos */}
         <Route path="/rating" element={<Rating />} /> {/* 👈 Calificación */}
         <Route path="/account" element={<Account />} /> {/* 👈 Mi Cuenta */}
+        <Route path="/whatsapp-demo" element={<WhatsAppDemo />} /> {/* 👈 Demo Íconos WhatsApp */}
       </Routes>
     </BrowserRouter>
   </StrictMode>,
