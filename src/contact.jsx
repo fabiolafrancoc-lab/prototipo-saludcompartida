@@ -149,10 +149,14 @@ export default function Contact() {
         }),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        throw new Error('Error al enviar el mensaje');
+        console.error('Error de API:', responseData);
+        throw new Error(responseData.error || 'Error al enviar el mensaje');
       }
 
+      console.log('Mensaje enviado exitosamente:', responseData);
       setShowSuccess(true);
       setTimeout(() => {
         // pasamos el primer nombre si deseas usarlo en /page4
@@ -163,8 +167,8 @@ export default function Contact() {
         }
       }, 3000);
     } catch (error) {
-      console.error('Error:', error);
-      alert('Hubo un error al enviar tu mensaje. Por favor intenta de nuevo.');
+      console.error('Error completo:', error);
+      alert(`Hubo un error al enviar tu mensaje: ${error.message}\n\nPor favor intenta de nuevo o contáctanos por WhatsApp.`);
       setIsSubmitting(false);
     }
   };

@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     const { name, email, phone, message, type } = req.body;
 
     // Validate required fields
-    if (!name || !email || !message) {
+    if (!name || !message) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       html: `
         <h2>Nuevo mensaje de contacto</h2>
         <p><strong>Nombre:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
+        ${email && email !== 'Sin email proporcionado' ? `<p><strong>Email:</strong> ${email}</p>` : '<p><strong>Email:</strong> <em>No proporcionado</em></p>'}
         ${phone ? `<p><strong>Teléfono:</strong> ${phone}</p>` : ''}
         <p><strong>Mensaje:</strong></p>
         <p>${message.replace(/\n/g, '<br>')}</p>
