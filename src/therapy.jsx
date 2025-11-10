@@ -474,7 +474,7 @@ export default function Therapy() {
 
   const handlePhoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, ''); // Solo números
-    if (value.length <= 8) {
+    if (value.length <= 10) {
       setFormData({...formData, phone: value});
     }
   };
@@ -487,15 +487,15 @@ export default function Therapy() {
       return;
     }
 
-    if (formData.phone.length !== 8) {
-      alert('Por favor ingresa un número de teléfono válido de 8 dígitos');
+    if (formData.phone.length !== 10) {
+      alert('Por favor ingresa un número de teléfono válido de 10 dígitos');
       return;
     }
 
     const dataToSend = {
       timestamp: new Date().toISOString(),
       name: `${formData.firstName} ${formData.lastName}`,
-      phone: `+55${formData.phone}`,
+      phone: `+52${formData.phone}`,
       sessionType: 'Individual',
       contactMethod: 'Videollamada',
       date: selectedDate.toLocaleDateString('es-MX'),
@@ -581,7 +581,7 @@ export default function Therapy() {
 
             <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-4 mb-8">
               <p className="text-sm text-gray-700">
-                <strong>Te vamos a contactar 24 horas antes</strong> al <span className="font-semibold">+55{formData.phone}</span> para confirmar tu sesión y mandarte el link de la videollamada.
+                <strong>Te vamos a contactar 24 horas antes</strong> al <span className="font-semibold">+52{formData.phone}</span> para confirmar tu sesión y mandarte el link de la videollamada.
               </p>
             </div>
 
@@ -848,7 +848,7 @@ export default function Therapy() {
             </label>
             <div className="flex">
               <div className="flex items-center bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl px-4">
-                <span className="text-gray-700 font-medium">+55</span>
+                <span className="text-gray-700 font-medium">+52</span>
               </div>
               <input
                 type="tel"
@@ -856,12 +856,12 @@ export default function Therapy() {
                 value={formData.phone}
                 onChange={handlePhoneChange}
                 className="flex-1 px-4 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="12345678"
-                maxLength="8"
+                placeholder="5512345678"
+                maxLength="10"
               />
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              Ingresa 8 dígitos (ejemplo: 55123456)
+              Ingresa 10 dígitos (ejemplo: 5512345678)
             </p>
           </div>
 
