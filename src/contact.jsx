@@ -131,17 +131,41 @@ export default function Contact() {
     if (!isValid) return;
 
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
 
-    setShowSuccess(true);
-    setTimeout(() => {
-      // pasamos el primer nombre si deseas usarlo en /page4
-      if (firstName) {
-        navigate('/page4', { state: { name: firstName } });
-      } else {
-        navigate('/page4');
+    try {
+      // Enviar email via API
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: `${formData.nombre} ${formData.apellidoPaterno}`,
+          email: formData.email || 'Sin email proporcionado',
+          phone: formData.telefono,
+          message: `Categoría: ${formData.categoria}\n\n${formData.mensaje}`,
+          type: 'mexico'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al enviar el mensaje');
       }
-    }, 3000);
+
+      setShowSuccess(true);
+      setTimeout(() => {
+        // pasamos el primer nombre si deseas usarlo en /page4
+        if (firstName) {
+          navigate('/page4', { state: { name: firstName } });
+        } else {
+          navigate('/page4');
+        }
+      }, 3000);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Hubo un error al enviar tu mensaje. Por favor intenta de nuevo.');
+      setIsSubmitting(false);
+    }
   };
 
   const formatPhoneDisplay = (value) => {
