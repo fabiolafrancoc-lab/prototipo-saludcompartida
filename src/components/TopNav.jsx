@@ -28,6 +28,15 @@ const TopNav = ({ logoSrc = '/saludcompartida logo WT.png', logoAlt = 'SaludComp
         <div className="flex items-center gap-4">
           <img src={logoSrc} alt={logoAlt} className="h-12 object-contain" />
         </div>
+        
+        {onBack && (
+          <button
+            onClick={_handleBack}
+            className="text-gray-600 hover:text-gray-900 font-medium text-lg transition-colors"
+          >
+            Volver
+          </button>
+        )}
       </div>
     </header>
   );
