@@ -505,6 +505,48 @@ export default function Therapy() {
 
     console.log('Agendamiento de terapia:', dataToSend);
     
+    // Enviar email de confirmación
+    try {
+      const emailMessage = `
+📅 NUEVA CITA DE TERAPIA AGENDADA
+
+--- Información del Paciente ---
+Nombre completo: ${formData.firstName} ${formData.lastName}
+Teléfono: +52${formData.phone}
+
+--- Detalles de la Sesión ---
+Fecha: ${selectedDate.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+Hora: ${selectedTime} hrs
+Tipo de sesión: Individual
+Método: Videollamada
+
+--- Motivos de Consulta ---
+${formData.concerns || 'No especificado'}
+
+--- Acción Requerida ---
+⚠️ IMPORTANTE: Contactar al paciente 24 horas antes para confirmar y enviar link de videollamada.
+      `.trim();
+
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: `${formData.firstName} ${formData.lastName}`,
+          phone: `+52${formData.phone}`,
+          message: emailMessage,
+          type: 'therapy'
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Error al enviar email de confirmación');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    
     setShowConfirmation(true);
   };
 

@@ -11,6 +11,7 @@ Una sola API KEY de Resend maneja TODOS los emails del prototipo, diferenciados 
 - **Asunto**: `[📞 CONTACTO] Nombre Usuario`
 - **Color**: Magenta (#E91E63)
 - **Usado en**: `/contact` (formulario de contacto México)
+- **Estado**: ✅ IMPLEMENTADO
 - **Campos**: nombre, apellido, teléfono, email (opcional), categoría, mensaje
 
 **Ejemplo de uso:**
@@ -33,6 +34,7 @@ fetch('/api/send-email', {
 - **Asunto**: `[🇺🇸 USA] Contacto Migrante - Nombre Usuario`
 - **Color**: Cyan (#06B6D4)
 - **Usado en**: `/migrantcontact` (formulario para usuarios en USA)
+- **Estado**: ✅ IMPLEMENTADO
 - **Campos**: nombre, mensaje
 
 **Ejemplo de uso:**
@@ -53,7 +55,8 @@ fetch('/api/send-email', {
 - **Asunto**: `[⭐ CALIFICACIÓN] Nombre Usuario`
 - **Color**: Amber (#F59E0B)
 - **Usado en**: `/rating` (sistema de calificaciones)
-- **Campos**: nombre, calificación (estrellas), comentario
+- **Estado**: ✅ IMPLEMENTADO
+- **Campos**: nombre, calificación (estrellas), motivos, comentario, info de contacto (si rating ≤ 3)
 
 **Ejemplo de uso:**
 ```javascript
@@ -73,8 +76,59 @@ fetch('/api/send-email', {
 - **Asunto**: `[💡 SUGERENCIA BLOG] Nombre Usuario`
 - **Color**: Purple (#8B5CF6)
 - **Usado en**: `/blog` (sugerencias de temas)
+- **Estado**: 🔜 PENDIENTE (API lista, falta formulario en blog)
 - **Campos**: nombre, email (opcional), tema sugerido
 
+---
+
+### 5️⃣ **Agendamiento de Terapia** (`type: 'therapy'`) ⭐ NUEVO
+- **Asunto**: `[🧠 CITA TERAPIA] Nombre Usuario`
+- **Color**: Green (#10B981)
+- **Usado en**: `/therapy` (agendamiento de citas psicológicas)
+- **Estado**: ✅ IMPLEMENTADO
+- **Campos**: nombre completo, teléfono, fecha, hora, motivos de consulta
+
+**Ejemplo de uso:**
+```javascript
+fetch('/api/send-email', {
+  method: 'POST',
+  body: JSON.stringify({
+    name: 'Pedro López',
+    message: 'Calificación: ⭐⭐⭐⭐⭐ (5 estrellas)\n\nMotivos: Excelente servicio, Rápida atención\n\nComentario: Todo fue perfecto...',
+    type: 'rating'
+  })
+});
+```
+
+---
+
+### 5️⃣ **Agendamiento de Terapia** (`type: 'therapy'`) ⭐ NUEVO
+**Ejemplo de uso:**
+```javascript
+fetch('/api/send-email', {
+  method: 'POST',
+  body: JSON.stringify({
+    name: 'Carlos Ramírez',
+    phone: '+525512345678',
+    message: `
+📅 NUEVA CITA DE TERAPIA AGENDADA
+
+Nombre: Carlos Ramírez
+Teléfono: +525512345678
+Fecha: Lunes, 15 de noviembre de 2025
+Hora: 14:00 hrs
+Tipo: Individual - Videollamada
+
+Motivos: Manejo de ansiedad y estrés laboral
+    `,
+    type: 'therapy'
+  })
+});
+```
+
+---
+
+### 6️⃣ **Sugerencia de Tema para Blog** (`type: 'blog-topic'`)
 **Ejemplo de uso:**
 ```javascript
 fetch('/api/send-email', {
@@ -99,6 +153,7 @@ Cuando recibas los emails en `ffranco@saludcompartida.com`, los verás así:
 ├─ [📞 CONTACTO] Juan Pérez               ← Magenta
 ├─ [🇺🇸 USA] Contacto Migrante - Maria    ← Cyan
 ├─ [⭐ CALIFICACIÓN] Pedro López          ← Amber
+├─ [🧠 CITA TERAPIA] Carlos Ramírez      ← Green 🆕
 └─ [💡 SUGERENCIA BLOG] Ana Martínez     ← Purple
 ```
 

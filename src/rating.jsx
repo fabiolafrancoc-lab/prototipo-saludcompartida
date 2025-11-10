@@ -118,16 +118,50 @@ const Rating = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
-    // Simulación de envío
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setShowSuccess(true);
-    
-    // Redirigir al dashboard después de 3 segundos
-    setTimeout(() => {
-      navigate('/page4');
-    }, 3000);
+    try {
+      // Preparar el mensaje con toda la información
+      const starsText = '⭐'.repeat(rating);
+      const reasonsList = selectedReasons.join(', ');
+      const otroText = showOtroInput && otroReason ? `\nOtro motivo: ${otroReason}` : '';
+      const commentText = comment ? `\n\nComentario adicional: ${comment}` : '';
+      const contactText = (rating <= 3 && contactInfo.nombre) 
+        ? `\n\n--- Información de Contacto ---\nNombre: ${contactInfo.nombre}\nEmail: ${contactInfo.email || 'No proporcionado'}` 
+        : '';
+      
+      const fullMessage = `Calificación: ${starsText} (${rating}/5 estrellas)\n\nMotivos seleccionados: ${reasonsList}${otroText}${commentText}${contactText}`;
+      
+      // Enviar email via API
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: contactInfo.nombre || nombreUsuario || 'Usuario Anónimo',
+          email: contactInfo.email || '',
+          message: fullMessage,
+          type: 'rating'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al enviar la calificación');
+      }
+
+      setIsSubmitting(false);
+      setShowSuccess(true);
+      
+      // Redirigir al dashboard después de 3 segundos
+      setTimeout(() => {
+        navigate('/page4');
+      }, 3000);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Hubo un error al enviar tu calificación. Pero la guardamos localmente.');
+      setIsSubmitting(false);
+      setShowSuccess(true);
+      setTimeout(() => navigate('/page4'), 3000);
+    }
   };
 
   const canProceed = () => {

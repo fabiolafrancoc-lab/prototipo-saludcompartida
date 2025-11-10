@@ -53,6 +53,11 @@ export default async function handler(req, res) {
         headerColor = '#8B5CF6'; // purple
         headerText = 'Nueva Sugerencia de Tema para Blog';
         break;
+      case 'therapy':
+        subject = `[🧠 CITA TERAPIA] ${name}`;
+        headerColor = '#10B981'; // green
+        headerText = '🗓️ Nueva Cita de Terapia Agendada';
+        break;
       case 'mexico':
       default:
         subject = `[📞 CONTACTO] ${name}`;
@@ -95,7 +100,13 @@ export default async function handler(req, res) {
             </div>
           </div>
           <div class="footer">
-            <p>Enviado desde: ${type === 'migrant' ? 'Formulario USA/Migrantes' : type === 'rating' ? 'Sistema de Calificaciones' : type === 'blog-topic' ? 'Blog - Sugerencias' : 'Formulario de Contacto México'}</p>
+            <p>Enviado desde: ${
+              type === 'migrant' ? 'Formulario USA/Migrantes' : 
+              type === 'rating' ? 'Sistema de Calificaciones' : 
+              type === 'blog-topic' ? 'Blog - Sugerencias' : 
+              type === 'therapy' ? 'Sistema de Agendamiento de Terapia' :
+              'Formulario de Contacto México'
+            }</p>
             <p>SaludCompartida © 2025</p>
           </div>
         </body>
