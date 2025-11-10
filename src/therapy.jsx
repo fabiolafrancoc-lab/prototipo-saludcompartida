@@ -474,7 +474,7 @@ export default function Therapy() {
 
   const handlePhoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, ''); // Solo números
-    if (value.length <= 10) {
+    if (value.length <= 8) {
       setFormData({...formData, phone: value});
     }
   };
@@ -487,8 +487,8 @@ export default function Therapy() {
       return;
     }
 
-    if (formData.phone.length !== 10) {
-      alert('Por favor ingresa un número de teléfono válido de 10 dígitos');
+    if (formData.phone.length !== 8) {
+      alert('Por favor ingresa un número de teléfono válido de 8 dígitos');
       return;
     }
 
@@ -856,12 +856,12 @@ export default function Therapy() {
                 value={formData.phone}
                 onChange={handlePhoneChange}
                 className="flex-1 px-4 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="1234567890"
-                maxLength="10"
+                placeholder="12345678"
+                maxLength="8"
               />
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              Ingresa 10 dígitos (ejemplo: 5512345678)
+              Ingresa 8 dígitos (ejemplo: 55123456)
             </p>
           </div>
 
