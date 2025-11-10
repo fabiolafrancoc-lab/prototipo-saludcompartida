@@ -33,11 +33,11 @@ export default function Pharmacy() {
   }, []);
 
   const nearbyPharmacies = [
-    { name: 'Farmacia Guadalajara', distance: '0.3 km', discount: '75%', logo: '🏥' },
-    { name: 'Farmacia Benavides', distance: '0.8 km', discount: '68%', logo: '🏥' },
-    { name: 'Farmacia del Ahorro', distance: '1.2 km', discount: '65%', logo: '🏥' },
-    { name: 'Farmacia San Pablo', distance: '1.5 km', discount: '62%', logo: '🏥' },
-    { name: 'Farmacia Similares', distance: '2.1 km', discount: '58%', logo: '🏥' },
+    { name: 'Farmacia Guadalajara', distance: '0.3 km', discount: '75%', logo: '/guadalajara.jpeg', featured: true },
+    { name: 'Farmacia Benavides', distance: '0.8 km', discount: '68%', logo: '/benavides.jpeg', featured: true },
+    { name: 'Farmacia del Ahorro', distance: '1.2 km', discount: '65%', logo: '/delahorro.jpeg', featured: true },
+    { name: 'Farmacia San Pablo', distance: '1.5 km', discount: '62%', logo: '🏥', featured: false },
+    { name: 'Farmacia Similares', distance: '2.1 km', discount: '58%', logo: '🏥', featured: false },
   ];
 
   const handleShareLocation = () => {
@@ -312,23 +312,34 @@ export default function Pharmacy() {
                 {nearbyPharmacies.map((pharmacy, index) => (
                   <div 
                     key={index}
-                    className="bg-white rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow border-2 border-gray-100 hover:border-cyan-300"
+                    className={`relative bg-white rounded-xl p-5 shadow-lg hover:shadow-xl transition-all ${
+                      pharmacy.featured 
+                        ? 'border-3 border-gradient-to-r from-yellow-400 to-amber-500 ring-2 ring-yellow-400 ring-opacity-50' 
+                        : 'border-2 border-gray-100 hover:border-cyan-300'
+                    }`}
                   >
+                    {pharmacy.featured && (
+                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                          ⭐ FARMACIA DESTACADA
+                        </span>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-lg overflow-hidden flex items-center justify-center bg-white border border-gray-200">
-                          {index === 0 ? (
-                            <img src="/guadalajara.jpeg" alt="Farmacia Guadalajara" className="w-full h-full object-contain p-1" />
-                          ) : index === 1 ? (
-                            <img src="/benavides.jpeg" alt="Farmacia Benavides" className="w-full h-full object-contain p-1" />
-                          ) : index === 2 ? (
-                            <img src="/delahorro.jpeg" alt="Farmacia del Ahorro" className="w-full h-full object-contain p-1" />
+                        <div className={`w-16 h-16 rounded-lg overflow-hidden flex items-center justify-center bg-white ${
+                          pharmacy.featured ? 'border-2 border-yellow-400' : 'border border-gray-200'
+                        }`}>
+                          {typeof pharmacy.logo === 'string' && pharmacy.logo.startsWith('/') ? (
+                            <img src={pharmacy.logo} alt={pharmacy.name} className="w-full h-full object-contain p-1" />
                           ) : (
-                            <span className="text-3xl">{index === 3 ? '⚕️' : '💊'}</span>
+                            <span className="text-3xl">{pharmacy.logo}</span>
                           )}
                         </div>
                         <div>
-                          <div className="font-bold text-lg text-gray-800">{pharmacy.name}</div>
+                          <div className={`font-bold text-lg ${pharmacy.featured ? 'text-amber-600' : 'text-gray-800'}`}>
+                            {pharmacy.name}
+                          </div>
                           <div className="text-gray-500 text-sm flex items-center gap-1">
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
@@ -338,12 +349,18 @@ export default function Pharmacy() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-3xl font-bold text-pink-600">{pharmacy.discount}</div>
+                        <div className={`text-3xl font-bold ${pharmacy.featured ? 'text-amber-600' : 'text-pink-600'}`}>
+                          {pharmacy.discount}
+                        </div>
                         <div className="text-xs text-gray-500">descuento</div>
                       </div>
                     </div>
                     
-                    <button className="w-full mt-4 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white py-2 rounded-lg font-semibold hover:from-cyan-600 hover:to-cyan-700 transition-all">
+                    <button className={`w-full mt-4 py-2 rounded-lg font-semibold transition-all ${
+                      pharmacy.featured 
+                        ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white hover:from-yellow-500 hover:to-amber-600' 
+                        : 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-600 hover:to-cyan-700'
+                    }`}>
                       Ver Mapa y Dirección
                     </button>
                   </div>

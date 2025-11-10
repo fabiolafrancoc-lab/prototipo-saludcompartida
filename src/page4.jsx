@@ -220,9 +220,9 @@ const Page4 = () => {
     }
   }, []);
 
-  // Show location banner when geolocation is detected
+  // Show location banner when geolocation is detected (only for Mexico)
   useEffect(() => {
-    if (!geoLoading && country) {
+    if (!geoLoading && country && isMexicoUser(countryCode)) {
       setShowLocationBanner(true);
       // Auto-hide after 5 seconds
       const timer = setTimeout(() => {
@@ -230,7 +230,7 @@ const Page4 = () => {
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [geoLoading, country]);
+  }, [geoLoading, country, countryCode]);
   
   const services = [
     {

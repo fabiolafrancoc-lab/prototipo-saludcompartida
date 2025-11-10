@@ -15,14 +15,13 @@ export default function Page3() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Auto-select country code based on geolocation
+  // Auto-select country code based on geolocation (only for Mexico)
   useEffect(() => {
     if (!geoLoading && detectedCountry) {
-      if (detectedCountry === 'US') {
-        setCountryCode('+1');
-      } else if (detectedCountry === 'MX') {
+      if (detectedCountry === 'MX') {
         setCountryCode('+52');
       }
+      // For US or other countries, keep default +52 (Mexico)
     }
   }, [detectedCountry, geoLoading]);
 
