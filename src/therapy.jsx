@@ -729,12 +729,30 @@ export default function Therapy() {
 
         {/* Videos de Salud Mental */}
         <div className="grid md:grid-cols-2 gap-8 mb-12">
-          <div className="rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center" style={{ minHeight: '300px' }}>
-            <p className="text-gray-600 text-lg px-8 text-center">Video de salud mental</p>
+          <div className="rounded-2xl overflow-hidden shadow-xl">
+            <video 
+              src="https://p0iccshbkx3s8qpk.public.blob.vercel-storage.com/womansreaming.mov"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              Tu navegador no soporta el video.
+            </video>
           </div>
 
-          <div className="rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-teal-100 to-blue-100 flex items-center justify-center" style={{ minHeight: '300px' }}>
-            <p className="text-gray-600 text-lg px-8 text-center">Video de bienestar emocional</p>
+          <div className="rounded-2xl overflow-hidden shadow-xl">
+            <video 
+              src="https://p0iccshbkx3s8qpk.public.blob.vercel-storage.com/mentalhealthhappy.mov"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              Tu navegador no soporta el video.
+            </video>
           </div>
         </div>
 

@@ -112,7 +112,7 @@ export default function Pharmacy() {
                 className="w-full h-full object-cover"
                 style={{ minHeight: '300px', maxHeight: '500px' }}
               >
-                <source src="/pharmacy1.mp4" type="video/mp4" />
+                <source src="https://p0iccshbkx3s8qpk.public.blob.vercel-storage.com/pharmacy1.mov" type="video/mp4" />
               </video>
             </div>
             
@@ -127,7 +127,7 @@ export default function Pharmacy() {
                 className="w-full h-full object-cover"
                 style={{ minHeight: '300px', maxHeight: '500px' }}
               >
-                <source src="/pharmacy2.mp4" type="video/mp4" />
+                <source src="https://p0iccshbkx3s8qpk.public.blob.vercel-storage.com/pharmacy2.mov" type="video/mp4" />
               </video>
             </div>
           </div>

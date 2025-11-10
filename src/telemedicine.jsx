@@ -64,9 +64,21 @@ export default function Telemedicine() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Section */}
+        {/* Hero Section con Video Background */}
         <div className="relative bg-gradient-to-r from-teal-600 to-teal-500 rounded-3xl overflow-hidden shadow-2xl mb-8">
           <div className="absolute inset-0 bg-black/20"></div>
+          
+          {/* Video Background */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="absolute inset-0 w-full h-full object-cover opacity-30"
+          >
+            <source src="https://p0iccshbkx3s8qpk.public.blob.vercel-storage.com/doctorvideo.mov" type="video/mp4" />
+          </video>
 
           <div className="relative z-10 px-8 py-12 text-white">
             <div className="flex items-center gap-3 mb-4">
@@ -125,8 +137,20 @@ export default function Telemedicine() {
           </div>
         </div>
 
-        {/* Video Destacado Expandido - SIN VERDE */}
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl mb-8 bg-gradient-to-br from-teal-500 to-blue-600" style={{ minHeight: '400px' }}>
+        {/* Video Destacado Expandido */}
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl mb-8">
+          {/* Video */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="w-full h-full object-cover min-h-[400px]"
+          >
+            <source src="https://p0iccshbkx3s8qpk.public.blob.vercel-storage.com/patient.mov" type="video/mp4" />
+          </video>
+
           {/* Solo gradient oscuro abajo para legibilidad del texto */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
 
