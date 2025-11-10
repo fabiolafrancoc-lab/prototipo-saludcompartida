@@ -465,7 +465,12 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
-                <p className="text-gray-600">contact@saludcompartida.com</p>
+                <a 
+                  href="mailto:contact@saludcompartida.com"
+                  className="text-cyan-600 hover:text-cyan-700 hover:underline transition-colors"
+                >
+                  contact@saludcompartida.com
+                </a>
               </div>
             </div>
 

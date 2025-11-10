@@ -381,7 +381,7 @@ const Page4 = () => {
       <main className="max-w-6xl mx-auto px-6 py-12">
         <div className="text-center mb-12">
           {userName && (
-            <p className="text-xl text-gray-600 mb-4">
+            <p className="text-lg text-gray-600 mb-4">
               ¡Hola <span className="font-bold text-cyan-600">{userName}</span>!
             </p>
           )}

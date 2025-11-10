@@ -139,18 +139,6 @@ export default function Account() {
           </p>
         </div>
 
-        {/* Success Message */}
-        {showSuccess && (
-          <div className="mb-6 bg-green-50 border-l-4 border-green-500 rounded-lg p-4">
-            <div className="flex items-center">
-              <svg className="w-6 h-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <p className="text-green-800 font-semibold">¡Información guardada exitosamente!</p>
-            </div>
-          </div>
-        )}
-
         {/* User Information Section */}
         <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
           <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-cyan-100">
@@ -356,6 +344,18 @@ export default function Account() {
             {isSaving ? 'Guardando...' : 'Guardar Información'}
           </button>
         </div>
+
+        {/* Success Message */}
+        {showSuccess && (
+          <div className="mt-6 bg-green-50 border-l-4 border-green-500 rounded-lg p-4 mx-auto max-w-md">
+            <div className="flex items-center">
+              <svg className="w-6 h-6 text-green-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <p className="text-green-800 font-semibold">¡Información guardada exitosamente!</p>
+            </div>
+          </div>
+        )}
 
         {/* Info Box */}
         <div className="mt-8 bg-cyan-50 border-l-4 border-cyan-500 rounded-lg p-4">
