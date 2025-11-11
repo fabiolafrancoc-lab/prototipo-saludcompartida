@@ -190,12 +190,12 @@ function App() {
 Nombre completo: ${migrantFirstName} ${migrantLastName} ${migrantMotherLastName || ''}
 Email: ${migrantEmail}
 Teléfono (WhatsApp): +1 ${migrantPhone}
-🔑 CÓDIGO DE ACCESO: ${migrantResult.accessCode}
+🔑 CÓDIGO DE ACCESO: ${result.migrantAccessCode}
 
 --- DATOS DEL FAMILIAR EN MÉXICO ---
 Nombre completo: ${familyFirstName} ${familyLastName} ${familyMotherLastName || ''}
 Teléfono (WhatsApp): +52 ${familyPhone}
-🔑 CÓDIGO DE ACCESO: ${familyResult.accessCode}
+🔑 CÓDIGO DE ACCESO: ${result.familyAccessCode}
 País: ${familyCountry}
 
 --- INFORMACIÓN ADICIONAL ---
@@ -204,8 +204,8 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
 
 --- SIGUIENTE PASO ---
 ⚠️ IMPORTANTE: Los usuarios deben usar su código de acceso para ingresar.
-- Migrante (USA): ${migrantResult.accessCode}
-- Familiar (México): ${familyResult.accessCode}
+- Migrante (USA): ${result.migrantAccessCode}
+- Familiar (México): ${result.familyAccessCode}
         `.trim();
 
         await fetch('/api/send-email', {
