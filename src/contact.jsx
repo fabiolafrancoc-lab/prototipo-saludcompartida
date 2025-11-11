@@ -440,7 +440,7 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
                     Acepto los{' '}
                     <button
                       type="button"
-                      onClick={() => navigate('/terms')}
+                      onClick={() => navigate('/terms', { state: { from: '/contact' } })}
                       className="text-cyan-600 font-semibold hover:text-cyan-700 underline"
                     >
                       Términos y Condiciones
@@ -448,7 +448,7 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
                     {' '}y las{' '}
                     <button
                       type="button"
-                      onClick={() => navigate('/privacy')}
+                      onClick={() => navigate('/privacy', { state: { from: '/contact' } })}
                       className="text-cyan-600 font-semibold hover:text-cyan-700 underline"
                     >
                       Políticas de Privacidad

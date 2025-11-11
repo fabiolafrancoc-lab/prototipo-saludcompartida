@@ -953,7 +953,7 @@ export default function Privacy() {
             ¿Tienes preguntas sobre los términos de servicio?
           </p>
           <button
-            onClick={() => navigate('/terms')}
+            onClick={() => navigate('/terms', { state: { from: '/privacy' } })}
             className="text-purple-600 hover:text-purple-700 font-semibold underline"
           >
             Lee nuestros Términos y Condiciones →

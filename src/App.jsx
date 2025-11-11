@@ -550,7 +550,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
 
                     <p className="text-center text-sm text-gray-500 leading-relaxed">
                       Al registrarte, aceptas nuestros{' '}
-                      <button className="text-cyan-600 hover:text-cyan-700 font-medium underline">
+                      <button 
+                        onClick={() => navigate('/terms', { state: { from: '/' } })}
+                        className="text-cyan-600 hover:text-cyan-700 font-medium underline"
+                      >
                         términos y condiciones
                       </button>
                     </p>
