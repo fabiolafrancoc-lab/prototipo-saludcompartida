@@ -776,45 +776,6 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                 </div>
               </div>
 
-              {/* CÓDIGOS DE ACCESO GENERADOS */}
-              {migrantAccessCode && familyAccessCode && (
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-6 mb-6">
-                  <div className="flex items-start gap-3 mb-4">
-                    <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                    </svg>
-                    <div className="flex-1">
-                      <p className="font-bold text-green-900 mb-2 text-lg">🎉 ¡Códigos de Acceso Generados!</p>
-                      <p className="text-sm text-green-700 mb-4">
-                        Guarda estos códigos. Los necesitarás para ingresar a la plataforma.
-                      </p>
-                      
-                      <div className="space-y-3">
-                        <div className="bg-white rounded-lg p-4 border border-green-200">
-                          <p className="text-xs text-gray-600 mb-1">Código Migrante (USA)</p>
-                          <p className="text-2xl font-bold text-green-700 font-mono tracking-wider">
-                            {migrantAccessCode}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">Para: {migrantFirstName} {migrantLastName}</p>
-                        </div>
-                        
-                        <div className="bg-white rounded-lg p-4 border border-green-200">
-                          <p className="text-xs text-gray-600 mb-1">Código Familiar (México)</p>
-                          <p className="text-2xl font-bold text-green-700 font-mono tracking-wider">
-                            {familyAccessCode}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">Para: {familyFirstName} {familyLastName}</p>
-                        </div>
-                      </div>
-                      
-                      <p className="text-xs text-green-600 mt-3 font-semibold">
-                        💡 También enviamos estos códigos por email a {migrantEmail}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               <div className="bg-cyan-50 border border-cyan-200 rounded-2xl p-6">
                 <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -833,7 +794,7 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                   </li>
                   <li className="flex gap-3">
                     <span className="font-bold text-cyan-600 min-w-[24px]">3.</span>
-                    <span>Activa los servicios inmediatamente con tu código</span>
+                    <span>Usa el enlace en el mensaje para ingresar y activar los servicios</span>
                   </li>
                 </ol>
               </div>
