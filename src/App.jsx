@@ -21,6 +21,7 @@ function App() {
   const [familyFirstName, setFamilyFirstName] = useState('');
   const [familyLastName, setFamilyLastName] = useState('');
   const [familyMotherLastName, setFamilyMotherLastName] = useState('');
+  const [familyEmail, setFamilyEmail] = useState('');
   const [familyPhone, setFamilyPhone] = useState('');
   
   // Estados para los códigos de acceso generados
@@ -107,7 +108,7 @@ function App() {
           firstName: familyFirstName,
           lastName: familyLastName,
           motherLastName: familyMotherLastName,
-          email: migrantEmail, // Usar el mismo email del migrante
+          email: familyEmail || migrantEmail, // Usar email del familiar si existe, sino el del migrante
           userType: 'family',
           linkedPhone: cleanMigrantPhone
         });
@@ -235,12 +236,15 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
             
             <button
               onClick={() => navigate('/page3')}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-full font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-pulse cursor-pointer"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
-              <span>¿Ya te registraste? ¡Ingresa con tu teléfono!</span>
+              <div className="text-left">
+                <div className="text-sm font-normal text-emerald-100">¿Ya tienes tu código?</div>
+                <div className="text-lg font-bold">Ingresa el código que recibiste vía WhatsApp</div>
+              </div>
             </button>
           </div>
           
@@ -480,7 +484,7 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">Apellido Materno</label>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">Apellido Materno <span className="text-gray-500 font-normal">(opcional)</span></label>
                           <input
                             type="text"
                             value={familyMotherLastName}
@@ -489,6 +493,20 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                             className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
                           />
                         </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Correo Electrónico <span className="text-gray-500 font-normal">(opcional)</span></label>
+                        <input
+                          type="email"
+                          value={familyEmail}
+                          onChange={(e) => setFamilyEmail(e.target.value)}
+                          placeholder="rosa.hernandez@email.com"
+                          className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
+                        />
+                        <p className="mt-2 text-xs text-gray-500">
+                          Si tu familiar tiene email, lo usaremos para enviarle su código de acceso
+                        </p>
                       </div>
 
                       <div>
