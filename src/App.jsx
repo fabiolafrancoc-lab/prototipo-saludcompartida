@@ -24,6 +24,10 @@ function App() {
   const [familyEmail, setFamilyEmail] = useState('');
   const [familyPhone, setFamilyPhone] = useState('');
   
+  // Estados para validación y errores
+  const [formError, setFormError] = useState('');
+  const [missingFields, setMissingFields] = useState([]);
+  
   // Estados para los códigos de acceso generados
   const [migrantAccessCode, setMigrantAccessCode] = useState('');
   const [familyAccessCode, setFamilyAccessCode] = useState('');
@@ -79,6 +83,28 @@ function App() {
   };
 
   const handleRegister = async () => {
+    // Limpiar errores previos
+    setFormError('');
+    setMissingFields([]);
+    
+    // Validar campos requeridos
+    const missing = [];
+    if (!migrantFirstName) missing.push('migrantFirstName');
+    if (!migrantLastName) missing.push('migrantLastName');
+    if (!migrantEmail) missing.push('migrantEmail');
+    if (!migrantPhone || migrantPhone.replace(/\s/g, '').length < 10) missing.push('migrantPhone');
+    if (!familyCountry) missing.push('familyCountry');
+    if (!familyFirstName) missing.push('familyFirstName');
+    if (!familyLastName) missing.push('familyLastName');
+    if (!familyPhone || familyPhone.replace(/\s/g, '').length < 10) missing.push('familyPhone');
+    
+    if (missing.length > 0) {
+      setMissingFields(missing);
+      setFormError('Por favor completa toda la información requerida');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    
     if (migrantFirstName && migrantLastName && migrantEmail && 
         migrantPhone && familyCountry && familyFirstName && familyLastName && 
         familyPhone) {
@@ -101,7 +127,8 @@ function App() {
         });
         
         if (!migrantResult.success) {
-          alert('Error al registrar migrante: ' + migrantResult.error);
+          setFormError('Error al registrar: ' + migrantResult.error);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
         
@@ -118,7 +145,8 @@ function App() {
         });
         
         if (!familyResult.success) {
-          alert('Error al registrar familiar: ' + familyResult.error);
+          setFormError('Error al registrar: ' + familyResult.error);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
         
@@ -235,6 +263,21 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
               ⚡ ¡Apúrate, quedan pocos cupos!
             </p>
           </div>
+
+          {/* Mensaje de Error */}
+          {formError && (
+            <div className="max-w-2xl mx-auto mb-6">
+              <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 flex items-start gap-3">
+                <svg className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <p className="font-bold text-red-900 mb-1">Error en el registro</p>
+                  <p className="text-sm text-red-700">{formError}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="mb-10 flex justify-center">
             <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 border-2 border-cyan-300 rounded-2xl p-6 shadow-lg max-w-2xl">
@@ -374,7 +417,9 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                             value={migrantFirstName}
                             onChange={(e) => setMigrantFirstName(e.target.value)}
                             placeholder="María"
-                            className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
+                            className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
+                              missingFields.includes('migrantFirstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-cyan-500'
+                            }`}
                           />
                         </div>
                         <div>
@@ -384,7 +429,9 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                             value={migrantLastName}
                             onChange={(e) => setMigrantLastName(e.target.value)}
                             placeholder="García"
-                            className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
+                            className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
+                              missingFields.includes('migrantLastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-cyan-500'
+                            }`}
                           />
                         </div>
                         <div>
@@ -406,7 +453,9 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           value={migrantEmail}
                           onChange={(e) => setMigrantEmail(e.target.value)}
                           placeholder="maria.garcia@email.com"
-                          className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
+                          className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
+                            missingFields.includes('migrantEmail') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-cyan-500'
+                          }`}
                         />
                       </div>
 
@@ -425,7 +474,9 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                             onChange={(e) => setMigrantPhone(formatUSPhone(e.target.value))}
                             placeholder="(305) 123-4567"
                             maxLength="14"
-                            className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
+                            className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
+                              missingFields.includes('migrantPhone') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-cyan-500'
+                            }`}
                           />
                         </div>
                         <p className="mt-2 text-xs text-gray-500">
@@ -475,7 +526,9 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                             value={familyFirstName}
                             onChange={(e) => setFamilyFirstName(e.target.value)}
                             placeholder="Rosa"
-                            className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
+                            className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
+                              missingFields.includes('familyFirstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-pink-500'
+                            }`}
                           />
                         </div>
                         <div>
@@ -485,7 +538,9 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                             value={familyLastName}
                             onChange={(e) => setFamilyLastName(e.target.value)}
                             placeholder="Hernández"
-                            className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
+                            className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
+                              missingFields.includes('familyLastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-pink-500'
+                            }`}
                           />
                         </div>
                         <div>
@@ -529,7 +584,9 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                             onChange={(e) => setFamilyPhone(formatMXPhone(e.target.value))}
                             placeholder="(55) 1234-5678"
                             maxLength="14"
-                            className="w-full pl-14 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
+                            className={`w-full pl-14 pr-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
+                              missingFields.includes('familyPhone') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-pink-500'
+                            }`}
                           />
                         </div>
                         <p className="mt-2 text-xs text-gray-500">
