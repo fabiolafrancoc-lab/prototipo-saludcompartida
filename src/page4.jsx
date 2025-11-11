@@ -381,14 +381,14 @@ const Page4 = () => {
       <main className="max-w-6xl mx-auto px-6 py-12">
         <div className="text-center mb-12">
           {userName && (
-            <p className="text-5xl text-gray-600 mb-4">
-              ¡Hola <span className="font-bold text-cyan-600">{userName}</span>!
-            </p>
+            <h1 className="text-6xl md:text-7xl font-extrabold mb-6 leading-tight">
+              ¡Hola <span className="text-cyan-500">{userName}</span>!
+            </h1>
           )}
-          <h1 className="text-5xl font-bold text-gray-800 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
             Todo lo que tu familia necesita
-          </h1>
-          <p className="text-2xl text-gray-600">
+          </h2>
+          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
             Porque cuidarlos no tiene que ser difícil ni caro
           </p>
         </div>
