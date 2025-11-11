@@ -99,85 +99,24 @@ export default function Page3() {
   }, [whatsappNumber, countryCode, useSpecialCode, userDataLoaded]);
 
   const handleAccessCode = async () => {
-    // Si está usando código especial, validar directamente
-    if (useSpecialCode && specialCode.trim()) {
-      const upperCode = specialCode.trim().toUpperCase();
-      
-      // Primero revisar si es un código demo
-      if (SPECIAL_ACCESS_CODES[upperCode]) {
-        const codeData = SPECIAL_ACCESS_CODES[upperCode];
-        
-        // Cargar datos demo del usuario
-        const userData = {
-          ...codeData.demoUser,
-          phoneId: `${codeData.demoUser.countryCode}${codeData.demoUser.phone}`,
-          accessType: codeData.type,
-          isDemo: true
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        
-        // Registrar el código usado (para analytics)
-        const usedCodes = JSON.parse(localStorage.getItem('usedSpecialCodes') || '[]');
-        usedCodes.push({
-          code: upperCode,
-          type: codeData.type,
-          usedAt: new Date().toISOString()
-        });
-        localStorage.setItem('usedSpecialCodes', JSON.stringify(usedCodes));
-        
-        // Navegar a la ruta correspondiente
-        setErrors({});
-        navigate(codeData.route);
-        return;
-      }
-      
-      // Si no es código demo, buscar en Supabase
-      try {
-        const result = await getUserByAccessCode(upperCode);
-        
-        if (result.success && result.data) {
-          const dbUser = result.data;
-          
-          const userData = {
-            firstName: dbUser.first_name,
-            lastName: dbUser.last_name,
-            motherLastName: dbUser.mother_last_name || '',
-            email: dbUser.email,
-            phone: dbUser.phone,
-            countryCode: dbUser.country_code,
-            phoneId: `${dbUser.country_code}${dbUser.phone}`,
-            accessCode: dbUser.access_code,
-            type: dbUser.user_type,
-            registeredAt: dbUser.created_at
-          };
-          
-          localStorage.setItem('currentUser', JSON.stringify(userData));
-          setCurrentUser(userData); // Actualizar contexto
-          setErrors({});
-          
-          // Navegar según el tipo de usuario
-          if (dbUser.user_type === 'migrant' || dbUser.country_code === '+1') {
-            navigate('/migrant');
-          } else {
-            navigate('/page4');
-          }
-        } else {
-          setErrors({ specialCode: 'Código no válido. Verifica e intenta nuevamente.' });
-        }
-      } catch (error) {
-        console.error('Error validando código:', error);
-        setErrors({ specialCode: 'Error al validar código. Intenta nuevamente.' });
-      }
-      return;
+    // Validar campos requeridos
+    const newErrors = {};
+    
+    if (!specialCode.trim()) {
+      newErrors.specialCode = 'El código de acceso es requerido';
     }
     
-    // Validación normal por teléfono (fallback a localStorage)
-    const newErrors = {};
+    if (!firstName.trim()) {
+      newErrors.firstName = 'El nombre es requerido';
+    }
+    
+    if (!lastName.trim()) {
+      newErrors.lastName = 'El apellido paterno es requerido';
+    }
     
     if (!whatsappNumber.trim()) {
       newErrors.whatsappNumber = 'El número de WhatsApp es requerido';
-    } else if (whatsappNumber.trim().length !== 10) {
+    } else if (whatsappNumber.replace(/\s/g, '').length !== 10) {
       newErrors.whatsappNumber = 'Debe tener 10 dígitos';
     }
     
@@ -191,14 +130,82 @@ export default function Page3() {
       return;
     }
     
+    const upperCode = specialCode.trim().toUpperCase();
+    
+    // Primero revisar si es un código demo/especial
+    if (SPECIAL_ACCESS_CODES[upperCode]) {
+      const codeData = SPECIAL_ACCESS_CODES[upperCode];
+      
+      // Cargar datos demo del usuario
+      const userData = {
+        ...codeData.demoUser,
+        phoneId: `${codeData.demoUser.countryCode}${codeData.demoUser.phone}`,
+        accessType: codeData.type,
+        isDemo: true
+      };
+      
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+      
+      // Registrar el código usado (para analytics)
+      const usedCodes = JSON.parse(localStorage.getItem('usedSpecialCodes') || '[]');
+      usedCodes.push({
+        code: upperCode,
+        type: codeData.type,
+        usedAt: new Date().toISOString()
+      });
+      localStorage.setItem('usedSpecialCodes', JSON.stringify(usedCodes));
+      
+      // Navegar a la ruta correspondiente
+      setErrors({});
+      navigate(codeData.route);
+      return;
+    }
+    
+    // Si no es código demo, buscar en Supabase
+    try {
+      const result = await getUserByAccessCode(upperCode);
+      
+      if (result.success && result.data) {
+        const dbUser = result.data;
+        
+        const userData = {
+          firstName: dbUser.first_name,
+          lastName: dbUser.last_name,
+          motherLastName: dbUser.mother_last_name || '',
+          email: dbUser.email,
+          phone: dbUser.phone,
+          countryCode: dbUser.country_code,
+          phoneId: `${dbUser.country_code}${dbUser.phone}`,
+          accessCode: dbUser.access_code,
+          type: dbUser.user_type,
+          registeredAt: dbUser.created_at
+        };
+        
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+        setCurrentUser(userData); // Actualizar contexto
+        setErrors({});
+        
+        // Navegar según el tipo de usuario
+        if (dbUser.user_type === 'migrant' || dbUser.country_code === '+1') {
+          navigate('/migrant');
+        } else {
+          navigate('/page4');
+        }
+        return;
+      }
+    } catch (error) {
+      console.error('Error validando código:', error);
+    }
+    
+    // Si llegamos aquí, el código no es válido
     // Construir el ID único con código de país + número
-    const uniquePhoneId = `${countryCode}${whatsappNumber.trim()}`;
+    const uniquePhoneId = `+52${whatsappNumber.replace(/\s/g, '')}`;
     
     // Verificar si el teléfono está registrado en localStorage (compatibilidad)
     const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
     
     if (registeredUsers[uniquePhoneId]) {
-      // Usuario encontrado - usar los datos del registro original (ya precargados)
+      // Usuario encontrado por teléfono - usar los datos del registro original
       const originalData = registeredUsers[uniquePhoneId];
       
       const userData = {
@@ -207,7 +214,7 @@ export default function Page3() {
         motherLastName: originalData.motherLastName || '',
         email: originalData.email || '',
         phone: originalData.phone,
-        countryCode: countryCode,
+        countryCode: '+52',
         phoneId: uniquePhoneId,
         type: originalData.type || 'user',
         registeredAt: originalData.registeredAt
@@ -217,13 +224,13 @@ export default function Page3() {
       
       // Limpiar errores y navegar según el tipo de usuario
       setErrors({});
-      if (originalData.type === 'migrant' || countryCode === '+1') {
+      if (originalData.type === 'migrant') {
         navigate('/migrant');
       } else {
         navigate('/page4');
       }
     } else {
-      // Usuario no encontrado - mostrar formulario de consulta
+      // Código no válido y teléfono no registrado - mostrar formulario de consulta
       setShowErrorForm(true);
       setErrors({});
     }
