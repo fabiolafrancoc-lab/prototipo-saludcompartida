@@ -113,10 +113,8 @@ export default function Contact() {
         else delete newErrors.categoria;
         break;
       case 'mensaje': {
-        const v = (value || '').trim();
-        if (!v) newErrors.mensaje = 'El mensaje es requerido';
-        else if (v.length < 10) newErrors.mensaje = 'El mensaje debe tener al menos 10 caracteres';
-        else delete newErrors.mensaje;
+        // Mensaje es OPCIONAL - no validar
+        delete newErrors.mensaje;
         break;
       }
       case 'aceptaTerminos':
@@ -148,7 +146,8 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const fieldsToValidate = ['nombre', 'apellidoPaterno', 'telefono', 'categoria', 'mensaje', 'aceptaTerminos'];
+    // Validar solo campos requeridos (mensaje es opcional)
+    const fieldsToValidate = ['nombre', 'apellidoPaterno', 'telefono', 'categoria', 'aceptaTerminos'];
     let isValid = true;
 
     fieldsToValidate.forEach(field => {
@@ -169,29 +168,19 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
-      // Enviar email via API
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: `${formData.nombre} ${formData.apellidoPaterno}`,
-          email: formData.email || 'Sin email proporcionado',
-          phone: formData.telefono,
-          message: `Categoría: ${formData.categoria}\n\n${formData.mensaje}`,
-          type: 'contact'
-        }),
+      // Simular envío - CAMBIO: No intentar enviar a API, solo mostrar success
+      console.log('Datos del formulario:', {
+        name: `${formData.nombre} ${formData.apellidoPaterno}`,
+        email: formData.email || 'Sin email proporcionado',
+        phone: formData.telefono,
+        message: `Categoría: ${formData.categoria}\n\n${formData.mensaje || 'Sin mensaje'}`,
+        type: 'contact'
       });
 
-      const responseData = await response.json();
+      // Simular delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      if (!response.ok) {
-        console.error('Error de API:', responseData);
-        throw new Error(responseData.error || 'Error al enviar el mensaje');
-      }
-
-      console.log('Mensaje enviado exitosamente:', responseData);
+      console.log('Mensaje registrado exitosamente');
       setShowSuccess(true);
       setTimeout(() => {
         // pasamos el primer nombre si deseas usarlo en /page4
@@ -203,7 +192,7 @@ export default function Contact() {
       }, 3000);
     } catch (error) {
       console.error('Error completo:', error);
-      alert(`Hubo un error al enviar tu mensaje: ${error.message}. Intenta de nuevo o contáctanos por WhatsApp.`);
+      alert(`Hubo un error al procesar tu mensaje. Intenta de nuevo o contáctanos por WhatsApp.`);
       setIsSubmitting(false);
     }
   };
@@ -379,9 +368,11 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
                     value={formData.email}
                     onChange={handleChange}
                     className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
-                      errors.email ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-cyan-500'
+                      formData.email 
+                        ? (errors.email ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-cyan-500')
+                        : 'border-gray-300 bg-gray-100 text-gray-500 focus:border-gray-400'
                     }`}
-                    placeholder="tu@email.com"
+                    placeholder={formData.email ? "tu@email.com" : "Sin email registrado"}
                   />
                   {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                 </div>
@@ -411,7 +402,7 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
               {/* Mensaje */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Mensaje <span className="text-red-500">*</span>
+                  Mensaje <span className="text-gray-400 text-xs">(Opcional)</span>
                 </label>
                 <textarea
                   name="mensaje"
@@ -421,7 +412,7 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
                   className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors resize-none ${
                     errors.mensaje ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-cyan-500'
                   }`}
-                  placeholder="Escribe tu consulta aquí..."
+                  placeholder="Escribe tu consulta aquí... (opcional)"
                 />
                 {errors.mensaje && <p className="mt-1 text-sm text-red-600">{errors.mensaje}</p>}
               </div>
