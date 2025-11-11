@@ -11,22 +11,28 @@ export default function Pharmacy() {
   // Cargar nombre del usuario desde localStorage
   useEffect(() => {
     try {
-      const accessUserData = localStorage.getItem('accessUser');
-      if (accessUserData) {
-        const userData = JSON.parse(accessUserData);
-        // Solo mostrar nombre si el código es MX2025
-        if (userData.accessCode === 'MX2025' && userData.firstName) {
-          setNombreUsuario(userData.firstName);
-          setApellidoPaterno(userData.lastName || '');
-        } else {
-          setNombreUsuario('Usuario');
-          setApellidoPaterno('SaludCompartida');
+      // Primero intentar con currentUser (nuevo sistema)
+      let userData = null;
+      const currentUserData = localStorage.getItem('currentUser');
+      if (currentUserData) {
+        userData = JSON.parse(currentUserData);
+      } else {
+        // Fallback a accessUser (sistema anterior)
+        const accessUserData = localStorage.getItem('accessUser');
+        if (accessUserData) {
+          userData = JSON.parse(accessUserData);
         }
+      }
+      
+      if (userData && userData.firstName) {
+        setNombreUsuario(userData.firstName);
+        setApellidoPaterno(userData.lastName || '');
       } else {
         setNombreUsuario('Usuario');
         setApellidoPaterno('SaludCompartida');
       }
     } catch (error) {
+      console.error('Error cargando datos del usuario:', error);
       setNombreUsuario('Usuario');
       setApellidoPaterno('SaludCompartida');
     }
