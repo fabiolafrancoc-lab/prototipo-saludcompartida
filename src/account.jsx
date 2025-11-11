@@ -8,9 +8,14 @@ export default function Account() {
   // Get user name from location state or localStorage
   let storedUserData = null;
   try {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
-    if (stored) {
-      storedUserData = JSON.parse(stored);
+    // Check currentUser first (new system), fallback to accessUser
+    const currentUserStored = typeof window !== 'undefined' ? localStorage.getItem('currentUser') : null;
+    const accessUserStored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
+    
+    if (currentUserStored) {
+      storedUserData = JSON.parse(currentUserStored);
+    } else if (accessUserStored) {
+      storedUserData = JSON.parse(accessUserStored);
     }
   } catch (e) {
     storedUserData = null;
