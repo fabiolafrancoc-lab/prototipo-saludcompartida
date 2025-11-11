@@ -131,7 +131,7 @@ const Rating = () => {
     // Validate that rating is selected
     if (!rating || rating === 0) {
       setShowError(true);
-      alert('Por favor selecciona una calificación antes de continuar');
+      alert('Por favor selecciona una calificación antes de continuar. Intenta de nuevo.');
       return;
     }
     
@@ -176,7 +176,7 @@ const Rating = () => {
       }, 3000);
     } catch (error) {
       console.error('Error:', error);
-      alert('Hubo un error al enviar tu calificación. Pero la guardamos localmente.');
+      alert('Hubo un error al enviar tu calificación. Intenta de nuevo.');
       setIsSubmitting(false);
       setShowSuccess(true);
       setTimeout(() => navigate('/page4'), 3000);

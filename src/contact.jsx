@@ -162,7 +162,7 @@ export default function Contact() {
     
     if (!isValid) {
       console.log('Formulario inválido. Errores:', errors);
-      alert('Por favor completa todos los campos requeridos y acepta los términos y condiciones');
+      alert('Por favor completa todos los campos requeridos y acepta los términos y condiciones. Intenta de nuevo.');
       return;
     }
 
@@ -203,7 +203,7 @@ export default function Contact() {
       }, 3000);
     } catch (error) {
       console.error('Error completo:', error);
-      alert(`Hubo un error al enviar tu mensaje: ${error.message}\n\nPor favor intenta de nuevo o contáctanos por WhatsApp.`);
+      alert(`Hubo un error al enviar tu mensaje: ${error.message}. Intenta de nuevo o contáctanos por WhatsApp.`);
       setIsSubmitting(false);
     }
   };

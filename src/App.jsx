@@ -103,7 +103,7 @@ function App() {
     if (migrantEmail && !emailRegex.test(migrantEmail)) {
       missing.push('migrantEmail');
       setMissingFields(['migrantEmail']);
-      setFormError('Por favor ingresa un correo electrónico válido (ejemplo: nombre@email.com)');
+      setFormError('Por favor ingresa un correo electrónico válido (ejemplo: nombre@email.com). Intenta de nuevo.');
       return;
     }
     
@@ -115,7 +115,7 @@ function App() {
     
     if (missing.length > 0) {
       setMissingFields(missing);
-      setFormError('Por favor completa toda la información requerida');
+      setFormError('Por favor completa toda la información requerida. Intenta de nuevo.');
       return;
     }
     

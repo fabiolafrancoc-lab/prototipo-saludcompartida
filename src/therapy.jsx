@@ -564,12 +564,12 @@ export default function Therapy() {
     const newOtherPersonErrors = {};
     
     if (!sessionFor) {
-      alert('Por favor indica si la sesión es para ti o para otra persona');
+      alert('Por favor indica si la sesión es para ti o para otra persona. Intenta de nuevo.');
       return;
     }
 
     if (!selectedDate || !selectedTime) {
-      alert('Por favor selecciona fecha y hora para tu sesión');
+      alert('Por favor selecciona fecha y hora para tu sesión. Intenta de nuevo.');
       return;
     }
 
@@ -618,7 +618,7 @@ export default function Therapy() {
     if (hasErrors) {
       setFormErrors(newFormErrors);
       setOtherPersonErrors(newOtherPersonErrors);
-      alert('Por favor completa todos los campos requeridos marcados en rojo');
+      alert('Por favor completa todos los campos requeridos marcados en rojo. Intenta de nuevo.');
       return;
     }
 
