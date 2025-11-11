@@ -39,7 +39,24 @@ export default function Telemedicine() {
   }, [phrases.length]);
 
   const handleWhatsAppCall = () => {
-    const firstName = localStorage.getItem('userName')?.split(' ')[0] || '';
+    // Obtener nombre del usuario desde localStorage
+    let firstName = '';
+    try {
+      const currentUserData = localStorage.getItem('currentUser');
+      if (currentUserData) {
+        const userData = JSON.parse(currentUserData);
+        firstName = userData?.firstName || '';
+      } else {
+        const accessUserData = localStorage.getItem('accessUser');
+        if (accessUserData) {
+          const userData = JSON.parse(accessUserData);
+          firstName = userData?.firstName || '';
+        }
+      }
+    } catch (e) {
+      firstName = '';
+    }
+    
     const greeting = firstName ? `Hola, soy ${firstName}` : 'Hola';
     const whatsappMessage = encodeURIComponent(
       `${greeting}! 🌟\n\nEstoy interesado en los servicios de Telemedicina. Por favor selecciona la opción que necesitas:\n\n` +
