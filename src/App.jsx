@@ -82,6 +82,11 @@ function App() {
     return `${limited.slice(0, 3)} ${limited.slice(3, 6)} ${limited.slice(6)}`;
   };
 
+  const clearError = () => {
+    setFormError('');
+    setMissingFields([]);
+  };
+
   const handleRegister = async () => {
     // Limpiar errores previos
     setFormError('');
@@ -398,7 +403,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           <input
                             type="text"
                             value={migrantFirstName}
-                            onChange={(e) => setMigrantFirstName(e.target.value)}
+                            onChange={(e) => {
+                              setMigrantFirstName(e.target.value);
+                              clearError();
+                            }}
                             placeholder="María"
                             className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
                               missingFields.includes('migrantFirstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-cyan-500'
@@ -410,7 +418,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           <input
                             type="text"
                             value={migrantLastName}
-                            onChange={(e) => setMigrantLastName(e.target.value)}
+                            onChange={(e) => {
+                              setMigrantLastName(e.target.value);
+                              clearError();
+                            }}
                             placeholder="García"
                             className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
                               missingFields.includes('migrantLastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-cyan-500'
@@ -422,7 +433,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           <input
                             type="text"
                             value={migrantMotherLastName}
-                            onChange={(e) => setMigrantMotherLastName(e.target.value)}
+                            onChange={(e) => {
+                              setMigrantMotherLastName(e.target.value);
+                              clearError();
+                            }}
                             placeholder="López"
                             className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
                           />
@@ -434,7 +448,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                         <input
                           type="email"
                           value={migrantEmail}
-                          onChange={(e) => setMigrantEmail(e.target.value)}
+                          onChange={(e) => {
+                            setMigrantEmail(e.target.value);
+                            clearError();
+                          }}
                           placeholder="maria.garcia@email.com"
                           className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
                             missingFields.includes('migrantEmail') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-cyan-500'
@@ -454,7 +471,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           <input
                             type="tel"
                             value={migrantPhone}
-                            onChange={(e) => setMigrantPhone(formatUSPhone(e.target.value))}
+                            onChange={(e) => {
+                              setMigrantPhone(formatUSPhone(e.target.value));
+                              clearError();
+                            }}
                             placeholder="(305) 123-4567"
                             maxLength="14"
                             className={`w-full pl-12 pr-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
@@ -471,7 +491,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                         <label className="block text-sm font-semibold text-gray-700 mb-2">Haga clic en el lugar donde vive su familiar</label>
                         <select
                           value={familyCountry}
-                          onChange={(e) => setFamilyCountry(e.target.value)}
+                          onChange={(e) => {
+                            setFamilyCountry(e.target.value);
+                            clearError();
+                          }}
                           className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all text-gray-900 bg-white"
                         >
                           <option value="">Selecciona un país</option>
@@ -507,7 +530,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           <input
                             type="text"
                             value={familyFirstName}
-                            onChange={(e) => setFamilyFirstName(e.target.value)}
+                            onChange={(e) => {
+                              setFamilyFirstName(e.target.value);
+                              clearError();
+                            }}
                             placeholder="Rosa"
                             className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
                               missingFields.includes('familyFirstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-pink-500'
@@ -519,7 +545,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           <input
                             type="text"
                             value={familyLastName}
-                            onChange={(e) => setFamilyLastName(e.target.value)}
+                            onChange={(e) => {
+                              setFamilyLastName(e.target.value);
+                              clearError();
+                            }}
                             placeholder="Hernández"
                             className={`w-full px-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
                               missingFields.includes('familyLastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-pink-500'
@@ -531,7 +560,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           <input
                             type="text"
                             value={familyMotherLastName}
-                            onChange={(e) => setFamilyMotherLastName(e.target.value)}
+                            onChange={(e) => {
+                              setFamilyMotherLastName(e.target.value);
+                              clearError();
+                            }}
                             placeholder="Pérez"
                             className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
                           />
@@ -543,7 +575,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                         <input
                           type="email"
                           value={familyEmail}
-                          onChange={(e) => setFamilyEmail(e.target.value)}
+                          onChange={(e) => {
+                            setFamilyEmail(e.target.value);
+                            clearError();
+                          }}
                           placeholder="rosa.hernandez@email.com"
                           className="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
                         />
@@ -564,7 +599,10 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           <input
                             type="tel"
                             value={familyPhone}
-                            onChange={(e) => setFamilyPhone(formatMXPhone(e.target.value))}
+                            onChange={(e) => {
+                              setFamilyPhone(formatMXPhone(e.target.value));
+                              clearError();
+                            }}
                             placeholder="(55) 1234-5678"
                             maxLength="14"
                             className={`w-full pl-14 pr-4 py-3.5 border-2 rounded-xl focus:ring-2 focus:ring-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white ${
