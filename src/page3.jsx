@@ -136,10 +136,16 @@ export default function Page3() {
     if (SPECIAL_ACCESS_CODES[upperCode]) {
       const codeData = SPECIAL_ACCESS_CODES[upperCode];
       
-      // Cargar datos demo del usuario
+      // Usar datos del formulario en lugar de datos hardcodeados
       const userData = {
-        ...codeData.demoUser,
-        phoneId: `${codeData.demoUser.countryCode}${codeData.demoUser.phone}`,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        motherLastName: motherLastName.trim(),
+        email: email.trim(),
+        phone: whatsappNumber.replace(/\s/g, ''),
+        countryCode: '+52',
+        phoneId: `+52${whatsappNumber.replace(/\s/g, '')}`,
+        accessCode: upperCode,
         accessType: codeData.type,
         isDemo: true
       };
