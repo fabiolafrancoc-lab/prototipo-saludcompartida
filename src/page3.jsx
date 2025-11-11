@@ -2,6 +2,46 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGeolocation } from './hooks/useGeolocation';
 
+// Códigos especiales de acceso para inversores y demos
+const SPECIAL_ACCESS_CODES = {
+  'INVESTOR2025': {
+    type: 'investor',
+    route: '/page4',
+    demoUser: {
+      firstName: 'María',
+      lastName: 'González',
+      motherLastName: 'Rodríguez',
+      phone: '5512345678',
+      email: 'demo@saludcompartida.com',
+      countryCode: '+52'
+    }
+  },
+  'DEMO-MX': {
+    type: 'demo-family',
+    route: '/page4',
+    demoUser: {
+      firstName: 'Carlos',
+      lastName: 'Martínez',
+      motherLastName: 'López',
+      phone: '5587654321',
+      email: 'demo-mx@saludcompartida.com',
+      countryCode: '+52'
+    }
+  },
+  'DEMO-US': {
+    type: 'demo-migrant',
+    route: '/migrant',
+    demoUser: {
+      firstName: 'John',
+      lastName: 'Smith',
+      motherLastName: '',
+      phone: '3105551234',
+      email: 'demo-us@saludcompartida.com',
+      countryCode: '+1'
+    }
+  }
+};
+
 export default function Page3() {
   const navigate = useNavigate();
   const { countryCode: detectedCountry, loading: geoLoading } = useGeolocation();
@@ -11,11 +51,13 @@ export default function Page3() {
   const [motherLastName, setMotherLastName] = useState('');
   const [whatsappNumber, setWhatsappNumber] = useState('');
   const [countryCode, setCountryCode] = useState('+52'); // New state for country code
+  const [specialCode, setSpecialCode] = useState(''); // Nuevo: para códigos especiales
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState({});
   const [showErrorForm, setShowErrorForm] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [useSpecialCode, setUseSpecialCode] = useState(false); // Toggle entre teléfono y código especial
 
   // Auto-select country code based on geolocation (only for Mexico)
   useEffect(() => {
@@ -28,7 +70,43 @@ export default function Page3() {
   }, [detectedCountry, geoLoading]);
 
   const handleAccessCode = () => {
-    // Validar campos
+    // Si está usando código especial, validar directamente
+    if (useSpecialCode && specialCode.trim()) {
+      const upperCode = specialCode.trim().toUpperCase();
+      
+      if (SPECIAL_ACCESS_CODES[upperCode]) {
+        const codeData = SPECIAL_ACCESS_CODES[upperCode];
+        
+        // Cargar datos demo del usuario
+        const userData = {
+          ...codeData.demoUser,
+          phoneId: `${codeData.demoUser.countryCode}${codeData.demoUser.phone}`,
+          accessType: codeData.type,
+          isDemo: true
+        };
+        
+        localStorage.setItem('accessUser', JSON.stringify(userData));
+        
+        // Registrar el código usado (para analytics)
+        const usedCodes = JSON.parse(localStorage.getItem('usedSpecialCodes') || '[]');
+        usedCodes.push({
+          code: upperCode,
+          type: codeData.type,
+          usedAt: new Date().toISOString()
+        });
+        localStorage.setItem('usedSpecialCodes', JSON.stringify(usedCodes));
+        
+        // Navegar a la ruta correspondiente
+        setErrors({});
+        navigate(codeData.route);
+        return;
+      } else {
+        setErrors({ specialCode: 'Código no válido. Verifica e intenta nuevamente.' });
+        return;
+      }
+    }
+    
+    // Validación normal por teléfono
     const newErrors = {};
     
     if (!firstName.trim()) {
@@ -285,8 +363,93 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
             </p>
           </div>
 
+          {/* TOGGLE: Teléfono vs Código Especial */}
+          <div className="mb-6 flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setUseSpecialCode(false);
+                setErrors({});
+              }}
+              className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+                !useSpecialCode
+                  ? 'bg-gradient-to-r from-cyan-500 to-pink-500 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              📱 Mi Teléfono
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setUseSpecialCode(true);
+                setErrors({});
+              }}
+              className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+                useSpecialCode
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              🔑 Código Especial
+            </button>
+          </div>
+
           {/* FORMULARIO */}
           <div className="space-y-5">
+            {useSpecialCode ? (
+              // MODO: CÓDIGO ESPECIAL
+              <>
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">
+                    Código de Acceso <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={specialCode}
+                    onChange={(e) => {
+                      setSpecialCode(e.target.value.toUpperCase());
+                      setErrors({ ...errors, specialCode: '' });
+                    }}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAccessCode()}
+                    placeholder="Ej: INVESTOR2025, DEMO-MX"
+                    className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-purple-500 text-lg font-mono uppercase ${
+                      errors.specialCode ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.specialCode && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.specialCode}
+                    </p>
+                  )}
+                </div>
+
+                {/* Info sobre códigos especiales */}
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                  <p className="text-sm text-purple-900 font-semibold mb-2">
+                    🎯 Códigos disponibles para demo:
+                  </p>
+                  <ul className="text-xs text-purple-700 space-y-1">
+                    <li>• <span className="font-mono font-bold">INVESTOR2025</span> - Acceso completo de inversores</li>
+                    <li>• <span className="font-mono font-bold">DEMO-MX</span> - Demo usuario México (familia)</li>
+                    <li>• <span className="font-mono font-bold">DEMO-US</span> - Demo usuario USA (migrante)</li>
+                  </ul>
+                </div>
+
+                {/* Botón de acceso con código especial */}
+                <button
+                  onClick={handleAccessCode}
+                  className="w-full mt-8 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 rounded-lg font-bold text-lg hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl"
+                >
+                  Ingresar con Código Especial
+                </button>
+              </>
+            ) : (
+              // MODO: TELÉFONO (FORMULARIO ORIGINAL)
+              <>
             {/* NOMBRE */}
             <div>
               <label className="block text-gray-700 font-semibold mb-2">
@@ -437,9 +600,8 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                 </p>
               )}
             </div>
-          </div>
 
-          {/* BOTÓN INGRESAR */}
+          {/* BOTÓN INGRESAR CON TELÉFONO */}
           <button
             onClick={handleAccessCode}
             className="w-full mt-8 bg-gradient-to-r from-cyan-500 to-pink-500 text-white py-4 rounded-lg font-bold text-lg hover:from-cyan-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl"
@@ -454,6 +616,9 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
               Ingresa el número de teléfono que registraste en la preventa.<br />
               Tu número de WhatsApp es tu código de acceso único.
             </p>
+          </div>
+          </>
+            )}
           </div>
         </div>
         )}
