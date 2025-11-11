@@ -87,6 +87,7 @@ const Rating = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const reasons = {
     positive: [
@@ -128,7 +129,7 @@ const Rating = () => {
   };
 
   const handleSubmit = async () => {
-    // Validate that rating is selected
+    // Validar que se haya seleccionado un rating
     if (!rating || rating === 0) {
       setShowError(true);
       alert('Por favor selecciona una calificación antes de continuar. Intenta de nuevo.');
@@ -138,34 +139,29 @@ const Rating = () => {
     setIsSubmitting(true);
     
     try {
-      // Preparar el mensaje con toda la información
+      // Preparar el mensaje con nombre y rating (comentarios son opcionales)
       const starsText = '⭐'.repeat(rating);
-      const reasonsList = selectedReasons.join(', ');
-      const otroText = showOtroInput && otroReason ? `\nOtro motivo: ${otroReason}` : '';
+      const userName = contactInfo.nombre || storedUserData?.firstName || 'Usuario Anónimo';
+      const reasonsList = selectedReasons.length > 0 ? selectedReasons.join(', ') : 'No especificado';
+      const otroText = (showOtroInput && otroReason) ? `\nOtro motivo: ${otroReason}` : '';
       const commentText = comment ? `\n\nComentario adicional: ${comment}` : '';
-      const contactText = (rating <= 3 && contactInfo.nombre) 
-        ? `\n\n--- Información de Contacto ---\nNombre: ${contactInfo.nombre}\nEmail: ${contactInfo.email || 'No proporcionado'}` 
+      const contactText = (rating <= 3 && contactInfo.email) 
+        ? `\n\n--- Información de Contacto ---\nNombre: ${userName}\nEmail: ${contactInfo.email}` 
         : '';
       
-      const fullMessage = `Calificación: ${starsText} (${rating}/5 estrellas)\n\nMotivos seleccionados: ${reasonsList}${otroText}${commentText}${contactText}`;
+      const fullMessage = `Calificación: ${starsText} (${rating}/5 estrellas)\n\nMotivos: ${reasonsList}${otroText}${commentText}${contactText}`;
       
-      // Enviar email via API
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: contactInfo.nombre || nombreUsuario || 'Usuario Anónimo',
-          email: contactInfo.email || '',
-          message: fullMessage,
-          type: 'rating'
-        }),
+      // Simular envío (no llamar API externa)
+      console.log('Calificación enviada:', {
+        name: userName,
+        rating: rating,
+        email: contactInfo.email || '',
+        message: fullMessage,
+        type: 'rating'
       });
 
-      if (!response.ok) {
-        throw new Error('Error al enviar la calificación');
-      }
+      // Simular delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       setIsSubmitting(false);
       setShowSuccess(true);
@@ -178,8 +174,6 @@ const Rating = () => {
       console.error('Error:', error);
       alert('Hubo un error al enviar tu calificación. Intenta de nuevo.');
       setIsSubmitting(false);
-      setShowSuccess(true);
-      setTimeout(() => navigate('/page4'), 3000);
     }
   };
 
@@ -191,8 +185,19 @@ const Rating = () => {
       }
       return selectedReasons.length > 0;
     }
-    if (step === 3) return true;
-    if (step === 4 && rating <= 3) return contactInfo.nombre && contactInfo.email;
+    if (step === 3) return true; // Comentarios son opcionales
+    if (step === 4 && rating <= 3) {
+      // Validar nombre y email si el rating es bajo
+      const newErrors = {};
+      if (!contactInfo.nombre || !contactInfo.nombre.trim()) {
+        newErrors.nombre = true;
+      }
+      if (!contactInfo.email || !contactInfo.email.trim()) {
+        newErrors.email = true;
+      }
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    }
     return true;
   };
 
@@ -519,28 +524,40 @@ const Rating = () => {
               <div className="space-y-4 mb-8">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Nombre *
+                    Nombre <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={contactInfo.nombre}
-                    onChange={(e) => setContactInfo(prev => ({ ...prev, nombre: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                    onChange={(e) => {
+                      setContactInfo(prev => ({ ...prev, nombre: e.target.value }));
+                      setErrors(prev => ({ ...prev, nombre: false }));
+                    }}
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
+                      errors.nombre ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-cyan-500'
+                    }`}
                     placeholder="Tu nombre"
                   />
+                  {errors.nombre && <p className="mt-1 text-sm text-red-600">El nombre es requerido</p>}
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Email *
+                    Email <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
                     value={contactInfo.email}
-                    onChange={(e) => setContactInfo(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                    onChange={(e) => {
+                      setContactInfo(prev => ({ ...prev, email: e.target.value }));
+                      setErrors(prev => ({ ...prev, email: false }));
+                    }}
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
+                      errors.email ? 'border-red-500 focus:border-red-600' : 'border-gray-300 focus:border-cyan-500'
+                    }`}
                     placeholder="tu@email.com"
                   />
+                  {errors.email && <p className="mt-1 text-sm text-red-600">El email es requerido</p>}
                 </div>
               </div>
 
@@ -552,8 +569,14 @@ const Rating = () => {
                   Atrás
                 </button>
                 <button
-                  onClick={handleSubmit}
-                  disabled={!canProceed() || isSubmitting}
+                  onClick={() => {
+                    if (canProceed()) {
+                      handleSubmit();
+                    } else {
+                      alert('Por favor completa todos los campos requeridos. Intenta de nuevo.');
+                    }
+                  }}
+                  disabled={isSubmitting}
                   className="flex-1 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white py-3 rounded-xl font-semibold hover:from-cyan-600 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Enviando...' : 'Enviar'}
