@@ -7,31 +7,28 @@ export default function Contact() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Toma el nombre del familiar desde location.state; si no existe, intenta leer firstName desde localStorage.
-  const rawName = typeof location.state?.name === 'string' ? location.state.name.trim() : '';
-  let storedFirstName = '';
+  // Get user data from localStorage
+  let storedUserData = null;
   try {
     const stored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
     if (stored) {
-      const parsed = JSON.parse(stored);
-      storedFirstName = parsed?.firstName || '';
+      storedUserData = JSON.parse(stored);
     }
   } catch (e) {
-    storedFirstName = '';
+    storedUserData = null;
   }
+
+  // Toma el nombre del familiar desde location.state; si no existe, intenta leer firstName desde localStorage.
+  const rawName = typeof location.state?.name === 'string' ? location.state.name.trim() : '';
+  const storedFirstName = storedUserData?.firstName || '';
   // Mostrar sólo el primer nombre (no el apellido)
   const firstName = rawName ? rawName.split(' ')[0] : (storedFirstName || '');
 
-  // Scroll al tope al montar
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
   const [formData, setFormData] = useState({
-    nombre: '',
-    apellidoPaterno: '',
-    telefono: '',
-    email: '',
+    nombre: storedUserData?.firstName || '',
+    apellidoPaterno: storedUserData?.lastName || '',
+    telefono: storedUserData?.phone || '',
+    email: storedUserData?.email || '',
     categoria: '',
     mensaje: '',
     aceptaTerminos: false
@@ -40,6 +37,36 @@ export default function Contact() {
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Scroll al tope al montar
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Also update from localStorage on mount
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem('accessUser');
+        if (stored) {
+          const userData = JSON.parse(stored);
+          setFormData(prev => ({
+            ...prev,
+            nombre: userData?.firstName || prev.nombre,
+            apellidoPaterno: userData?.lastName || prev.apellidoPaterno,
+            telefono: userData?.phone || prev.telefono,
+            email: userData?.email || prev.email
+          }));
+        }
+      } catch (e) {
+        console.error('Error updating form data from storage:', e);
+      }
+    };
+
+    handleStorageChange(); // Call on mount
+    
+    // Listen for storage changes
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const categorias = [
     'Información General',
@@ -153,7 +180,7 @@ export default function Contact() {
           email: formData.email || 'Sin email proporcionado',
           phone: formData.telefono,
           message: `Categoría: ${formData.categoria}\n\n${formData.mensaje}`,
-          type: 'mexico'
+          type: 'contact'
         }),
       });
 
@@ -186,7 +213,7 @@ export default function Contact() {
     const cleaned = String(value).replace(/\D/g, '');
     if (cleaned.length <= 3) return cleaned;
     if (cleaned.length <= 6) return `${cleaned.slice(0, 3)} ${cleaned.slice(3)}`;
-    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 10)}`;
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
   };
 
   const whatsappNumber = '5215573860842';

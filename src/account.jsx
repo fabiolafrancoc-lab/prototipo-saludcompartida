@@ -20,17 +20,19 @@ export default function Account() {
 
   const [userData, setUserData] = useState({
     firstName: storedUserData?.firstName || '',
-    lastName: '',
-    motherLastName: '',
-    birthDate: '',
+    lastName: storedUserData?.lastName || '',
+    motherLastName: storedUserData?.motherLastName || '',
+    birthDate: storedUserData?.birthDate || '',
     phone: storedUserData?.phone || ''
   });
 
-  const [familyMembers, setFamilyMembers] = useState([
-    { firstName: '', lastName: '', motherLastName: '', relationship: '' },
-    { firstName: '', lastName: '', motherLastName: '', relationship: '' },
-    { firstName: '', lastName: '', motherLastName: '', relationship: '' }
-  ]);
+  const [familyMembers, setFamilyMembers] = useState(
+    storedUserData?.familyMembers || [
+      { firstName: '', lastName: '', motherLastName: '', relationship: '' },
+      { firstName: '', lastName: '', motherLastName: '', relationship: '' },
+      { firstName: '', lastName: '', motherLastName: '', relationship: '' }
+    ]
+  );
 
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -59,14 +61,14 @@ export default function Account() {
   const formatPhoneDisplay = (phone) => {
     if (!phone) return '';
     const cleaned = phone.replace(/\D/g, '');
-    if (cleaned.length <= 2) return cleaned;
-    if (cleaned.length <= 6) return `${cleaned.slice(0, 2)} ${cleaned.slice(2)}`;
-    return `${cleaned.slice(0, 2)} ${cleaned.slice(2, 6)} ${cleaned.slice(6, 10)}`;
+    if (cleaned.length <= 3) return cleaned;
+    if (cleaned.length <= 6) return `${cleaned.slice(0, 3)} ${cleaned.slice(3)}`;
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
   };
 
   const handleSave = () => {
-    if (!userData.firstName || !userData.lastName || !userData.motherLastName) {
-      alert('Por favor completa tu nombre completo');
+    if (!userData.firstName || !userData.lastName) {
+      alert('Por favor completa tu nombre y apellido paterno');
       return;
     }
 
@@ -81,6 +83,19 @@ export default function Account() {
     }
 
     setIsSaving(true);
+    
+    // Save to localStorage to share across all forms
+    const userDataToSave = {
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      motherLastName: userData.motherLastName,
+      phone: userData.phone,
+      birthDate: userData.birthDate,
+      email: storedUserData?.email || '', // Keep email if exists
+      familyMembers: familyMembers
+    };
+    
+    localStorage.setItem('accessUser', JSON.stringify(userDataToSave));
     
     // Simulate save
     setTimeout(() => {
@@ -184,7 +199,7 @@ export default function Account() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Apellido Materno <span className="text-red-500">*</span>
+                  Apellido Materno <span className="text-gray-500 text-xs">(opcional)</span>
                 </label>
                 <input
                   type="text"
@@ -227,12 +242,12 @@ export default function Account() {
                   value={formatPhoneDisplay(userData.phone)}
                   onChange={(e) => handleUserChange('phone', e.target.value)}
                   className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-r-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
-                  placeholder="55 1234 5678"
+                  placeholder="555 123 4567"
                   maxLength="12"
                 />
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                10 dígitos
+                Formato: XXX XXX XXXX
               </p>
             </div>
           </div>
@@ -296,7 +311,7 @@ export default function Account() {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Apellido Materno
+                        Apellido Materno <span className="text-gray-400 text-xs">(opcional)</span>
                       </label>
                       <input
                         type="text"

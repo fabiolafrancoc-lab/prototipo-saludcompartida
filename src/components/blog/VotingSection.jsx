@@ -6,6 +6,7 @@ export default function VotingSection() {
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [otherTopic, setOtherTopic] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(false);
 
   const votingOptions = [
     "Cómo manejar el estrés",
@@ -33,7 +34,10 @@ export default function VotingSection() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    setError(false);
+    
     if (selectedTopics.length === 0 && !otherTopic.trim()) {
+      setError(true);
       alert('Por favor selecciona al menos un tema o escribe tu sugerencia');
       return;
     }
@@ -70,6 +74,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
         },
         body: JSON.stringify({
           name: 'Usuario del Blog',
+          email: 'blog@saludcompartida.com',
           message: message,
           type: 'blog-topic'
         }),
@@ -172,11 +177,18 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
           </label>
           <textarea
             value={otherTopic}
-            onChange={(e) => setOtherTopic(e.target.value)}
+            onChange={(e) => { setOtherTopic(e.target.value); setError(false); }}
             rows="3"
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-purple-500 resize-none ${
+              error && selectedTopics.length === 0 && !otherTopic.trim() 
+                ? 'border-red-500 bg-red-50' 
+                : 'border-gray-300'
+            }`}
             placeholder="Ejemplo: Cómo superar el duelo, Cuidar mi salud mental en el trabajo..."
           />
+          {error && selectedTopics.length === 0 && !otherTopic.trim() && (
+            <p className="text-red-500 text-xs mt-1">Selecciona al menos un tema o escribe una sugerencia</p>
+          )}
         </div>
 
         {/* Contador de selecciones */}

@@ -11,9 +11,11 @@ export default function Page3() {
   const [motherLastName, setMotherLastName] = useState('');
   const [whatsappNumber, setWhatsappNumber] = useState('');
   const [countryCode, setCountryCode] = useState('+52'); // New state for country code
-  const [accessCode, setAccessCode] = useState('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showErrorForm, setShowErrorForm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   // Auto-select country code based on geolocation (only for Mexico)
   useEffect(() => {
@@ -43,10 +45,6 @@ export default function Page3() {
       newErrors.whatsappNumber = 'Debe tener 10 dígitos';
     }
     
-    if (!accessCode.trim()) {
-      newErrors.accessCode = 'El código es requerido';
-    }
-    
     if (!acceptedTerms) {
       newErrors.acceptedTerms = 'Debes aceptar los términos y condiciones';
     }
@@ -57,33 +55,93 @@ export default function Page3() {
       return;
     }
     
-    // Validar código según el país seleccionado
-    const trimmedCode = accessCode.trim().toUpperCase();
-    const expectedCode = countryCode === '+1' ? 'USA2025' : 'MX2025';
+    // Construir el ID único con código de país + número
+    const uniquePhoneId = `${countryCode}${whatsappNumber.trim()}`;
     
-    if (trimmedCode === expectedCode) {
-      // Guardar datos en localStorage
+    // Verificar si el teléfono está registrado
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+    
+    if (registeredUsers[uniquePhoneId]) {
+      // Usuario encontrado - cargar sus datos y dar acceso
       const userData = {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         motherLastName: motherLastName.trim(),
         phone: whatsappNumber.trim(),
         countryCode: countryCode,
-        accessCode: trimmedCode
+        phoneId: uniquePhoneId,
+        registeredData: registeredUsers[uniquePhoneId] // datos del registro original
       };
       
       localStorage.setItem('accessUser', JSON.stringify(userData));
       
-      // Limpiar errores y navegar según el código
+      // Limpiar errores y navegar según el código de país
       setErrors({});
-      if (trimmedCode === 'USA2025') {
+      if (countryCode === '+1') {
         navigate('/migrant');
       } else {
         navigate('/page4');
       }
     } else {
-      const expectedMessage = countryCode === '+1' ? 'USA2025' : 'MX2025';
-      setErrors({ accessCode: `Código inválido. Usa ${expectedMessage} para ${countryCode === '+1' ? 'Estados Unidos' : 'México'}` });
+      // Usuario no encontrado - mostrar formulario de consulta
+      setShowErrorForm(true);
+      setErrors({});
+    }
+  };
+
+  const handleSendErrorReport = async () => {
+    if (!errorMessage.trim()) {
+      setErrors({ errorMessage: 'Por favor describe tu consulta' });
+      return;
+    }
+
+    try {
+      const uniquePhoneId = `${countryCode}${whatsappNumber.trim()}`;
+      const emailBody = `
+🔴 CÓDIGO O CLAVE ERRADA - CONSULTA DE USUARIO
+
+--- DATOS DEL USUARIO ---
+Nombre completo: ${firstName} ${lastName} ${motherLastName || ''}
+Teléfono intentado: ${uniquePhoneId}
+
+--- CONSULTA ---
+${errorMessage}
+
+--- INFORMACIÓN ADICIONAL ---
+Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+      `.trim();
+
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: `${firstName} ${lastName}`,
+          email: 'consultas@saludcompartida.com',
+          message: emailBody,
+          type: 'access-error'
+        }),
+      });
+
+      if (response.ok) {
+        setShowSuccessMessage(true);
+        setShowErrorForm(false);
+        
+        // Limpiar formulario después de 5 segundos y volver al inicio
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+          setFirstName('');
+          setLastName('');
+          setMotherLastName('');
+          setWhatsappNumber('');
+          setErrorMessage('');
+          setAcceptedTerms(false);
+        }, 5000);
+      }
+    } catch (error) {
+      console.error('Error al enviar consulta:', error);
+      setErrors({ errorMessage: 'Error al enviar. Intenta nuevamente.' });
     }
   };
 
@@ -107,14 +165,123 @@ export default function Page3() {
       </header>
 
       <main className="max-w-md mx-auto px-4 py-12">
+        {showSuccessMessage ? (
+          // MENSAJE DE ÉXITO
+          <div className="bg-white rounded-2xl shadow-2xl p-8">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                ¡Consulta Enviada!
+              </h2>
+              <p className="text-gray-700 leading-relaxed mb-2">
+                Gracias por comunicarte con SaludCompartida.
+              </p>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                En 15 minutos responderemos tu consulta.
+              </p>
+              <div className="bg-cyan-50 border border-cyan-200 rounded-lg p-4">
+                <p className="text-cyan-700 font-semibold">
+                  🕒 Horario de Atención
+                </p>
+                <p className="text-cyan-600">
+                  09:00 a 18:00
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : showErrorForm ? (
+          // FORMULARIO DE CONSULTA POR ERROR
+          <div className="bg-white rounded-2xl shadow-2xl p-8">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-red-600 mb-3">
+                Código o Clave Errada
+              </h2>
+              <p className="text-gray-600">
+                No encontramos tu número registrado.<br />
+                Por favor, cuéntanos qué pasó para ayudarte.
+              </p>
+            </div>
+
+            {/* RESUMEN DE DATOS INGRESADOS */}
+            <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
+              <p className="text-sm text-gray-600 mb-2">
+                <span className="font-semibold">Datos ingresados:</span>
+              </p>
+              <p className="text-sm text-gray-700">
+                Nombre: {firstName} {lastName} {motherLastName}
+              </p>
+              <p className="text-sm text-gray-700">
+                Teléfono: {countryCode} {whatsappNumber}
+              </p>
+            </div>
+
+            {/* CAMPO DE CONSULTA */}
+            <div className="mb-6">
+              <label className="block text-gray-700 font-semibold mb-2">
+                Describe tu consulta <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={errorMessage}
+                onChange={(e) => {
+                  setErrorMessage(e.target.value);
+                  setErrors({ ...errors, errorMessage: '' });
+                }}
+                placeholder="Ejemplo: Me registré hace 2 días pero no puedo ingresar, o necesito ayuda con mi código..."
+                rows={5}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-cyan-500 resize-none ${
+                  errors.errorMessage ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                }`}
+              />
+              {errors.errorMessage && (
+                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.errorMessage}
+                </p>
+              )}
+            </div>
+
+            {/* BOTONES */}
+            <div className="space-y-3">
+              <button
+                onClick={handleSendErrorReport}
+                className="w-full bg-gradient-to-r from-cyan-500 to-pink-500 text-white py-4 rounded-lg font-bold text-lg hover:from-cyan-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl"
+              >
+                Enviar Consulta
+              </button>
+              
+              <button
+                onClick={() => {
+                  setShowErrorForm(false);
+                  setErrorMessage('');
+                  setErrors({});
+                }}
+                className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+              >
+                Volver a Intentar
+              </button>
+            </div>
+          </div>
+        ) : (
+          // FORMULARIO ORIGINAL DE ACCESO
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           {/* TÍTULO */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-pink-600 bg-clip-text text-transparent mb-3">
-              Registro de Acceso
+              Ingresa a tu Cuenta
             </h1>
             <p className="text-gray-600">
-              Completa tus datos y el código que recibiste
+              Usa el número de WhatsApp que registraste
             </p>
           </div>
 
@@ -229,34 +396,6 @@ export default function Page3() {
               )}
             </div>
 
-            {/* CÓDIGO DE ACCESO */}
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">
-                Código de Acceso <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={accessCode}
-                onChange={(e) => {
-                  setAccessCode(e.target.value);
-                  setErrors({ ...errors, accessCode: '' });
-                }}
-                onKeyPress={(e) => e.key === 'Enter' && handleAccessCode()}
-                placeholder="Ej: MX2025"
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-cyan-500 text-lg font-mono uppercase ${
-                  errors.accessCode ? 'border-red-500' : 'border-gray-300'
-                }`}
-              />
-              {errors.accessCode && (
-                <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {errors.accessCode}
-                </p>
-              )}
-            </div>
-
             {/* TÉRMINOS Y CONDICIONES */}
             <div>
               <label className="flex items-start gap-3 cursor-pointer">
@@ -311,11 +450,13 @@ export default function Page3() {
           {/* AYUDA */}
           <div className="mt-6 p-4 bg-cyan-50 rounded-lg border border-cyan-200">
             <p className="text-sm text-gray-600 text-center">
-              <span className="font-semibold text-cyan-700">💡 Códigos válidos:</span><br />
-              MX2025 (México) o USA2025 (Estados Unidos)
+              <span className="font-semibold text-cyan-700">💡 ¿Cómo funciona?</span><br />
+              Ingresa el número de teléfono que registraste en la preventa.<br />
+              Tu número de WhatsApp es tu código de acceso único.
             </p>
           </div>
         </div>
+        )}
       </main>
     </div>
   );

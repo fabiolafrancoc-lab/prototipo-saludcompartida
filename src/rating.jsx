@@ -59,8 +59,19 @@ const VerySadFaceIcon = () => (
 const Rating = () => {
   const navigate = useNavigate();
   
-  // Nombre del usuario (puedes recibir esto desde props o estado global)
-  const nombreUsuario = "María";
+  // Get user data from localStorage
+  let storedUserData = null;
+  try {
+    const stored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
+    if (stored) {
+      storedUserData = JSON.parse(stored);
+    }
+  } catch (e) {
+    storedUserData = null;
+  }
+  
+  // Nombre del usuario
+  const nombreUsuario = storedUserData?.firstName || "Usuario";
   
   const [step, setStep] = useState(1);
   const [rating, setRating] = useState(0);
@@ -70,11 +81,12 @@ const Rating = () => {
   const [showOtroInput, setShowOtroInput] = useState(false);
   const [comment, setComment] = useState('');
   const [contactInfo, setContactInfo] = useState({
-    nombre: '',
-    email: ''
+    nombre: storedUserData?.firstName ? `${storedUserData.firstName} ${storedUserData.lastName || ''}`.trim() : '',
+    email: storedUserData?.email || ''
   });
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showError, setShowError] = useState(false);
 
   const reasons = {
     positive: [
@@ -116,6 +128,13 @@ const Rating = () => {
   };
 
   const handleSubmit = async () => {
+    // Validate that rating is selected
+    if (!rating || rating === 0) {
+      setShowError(true);
+      alert('Por favor selecciona una calificación antes de continuar');
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {

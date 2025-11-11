@@ -344,18 +344,66 @@ const StressTips = ({ onBack }) => {
 
 export default function Therapy() {
   const navigate = useNavigate();
+  
+  // Get user data from localStorage
+  let storedUserData = null;
+  try {
+    const stored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
+    if (stored) {
+      storedUserData = JSON.parse(stored);
+    }
+  } catch (e) {
+    storedUserData = null;
+  }
+  
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [currentView, setCurrentView] = useState('main');
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
+  const [sessionFor, setSessionFor] = useState(''); // 'myself' o 'other'
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    email: '',
+    firstName: storedUserData?.firstName || '',
+    lastName: storedUserData?.lastName || '',
+    phone: storedUserData?.phone || '',
+    email: storedUserData?.email || '',
     concerns: ''
   });
+  const [otherPersonData, setOtherPersonData] = useState({
+    firstName: '',
+    lastName: '',
+    motherLastName: '',
+    email: '',
+    phone: '',
+    relationship: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [otherPersonErrors, setOtherPersonErrors] = useState({});
+
+  // Update form data when localStorage changes (e.g., from account update)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem('accessUser');
+        if (stored) {
+          const userData = JSON.parse(stored);
+          setFormData(prev => ({
+            ...prev,
+            firstName: userData?.firstName || prev.firstName,
+            lastName: userData?.lastName || prev.lastName,
+            phone: userData?.phone || prev.phone,
+            email: userData?.email || prev.email
+          }));
+        }
+      } catch (e) {
+        console.error('Error updating form data from storage:', e);
+      }
+    };
+
+    // Listen for storage changes
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // 50 Testimoniales rotativos - Solo nombre y edad
   const testimonials = [
@@ -457,20 +505,29 @@ export default function Therapy() {
   const generateDates = () => {
     const dates = [];
     const today = new Date();
-    for (let i = 1; i <= 14; i++) {
+    let daysAdded = 0;
+    let currentDay = 16; // Empezar después de 15 días
+    
+    while (daysAdded < 21) { // Generar 3 semanas de fechas disponibles
       const date = new Date(today);
-      date.setDate(today.getDate() + i);
-      dates.push(date);
+      date.setDate(today.getDate() + currentDay);
+      
+      // Excluir domingos (día 0)
+      if (date.getDay() !== 0) {
+        dates.push(date);
+        daysAdded++;
+      }
+      currentDay++;
     }
     return dates;
   };
 
   const availableDates = generateDates();
 
-  const timeSlots = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', 
-    '13:00', '14:00', '15:00', '16:00', '17:00', 
-    '18:00', '19:00', '20:00'
+  // Pool de horarios disponibles (se seleccionarán 5 por día)
+  const allTimeSlots = [
+    '09:00', '10:00', '11:00', '12:00', 
+    '14:00', '15:00', '16:00', '17:00', '18:00'
   ];
 
   const handlePhoneChange = (e) => {
@@ -480,23 +537,113 @@ export default function Therapy() {
     }
   };
 
+  const handleOtherPersonPhoneChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ''); // Solo números
+    if (value.length <= 10) {
+      setOtherPersonData({...otherPersonData, phone: value});
+    }
+  };
+
+  const formatPhoneDisplay = (phone) => {
+    if (!phone) return '';
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length <= 3) return cleaned;
+    if (cleaned.length <= 6) return `${cleaned.slice(0, 3)} ${cleaned.slice(3)}`;
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Reset errors
+    setFormErrors({});
+    setOtherPersonErrors({});
+    
+    let hasErrors = false;
+    const newFormErrors = {};
+    const newOtherPersonErrors = {};
+    
+    if (!sessionFor) {
+      alert('Por favor indica si la sesión es para ti o para otra persona');
+      return;
+    }
+
     if (!selectedDate || !selectedTime) {
       alert('Por favor selecciona fecha y hora para tu sesión');
       return;
     }
 
-    if (formData.phone.length !== 10) {
-      alert('Por favor ingresa un número de teléfono válido de 10 dígitos');
+    // Validar formData (quien agenda)
+    if (!formData.firstName) {
+      newFormErrors.firstName = true;
+      hasErrors = true;
+    }
+    if (!formData.lastName) {
+      newFormErrors.lastName = true;
+      hasErrors = true;
+    }
+    if (!formData.email) {
+      newFormErrors.email = true;
+      hasErrors = true;
+    }
+    if (!formData.phone || formData.phone.length !== 10) {
+      newFormErrors.phone = true;
+      hasErrors = true;
+    }
+
+    // Validar otherPersonData si es para otra persona
+    if (sessionFor === 'other') {
+      if (!otherPersonData.firstName) {
+        newOtherPersonErrors.firstName = true;
+        hasErrors = true;
+      }
+      if (!otherPersonData.lastName) {
+        newOtherPersonErrors.lastName = true;
+        hasErrors = true;
+      }
+      if (!otherPersonData.email) {
+        newOtherPersonErrors.email = true;
+        hasErrors = true;
+      }
+      if (!otherPersonData.phone || otherPersonData.phone.length !== 10) {
+        newOtherPersonErrors.phone = true;
+        hasErrors = true;
+      }
+      if (!otherPersonData.relationship) {
+        newOtherPersonErrors.relationship = true;
+        hasErrors = true;
+      }
+    }
+
+    if (hasErrors) {
+      setFormErrors(newFormErrors);
+      setOtherPersonErrors(newOtherPersonErrors);
+      alert('Por favor completa todos los campos requeridos marcados en rojo');
       return;
     }
 
+    const patientInfo = sessionFor === 'myself' 
+      ? `${formData.firstName} ${formData.lastName}`
+      : `${otherPersonData.firstName} ${otherPersonData.lastName} ${otherPersonData.motherLastName || ''}`.trim();
+
+    const patientPhone = sessionFor === 'myself'
+      ? `+52${formData.phone}`
+      : `+52${otherPersonData.phone}`;
+
+    const patientEmail = sessionFor === 'myself'
+      ? formData.email
+      : otherPersonData.email;
+
     const dataToSend = {
       timestamp: new Date().toISOString(),
-      name: `${formData.firstName} ${formData.lastName}`,
-      phone: `+52${formData.phone}`,
+      sessionFor: sessionFor === 'myself' ? 'Para mí' : 'Para otra persona',
+      patientName: patientInfo,
+      patientPhone: patientPhone,
+      patientEmail: patientEmail,
+      contactName: `${formData.firstName} ${formData.lastName}`,
+      contactPhone: `+52${formData.phone}`,
+      contactEmail: formData.email,
+      relationship: sessionFor === 'other' ? otherPersonData.relationship : 'Propio paciente',
       sessionType: 'Individual',
       contactMethod: 'Videollamada',
       date: selectedDate.toLocaleDateString('es-MX'),
@@ -511,9 +658,19 @@ export default function Therapy() {
       const emailMessage = `
 📅 NUEVA CITA DE TERAPIA AGENDADA
 
---- Información del Paciente ---
-Nombre completo: ${formData.firstName} ${formData.lastName}
+--- Tipo de Sesión ---
+${sessionFor === 'myself' ? '✅ Sesión para el usuario que agenda' : '👥 Sesión para otra persona (familiar)'}
+
+--- Información del Paciente (quien asistirá a terapia) ---
+Nombre completo: ${patientInfo}
+Teléfono: ${patientPhone}
+Email: ${patientEmail}
+${sessionFor === 'other' ? `Parentesco: ${otherPersonData.relationship}` : ''}
+
+--- Información de Contacto (quien agenda) ---
+Nombre: ${formData.firstName} ${formData.lastName}
 Teléfono: +52${formData.phone}
+Email: ${formData.email}
 
 --- Detalles de la Sesión ---
 Fecha: ${selectedDate.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -525,7 +682,7 @@ Método: Videollamada
 ${formData.concerns || 'No especificado'}
 
 --- Acción Requerida ---
-⚠️ IMPORTANTE: Contactar al paciente 24 horas antes para confirmar y enviar link de videollamada.
+⚠️ IMPORTANTE: Contactar ${sessionFor === 'myself' ? 'al paciente' : 'a ambos números'} 24 horas antes para confirmar y enviar link de videollamada.
       `.trim();
 
       const response = await fetch('/api/send-email', {
@@ -534,8 +691,10 @@ ${formData.concerns || 'No especificado'}
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: `${formData.firstName} ${formData.lastName}`,
-          phone: `+52${formData.phone}`,
+          name: sessionFor === 'myself' 
+            ? `${formData.firstName} ${formData.lastName}` 
+            : `${otherPersonData.firstName} ${otherPersonData.lastName} (agendado por ${formData.firstName})`,
+          phone: patientPhone,
           message: emailMessage,
           type: 'therapy'
         }),
@@ -563,21 +722,22 @@ ${formData.concerns || 'No especificado'}
 
   const isWeekend = (date) => {
     const day = date.getDay();
-    return day === 0 || day === 6;
+    return day === 6; // Solo sábado (domingo ya está excluido)
   };
 
   const getAvailableTimesForDate = (date) => {
     if (!date) return [];
-    if (isWeekend(date)) {
-      return timeSlots.filter(time => {
-        const hour = parseInt(time.split(':')[0]);
-        return hour >= 9 && hour < 14;
-      });
+    
+    const day = date.getDay();
+    
+    // Sábado (día 6): 09:00 a 12:00
+    if (day === 6) {
+      return ['09:00', '10:00', '11:00', '12:00'];
     }
-    return timeSlots.filter(time => {
-      const hour = parseInt(time.split(':')[0]);
-      return hour >= 8 && hour <= 20;
-    });
+    
+    // Lunes a Viernes: 5 horarios disponibles
+    // Seleccionamos de manera distribuida durante el día
+    return ['09:00', '11:00', '14:00', '16:00', '18:00'];
   };
 
   if (currentView === 'anxiety') {
@@ -610,11 +770,16 @@ ${formData.concerns || 'No especificado'}
             </h2>
             
             <p className="text-lg text-gray-600 mb-8">
-              Que bueno que diste el primer paso. Hablar de lo que sientes es de valientes.
+              {sessionFor === 'myself' 
+                ? 'Que bueno que diste el primer paso. Hablar de lo que sientes es de valientes.'
+                : 'Gracias por cuidar a tu familia. Has tomado una gran decisión al apoyar a tu ser querido.'
+              }
             </p>
 
             <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-6 mb-8">
-              <p className="text-sm text-gray-600 mb-2">Tu sesión</p>
+              <p className="text-sm text-gray-600 mb-2">
+                {sessionFor === 'myself' ? 'Tu sesión' : `Sesión de ${otherPersonData.firstName} ${otherPersonData.lastName}`}
+              </p>
               <p className="text-2xl font-bold text-gray-900 mb-1">
                 {selectedDate.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}
               </p>
@@ -624,8 +789,62 @@ ${formData.concerns || 'No especificado'}
 
             <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-4 mb-8">
               <p className="text-sm text-gray-700">
-                <strong>Te vamos a contactar 24 horas antes</strong> al <span className="font-semibold">+52{formData.phone}</span> para confirmar tu sesión y mandarte el link de la videollamada.
+                <strong>Te vamos a contactar 24 horas antes</strong> al{' '}
+                <span className="font-semibold">+52 {formatPhoneDisplay(formData.phone)}</span>
+                {sessionFor === 'other' && (
+                  <>
+                    {' '}y al <span className="font-semibold">+52 {formatPhoneDisplay(otherPersonData.phone)}</span>
+                  </>
+                )}
+                {' '}para confirmar {sessionFor === 'myself' ? 'tu' : 'la'} sesión y mandar el link de la videollamada.
               </p>
+            </div>
+
+            {/* Sección de Cancelación y Reprogramación */}
+            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 mb-8">
+              <div className="flex items-start gap-3 mb-4">
+                <svg className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-2">¿Necesitas cancelar o reprogramar?</h3>
+                  <p className="text-sm text-gray-700 mb-3">
+                    Entendemos que a veces surgen imprevistos. Si necesitas cambiar tu cita:
+                  </p>
+                  
+                  <div className="space-y-2 text-sm text-gray-700">
+                    <div className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <span><strong>Por WhatsApp:</strong> Envía un mensaje al <a href={`https://wa.me/5215512345678?text=${encodeURIComponent('Hola, necesito cancelar/reprogramar mi sesión de terapia del ' + selectedDate.toLocaleDateString('es-MX'))}`} className="text-cyan-600 hover:underline font-semibold">55 1234 5678</a></span>
+                    </div>
+                    
+                    <div className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <span><strong>Por email:</strong> Escribe a <a href={`mailto:terapia@saludcompartida.com?subject=Cancelar/Reprogramar sesión&body=Nombre: ${formData.firstName} ${formData.lastName}%0D%0AFecha de cita: ${selectedDate.toLocaleDateString('es-MX')}%0D%0AHora: ${selectedTime}%0D%0A%0D%0AMotivo:`} className="text-cyan-600 hover:underline font-semibold">terapia@saludcompartida.com</a></span>
+                    </div>
+                    
+                    <div className="flex items-start gap-2">
+                      <svg className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <span><strong>Por teléfono:</strong> Llama al 55 1234 5678 (Lunes a Viernes, 9am-6pm)</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-yellow-300">
+                    <p className="text-xs text-gray-600 mb-2">
+                      <strong>Importante:</strong> Avísanos con al menos 24 horas de anticipación si necesitas cancelar o reprogramar.
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      <strong>Nota sobre reprogramaciones:</strong> Las reprogramaciones están incluidas en tu suscripción, pero las fechas disponibles empiezan después de 15 días desde la fecha de reprogramación.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-3">
@@ -639,9 +858,11 @@ ${formData.concerns || 'No especificado'}
               <button
                 onClick={() => {
                   setShowConfirmation(false);
+                  setSessionFor('');
                   setSelectedDate(null);
                   setSelectedTime(null);
-                  setFormData({ firstName: '', lastName: '', phone: '', concerns: '' });
+                  setFormData({ firstName: '', lastName: '', phone: '', email: '', concerns: '' });
+                  setOtherPersonData({ firstName: '', lastName: '', motherLastName: '', email: '', phone: '', relationship: '' });
                 }}
                 className="w-full text-gray-600 hover:text-gray-900 font-medium"
               >
@@ -852,99 +1073,325 @@ ${formData.concerns || 'No especificado'}
             Agenda tu sesión individual
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Nombre
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.firstName}
-                onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Tu nombre"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Apellido paterno
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.lastName}
-                onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Tu apellido"
-              />
-            </div>
-          </div>
-
-          <div className="mb-8">
-            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-              </svg>
-              Tu teléfono (WhatsApp)
-            </label>
-            <div className="flex">
-              <div className="flex items-center bg-gray-100 border border-r-0 border-gray-300 rounded-l-xl px-4">
-                <span className="text-gray-700 font-medium">+52</span>
-              </div>
-              <input
-                type="tel"
-                required
-                value={formData.phone}
-                onChange={handlePhoneChange}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-r-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="5512345678"
-                maxLength="10"
-              />
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Ingresa 10 dígitos (ejemplo: 5512345678)
-            </p>
-          </div>
-
-          <div className="mb-8">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Tu correo electrónico
-            </label>
-            <input
-              type="email"
-              required
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="tucorreo@ejemplo.com"
-            />
-          </div>
-
+          {/* Selección: Para Mí o Para Otra Persona */}
           <div className="mb-8">
             <label className="block text-sm font-semibold text-gray-700 mb-3">
-              Selecciona el día
+              La sesión de terapia es:
             </label>
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setSessionFor('myself')}
+                className={`p-6 rounded-xl border-2 transition-all ${
+                  sessionFor === 'myself'
+                    ? 'border-purple-500 bg-purple-50'
+                    : 'border-gray-200 hover:border-purple-300'
+                }`}
+              >
+                <div className="flex items-center justify-center mb-3">
+                  <svg className="w-8 h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <h3 className="font-bold text-gray-900 text-center">Para Mí</h3>
+                <p className="text-sm text-gray-600 text-center mt-2">
+                  Yo asistiré a la sesión
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSessionFor('other')}
+                className={`p-6 rounded-xl border-2 transition-all ${
+                  sessionFor === 'other'
+                    ? 'border-pink-500 bg-pink-50'
+                    : 'border-gray-200 hover:border-pink-300'
+                }`}
+              >
+                <div className="flex items-center justify-center mb-3">
+                  <svg className="w-8 h-8 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h3 className="font-bold text-gray-900 text-center">Para Otra Persona</h3>
+                <p className="text-sm text-gray-600 text-center mt-2">
+                  Un familiar asistirá
+                </p>
+              </button>
+            </div>
+          </div>
+
+          {/* Datos de quien agenda (siempre visible) */}
+          {sessionFor && (
+            <>
+              <div className="bg-gradient-to-r from-cyan-50 to-cyan-100 rounded-xl p-6 mb-8">
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  {sessionFor === 'myself' ? 'Tus Datos' : 'Datos de quien agenda (tú)'}
+                </h3>
+
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Nombre <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
+                        formErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      }`}
+                      placeholder="Tu nombre"
+                    />
+                    {formErrors.firstName && (
+                      <p className="text-red-500 text-xs mt-1">Este campo es requerido</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Apellido paterno <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
+                        formErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      }`}
+                      placeholder="Tu apellido"
+                    />
+                    {formErrors.lastName && (
+                      <p className="text-red-500 text-xs mt-1">Este campo es requerido</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Tu correo electrónico <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
+                      formErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    }`}
+                    placeholder="tucorreo@ejemplo.com"
+                  />
+                  {formErrors.email && (
+                    <p className="text-red-500 text-xs mt-1">Este campo es requerido</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    Tu teléfono (WhatsApp) <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex">
+                    <div className={`flex items-center bg-gray-100 border border-r-0 rounded-l-xl px-4 ${
+                      formErrors.phone ? 'border-red-500' : 'border-gray-300'
+                    }`}>
+                      <span className="text-gray-700 font-medium">+52</span>
+                    </div>
+                    <input
+                      type="tel"
+                      required
+                      value={formatPhoneDisplay(formData.phone)}
+                      onChange={handlePhoneChange}
+                      className={`flex-1 px-4 py-3 border rounded-r-xl focus:ring-2 focus:ring-cyan-500 ${
+                        formErrors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      }`}
+                      placeholder="555 123 4567"
+                      maxLength="12"
+                    />
+                  </div>
+                  {formErrors.phone ? (
+                    <p className="text-red-500 text-xs mt-1">Ingresa un teléfono válido de 10 dígitos</p>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-1">Formato: XXX XXX XXXX</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Datos de la persona que asistirá (solo si es para otra persona) */}
+              {sessionFor === 'other' && (
+                <div className="bg-gradient-to-r from-pink-50 to-pink-100 rounded-xl p-6 mb-8">
+                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Datos de quien asistirá a terapia
+                  </h3>
+
+                  <div className="grid md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Nombre <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={otherPersonData.firstName}
+                        onChange={(e) => setOtherPersonData({...otherPersonData, firstName: e.target.value})}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
+                          otherPersonErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        }`}
+                        placeholder="Nombre"
+                      />
+                      {otherPersonErrors.firstName && (
+                        <p className="text-red-500 text-xs mt-1">Este campo es requerido</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Apellido Paterno <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={otherPersonData.lastName}
+                        onChange={(e) => setOtherPersonData({...otherPersonData, lastName: e.target.value})}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
+                          otherPersonErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        }`}
+                        placeholder="Apellido paterno"
+                      />
+                      {otherPersonErrors.lastName && (
+                        <p className="text-red-500 text-xs mt-1">Este campo es requerido</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Apellido Materno <span className="text-gray-400 text-xs">(opcional)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={otherPersonData.motherLastName}
+                        onChange={(e) => setOtherPersonData({...otherPersonData, motherLastName: e.target.value})}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                        placeholder="Apellido materno"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Correo electrónico <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={otherPersonData.email}
+                      onChange={(e) => setOtherPersonData({...otherPersonData, email: e.target.value})}
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
+                        otherPersonErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      }`}
+                      placeholder="correo@ejemplo.com"
+                    />
+                    {otherPersonErrors.email && (
+                      <p className="text-red-500 text-xs mt-1">Este campo es requerido</p>
+                    )}
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                      </svg>
+                      Teléfono (WhatsApp) <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex">
+                      <div className={`flex items-center bg-gray-100 border border-r-0 rounded-l-xl px-4 ${
+                        otherPersonErrors.phone ? 'border-red-500' : 'border-gray-300'
+                      }`}>
+                        <span className="text-gray-700 font-medium">+52</span>
+                      </div>
+                      <input
+                        type="tel"
+                        required
+                        value={formatPhoneDisplay(otherPersonData.phone)}
+                        onChange={handleOtherPersonPhoneChange}
+                        className={`flex-1 px-4 py-3 border rounded-r-xl focus:ring-2 focus:ring-pink-500 ${
+                          otherPersonErrors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        }`}
+                        placeholder="555 123 4567"
+                        maxLength="12"
+                      />
+                    </div>
+                    {otherPersonErrors.phone ? (
+                      <p className="text-red-500 text-xs mt-1">Ingresa un teléfono válido de 10 dígitos</p>
+                    ) : (
+                      <p className="text-xs text-gray-500 mt-1">Formato: XXX XXX XXXX (diferente al tuyo)</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Parentesco <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      required
+                      value={otherPersonData.relationship}
+                      onChange={(e) => setOtherPersonData({...otherPersonData, relationship: e.target.value})}
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
+                        otherPersonErrors.relationship ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                      }`}
+                    >
+                      <option value="">Selecciona el parentesco</option>
+                      <option value="Mamá">Mamá</option>
+                      <option value="Papá">Papá</option>
+                      <option value="Hijo/a">Hijo/a</option>
+                      <option value="Hermano/a">Hermano/a</option>
+                      <option value="Esposo/a">Esposo/a</option>
+                      <option value="Abuelo/a">Abuelo/a</option>
+                      <option value="Tío/a">Tío/a</option>
+                      <option value="Primo/a">Primo/a</option>
+                      <option value="Otro familiar">Otro familiar</option>
+                    </select>
+                    {otherPersonErrors.relationship && (
+                      <p className="text-red-500 text-xs mt-1">Selecciona el parentesco</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Fecha y hora solo si ya eligió Para Mí o Para Otra Persona */}
+          {sessionFor && (
+            <>
+              <div className="mb-8">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Selecciona el día
+                </label>
+                <div className="grid grid-cols-7 gap-2">
               {availableDates.map((date, index) => {
                 const formatted = formatDate(date);
-                const isSunday = date.getDay() === 0;
                 const isSelected = selectedDate?.toDateString() === date.toDateString();
                 
                 return (
                   <button
                     key={index}
                     type="button"
-                    disabled={isSunday}
                     onClick={() => {
                       setSelectedDate(date);
                       setSelectedTime(null);
                     }}
                     className={`p-3 rounded-xl text-center transition-all ${
-                      isSunday
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : isSelected
+                      isSelected
                         ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg'
                         : 'bg-white border-2 border-gray-200 hover:border-purple-300'
                     }`}
@@ -957,7 +1404,7 @@ ${formData.concerns || 'No especificado'}
               })}
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              * Cerrado los domingos
+              * Fechas disponibles después de 15 días. Cerrado los domingos.
             </p>
           </div>
 
@@ -966,7 +1413,7 @@ ${formData.concerns || 'No especificado'}
               <label className="block text-sm font-semibold text-gray-700 mb-3">
                 Selecciona la hora
               </label>
-              <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+              <div className="grid grid-cols-4 md:grid-cols-5 gap-3">
                 {getAvailableTimesForDate(selectedDate).map((time) => (
                   <button
                     key={time}
@@ -984,8 +1431,8 @@ ${formData.concerns || 'No especificado'}
               </div>
               <p className="text-xs text-gray-500 mt-2">
                 {isWeekend(selectedDate) 
-                  ? '* Sábados: 9:00am - 2:00pm'
-                  : '* Lunes a Viernes: 8:00am - 8:00pm'
+                  ? '* Sábado: 9:00am - 12:00pm'
+                  : '* Lunes a Viernes: 5 horarios disponibles'
                 }
               </p>
             </div>
@@ -1006,9 +1453,9 @@ ${formData.concerns || 'No especificado'}
 
           <button
             type="submit"
-            disabled={!selectedDate || !selectedTime}
+            disabled={!selectedDate || !selectedTime || !sessionFor}
             className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
-              selectedDate && selectedTime
+              selectedDate && selectedTime && sessionFor
                 ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
@@ -1019,6 +1466,8 @@ ${formData.concerns || 'No especificado'}
           <p className="text-xs text-center text-gray-500 mt-4">
             Te contactaremos 24 horas antes para confirmar tu sesión por videollamada
           </p>
+            </>
+          )}
         </form>
 
         <div className="mt-12 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-8">

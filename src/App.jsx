@@ -61,21 +61,115 @@ function App() {
   const formatUSPhone = (value) => {
     const numbers = value.replace(/\D/g, '');
     if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `(${numbers.slice(0, 3)}) ${numbers.slice(3)}`;
-    return `(${numbers.slice(0, 3)}) ${numbers.slice(3, 6)}-${numbers.slice(6, 10)}`;
+    if (numbers.length <= 6) return `${numbers.slice(0, 3)} ${numbers.slice(3)}`;
+    return `${numbers.slice(0, 3)} ${numbers.slice(3, 6)} ${numbers.slice(6)}`;
   };
 
   const formatMXPhone = (value) => {
     const numbers = value.replace(/\D/g, '');
-    if (numbers.length <= 2) return numbers;
-    if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6, 10)}`;
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 6) return `${numbers.slice(0, 3)} ${numbers.slice(3)}`;
+    return `${numbers.slice(0, 3)} ${numbers.slice(3, 6)} ${numbers.slice(6)}`;
   };
 
-  const handleRegister = () => {
-    if (migrantFirstName && migrantLastName && migrantMotherLastName && migrantEmail && 
+  const handleRegister = async () => {
+    if (migrantFirstName && migrantLastName && migrantEmail && 
         migrantPhone && familyCountry && familyFirstName && familyLastName && 
-        familyMotherLastName && familyPhone) {
+        familyPhone) {
+      
+      // Prepare registration data
+      const registrationData = {
+        timestamp: new Date().toISOString(),
+        migrant: {
+          firstName: migrantFirstName,
+          lastName: migrantLastName,
+          motherLastName: migrantMotherLastName,
+          email: migrantEmail,
+          phone: `+1 ${migrantPhone}`
+        },
+        family: {
+          firstName: familyFirstName,
+          lastName: familyLastName,
+          motherLastName: familyMotherLastName,
+          phone: `+52 ${familyPhone}`,
+          country: familyCountry
+        }
+      };
+
+      console.log('Datos de registro:', registrationData);
+
+      // Guardar en localStorage usando teléfonos como IDs únicos
+      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+      
+      // Guardar ambos usuarios con su teléfono como ID
+      const migrantPhoneId = `+1${migrantPhone.replace(/\s/g, '')}`;
+      const familyPhoneId = `+52${familyPhone.replace(/\s/g, '')}`;
+      
+      registeredUsers[migrantPhoneId] = {
+        ...registrationData.migrant,
+        registeredAt: registrationData.timestamp,
+        type: 'migrant',
+        linkedFamilyPhone: familyPhoneId
+      };
+      
+      registeredUsers[familyPhoneId] = {
+        ...registrationData.family,
+        registeredAt: registrationData.timestamp,
+        type: 'family',
+        linkedMigrantPhone: migrantPhoneId
+      };
+      
+      localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+      console.log('Usuarios registrados:', registeredUsers);
+
+      // Send email with registration data
+      try {
+        const emailMessage = `
+🎉 NUEVO REGISTRO DE PREVENTA
+
+--- DATOS DEL MIGRANTE EN EEUU ---
+Nombre completo: ${migrantFirstName} ${migrantLastName} ${migrantMotherLastName || ''}
+Email: ${migrantEmail}
+Teléfono (WhatsApp): +1 ${migrantPhone}
+ID de acceso: ${migrantPhoneId}
+
+--- DATOS DEL FAMILIAR EN MÉXICO ---
+Nombre completo: ${familyFirstName} ${familyLastName} ${familyMotherLastName || ''}
+Teléfono (WhatsApp): +52 ${familyPhone}
+ID de acceso: ${familyPhoneId}
+País: ${familyCountry}
+
+--- INFORMACIÓN ADICIONAL ---
+Fecha de registro: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+Cupos restantes después de este registro: ${spotsLeft - 1}
+
+--- SIGUIENTE PASO ---
+⚠️ IMPORTANTE: Los usuarios pueden ingresar usando su número de teléfono como ID único.
+- Migrante (USA): ${migrantPhoneId}
+- Familiar (México): ${familyPhoneId}
+        `.trim();
+
+        const response = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: `${migrantFirstName} ${migrantLastName}`,
+            email: migrantEmail,
+            message: emailMessage,
+            type: 'registration'
+          }),
+        });
+
+        if (!response.ok) {
+          console.error('Error al enviar email de registro');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+
+      // Continue with UI flow
       setSpotsLeft(prev => Math.max(0, prev - 1));
       setShowConfetti(true);
       setCurrentPage('confirmation');
@@ -131,7 +225,7 @@ function App() {
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
-              <span>¿Ya tienes tu código? ¡Ingresa aquí!</span>
+              <span>¿Ya te registraste? ¡Ingresa con tu teléfono!</span>
             </button>
           </div>
           
