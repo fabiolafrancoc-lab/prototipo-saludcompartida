@@ -10,9 +10,14 @@ export default function Contact() {
   // Get user data from localStorage
   let storedUserData = null;
   try {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
-    if (stored) {
-      storedUserData = JSON.parse(stored);
+    // Primero intentar con currentUser (nuevo sistema)
+    const currentUserStored = typeof window !== 'undefined' ? localStorage.getItem('currentUser') : null;
+    const accessUserStored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
+    
+    if (currentUserStored) {
+      storedUserData = JSON.parse(currentUserStored);
+    } else if (accessUserStored) {
+      storedUserData = JSON.parse(accessUserStored);
     }
   } catch (e) {
     storedUserData = null;
@@ -45,9 +50,19 @@ export default function Contact() {
     // Also update from localStorage on mount
     const handleStorageChange = () => {
       try {
-        const stored = localStorage.getItem('accessUser');
-        if (stored) {
-          const userData = JSON.parse(stored);
+        // Primero intentar con currentUser (nuevo sistema)
+        let userData = null;
+        const currentUserStored = localStorage.getItem('currentUser');
+        if (currentUserStored) {
+          userData = JSON.parse(currentUserStored);
+        } else {
+          const accessUserStored = localStorage.getItem('accessUser');
+          if (accessUserStored) {
+            userData = JSON.parse(accessUserStored);
+          }
+        }
+        
+        if (userData) {
           setFormData(prev => ({
             ...prev,
             nombre: userData?.firstName || prev.nombre,

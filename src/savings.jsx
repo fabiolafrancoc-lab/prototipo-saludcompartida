@@ -5,13 +5,21 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 const Savings = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // Prefer name passed in location.state, otherwise try stored accessUser from page3, default to 'Nombre'
+  // Prefer name passed in location.state, otherwise try stored user data from page3, default to 'Nombre'
   let storedFirstName = null;
   try {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
-    if (stored) {
-      const parsed = JSON.parse(stored);
+    // Primero intentar con currentUser (nuevo sistema)
+    const currentUserStored = typeof window !== 'undefined' ? localStorage.getItem('currentUser') : null;
+    if (currentUserStored) {
+      const parsed = JSON.parse(currentUserStored);
       storedFirstName = parsed?.firstName || null;
+    } else {
+      // Fallback a accessUser (sistema anterior)
+      const accessUserStored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
+      if (accessUserStored) {
+        const parsed = JSON.parse(accessUserStored);
+        storedFirstName = parsed?.firstName || null;
+      }
     }
   } catch (e) {
     storedFirstName = null;

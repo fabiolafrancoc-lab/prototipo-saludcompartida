@@ -9,10 +9,18 @@ export default function MigrantContact() {
   // Get user's first name from localStorage
   let firstName = '';
   try {
-    const stored = localStorage.getItem('accessUser');
-    if (stored) {
-      const parsed = JSON.parse(stored);
+    // Primero intentar con currentUser (nuevo sistema)
+    const currentUserStored = localStorage.getItem('currentUser');
+    if (currentUserStored) {
+      const parsed = JSON.parse(currentUserStored);
       firstName = parsed?.firstName || '';
+    } else {
+      // Fallback a accessUser (sistema anterior)
+      const accessUserStored = localStorage.getItem('accessUser');
+      if (accessUserStored) {
+        const parsed = JSON.parse(accessUserStored);
+        firstName = parsed?.firstName || '';
+      }
     }
   } catch (e) {
     firstName = '';

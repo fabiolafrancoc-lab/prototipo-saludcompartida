@@ -62,9 +62,14 @@ const Rating = () => {
   // Get user data from localStorage
   let storedUserData = null;
   try {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
-    if (stored) {
-      storedUserData = JSON.parse(stored);
+    // Primero intentar con currentUser (nuevo sistema)
+    const currentUserStored = typeof window !== 'undefined' ? localStorage.getItem('currentUser') : null;
+    const accessUserStored = typeof window !== 'undefined' ? localStorage.getItem('accessUser') : null;
+    
+    if (currentUserStored) {
+      storedUserData = JSON.parse(currentUserStored);
+    } else if (accessUserStored) {
+      storedUserData = JSON.parse(accessUserStored);
     }
   } catch (e) {
     storedUserData = null;

@@ -203,17 +203,26 @@ const Page4 = () => {
   const { country, countryCode, loading: geoLoading } = useGeolocation();
   const [showLocationBanner, setShowLocationBanner] = useState(false);
   
-  // Get user data from localStorage (MX2025 code)
+  // Get user data from localStorage
   const [userName, setUserName] = useState('');
   
   useEffect(() => {
     try {
-      const accessUserData = localStorage.getItem('accessUser');
-      if (accessUserData) {
-        const userData = JSON.parse(accessUserData);
-        if (userData.accessCode === 'MX2025' && userData.firstName) {
-          setUserName(userData.firstName);
+      // Primero intentar con currentUser (nuevo sistema)
+      let userData = null;
+      const currentUserData = localStorage.getItem('currentUser');
+      if (currentUserData) {
+        userData = JSON.parse(currentUserData);
+      } else {
+        // Fallback a accessUser (sistema anterior)
+        const accessUserData = localStorage.getItem('accessUser');
+        if (accessUserData) {
+          userData = JSON.parse(accessUserData);
         }
+      }
+      
+      if (userData && userData.firstName) {
+        setUserName(userData.firstName);
       }
     } catch (error) {
       console.error('Error reading user data:', error);
