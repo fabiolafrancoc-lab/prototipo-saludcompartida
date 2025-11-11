@@ -68,17 +68,17 @@ export default function Account() {
 
   const handleSave = () => {
     if (!userData.firstName || !userData.lastName) {
-      alert('Por favor completa tu nombre y apellido paterno');
+      alert('Por favor completa tu nombre y apellido paterno. Intenta de nuevo.');
       return;
     }
 
     if (!userData.birthDate) {
-      alert('Por favor ingresa tu fecha de nacimiento');
+      alert('Por favor ingresa tu fecha de nacimiento. Intenta de nuevo.');
       return;
     }
 
     if (userData.phone.length !== 10) {
-      alert('Por favor ingresa un número de WhatsApp válido de 10 dígitos');
+      alert('Por favor ingresa un número de WhatsApp válido de 10 dígitos. Intenta de nuevo.');
       return;
     }
 
