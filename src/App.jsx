@@ -505,7 +505,7 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                             value={familyPhone}
                             onChange={(e) => setFamilyPhone(formatMXPhone(e.target.value))}
                             placeholder="(55) 1234-5678"
-                            maxLength="15"
+                            maxLength="14"
                             className="w-full pl-14 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all text-gray-900 placeholder-gray-400 bg-white"
                           />
                         </div>

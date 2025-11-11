@@ -10,7 +10,8 @@ async function supabaseRequest(endpoint, method = 'GET', body = null) {
     headers: {
       'Content-Type': 'application/json',
       'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Prefer': 'return=representation' // Para que retorne los datos insertados
     }
   };
 
@@ -21,11 +22,19 @@ async function supabaseRequest(endpoint, method = 'GET', body = null) {
   const response = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, options);
   
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Error en la petición a Supabase');
+    let errorMessage = 'Error en la petición a Supabase';
+    try {
+      const error = await response.json();
+      errorMessage = error.message || error.hint || JSON.stringify(error);
+    } catch (e) {
+      errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+    }
+    throw new Error(errorMessage);
   }
 
-  return response.json();
+  // Para INSERT/POST, Supabase puede retornar respuesta vacía (201 Created)
+  const text = await response.text();
+  return text ? JSON.parse(text) : {};
 }
 
 // Función para generar código de acceso único
