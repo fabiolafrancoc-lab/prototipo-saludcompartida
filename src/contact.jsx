@@ -332,7 +332,14 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
                     }`}
                     placeholder="Tu nombre"
                   />
-                  {errors.nombre && <p className="mt-1 text-sm text-red-600">{errors.nombre}</p>}
+                  {errors.nombre && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      Este campo es obligatorio
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -349,7 +356,14 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
                     }`}
                     placeholder="Tu apellido paterno"
                   />
-                  {errors.apellidoPaterno && <p className="mt-1 text-sm text-red-600">{errors.apellidoPaterno}</p>}
+                  {errors.apellidoPaterno && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      Este campo es obligatorio
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -376,7 +390,14 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
                       placeholder="XXX XXX XXXX"
                     />
                   </div>
-                  {errors.telefono && <p className="mt-1 text-sm text-red-600">{errors.telefono}</p>}
+                  {errors.telefono && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      Este campo es obligatorio
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -417,7 +438,14 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
                     <option key={idx} value={cat}>{cat}</option>
                   ))}
                 </select>
-                {errors.categoria && <p className="mt-1 text-sm text-red-600">{errors.categoria}</p>}
+                {errors.categoria && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    Este campo es obligatorio
+                  </p>
+                )}
               </div>
 
               {/* Mensaje */}
