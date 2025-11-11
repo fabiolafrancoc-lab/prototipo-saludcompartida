@@ -18,12 +18,16 @@ export default function Account() {
 
   const userName = location.state?.name || storedUserData?.firstName || '';
 
+  // Detectar código de país desde localStorage
+  const [countryCode, setCountryCode] = useState(storedUserData?.countryCode || '+52');
+
   const [userData, setUserData] = useState({
     firstName: storedUserData?.firstName || '',
     lastName: storedUserData?.lastName || '',
     motherLastName: storedUserData?.motherLastName || '',
     birthDate: storedUserData?.birthDate || '',
-    phone: storedUserData?.phone || ''
+    phone: storedUserData?.phone || '',
+    email: storedUserData?.email || ''
   });
 
   const [familyMembers, setFamilyMembers] = useState(
@@ -34,6 +38,7 @@ export default function Account() {
     ]
   );
 
+  const [errors, setErrors] = useState({});
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -42,6 +47,9 @@ export default function Account() {
   }, []);
 
   const handleUserChange = (field, value) => {
+    // Limpiar error cuando el usuario empieza a escribir
+    setErrors(prev => ({ ...prev, [field]: '' }));
+
     if (field === 'phone') {
       const cleaned = value.replace(/\D/g, '').slice(0, 10);
       setUserData(prev => ({ ...prev, phone: cleaned }));
@@ -67,18 +75,27 @@ export default function Account() {
   };
 
   const handleSave = () => {
-    if (!userData.firstName || !userData.lastName) {
-      alert('Por favor completa tu nombre y apellido paterno. Intenta de nuevo.');
-      return;
+    const newErrors = {};
+
+    if (!userData.firstName || !userData.firstName.trim()) {
+      newErrors.firstName = 'El nombre es requerido';
+    }
+
+    if (!userData.lastName || !userData.lastName.trim()) {
+      newErrors.lastName = 'El apellido paterno es requerido';
     }
 
     if (!userData.birthDate) {
-      alert('Por favor ingresa tu fecha de nacimiento. Intenta de nuevo.');
-      return;
+      newErrors.birthDate = 'La fecha de nacimiento es requerida';
     }
 
-    if (userData.phone.length !== 10) {
-      alert('Por favor ingresa un número de WhatsApp válido de 10 dígitos. Intenta de nuevo.');
+    if (!userData.phone || userData.phone.length !== 10) {
+      newErrors.phone = 'El teléfono debe tener 10 dígitos';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      alert('Por favor completa todos los campos requeridos correctamente. Intenta de nuevo.');
       return;
     }
 
@@ -91,7 +108,8 @@ export default function Account() {
       motherLastName: userData.motherLastName,
       phone: userData.phone,
       birthDate: userData.birthDate,
-      email: storedUserData?.email || '', // Keep email if exists
+      email: userData.email,
+      countryCode: countryCode,
       familyMembers: familyMembers
     };
     
@@ -179,9 +197,16 @@ export default function Account() {
                   type="text"
                   value={userData.firstName}
                   onChange={(e) => handleUserChange('firstName', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
+                    errors.firstName 
+                      ? 'border-red-500 focus:border-red-600' 
+                      : userData.firstName 
+                        ? 'border-gray-200 focus:border-cyan-500' 
+                        : 'border-gray-200 bg-gray-50 text-gray-500 focus:border-cyan-500'
+                  }`}
                   placeholder="Tu nombre"
                 />
+                {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
               </div>
 
               <div>
@@ -192,9 +217,16 @@ export default function Account() {
                   type="text"
                   value={userData.lastName}
                   onChange={(e) => handleUserChange('lastName', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
+                    errors.lastName 
+                      ? 'border-red-500 focus:border-red-600' 
+                      : userData.lastName 
+                        ? 'border-gray-200 focus:border-cyan-500' 
+                        : 'border-gray-200 bg-gray-50 text-gray-500 focus:border-cyan-500'
+                  }`}
                   placeholder="Apellido paterno"
                 />
+                {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
               </div>
 
               <div>
@@ -205,7 +237,11 @@ export default function Account() {
                   type="text"
                   value={userData.motherLastName}
                   onChange={(e) => handleUserChange('motherLastName', e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
+                    userData.motherLastName 
+                      ? 'border-gray-200 focus:border-cyan-500' 
+                      : 'border-gray-200 bg-gray-50 text-gray-500 focus:border-cyan-500'
+                  }`}
                   placeholder="Apellido materno"
                 />
               </div>
@@ -220,9 +256,16 @@ export default function Account() {
                 type="date"
                 value={userData.birthDate}
                 onChange={(e) => handleUserChange('birthDate', e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
+                className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
+                  errors.birthDate 
+                    ? 'border-red-500 focus:border-red-600' 
+                    : userData.birthDate 
+                      ? 'border-gray-200 focus:border-cyan-500' 
+                      : 'border-gray-200 bg-gray-50 text-gray-500 focus:border-cyan-500'
+                }`}
                 placeholder="dd/mm/aaaa"
               />
+              {errors.birthDate && <p className="mt-1 text-sm text-red-600">{errors.birthDate}</p>}
             </div>
 
             {/* WhatsApp */}
@@ -234,18 +277,27 @@ export default function Account() {
                 </svg>
               </label>
               <div className="flex">
-                <div className="flex items-center bg-gray-100 border-2 border-r-0 border-gray-200 rounded-l-xl px-4">
-                  <span className="text-gray-700 font-semibold">+52</span>
+                <div className={`flex items-center border-2 border-r-0 rounded-l-xl px-4 ${
+                  errors.phone ? 'border-red-500 bg-red-50' : 'bg-gray-100 border-gray-200'
+                }`}>
+                  <span className="text-gray-700 font-semibold">{countryCode}</span>
                 </div>
                 <input
                   type="tel"
                   value={formatPhoneDisplay(userData.phone)}
                   onChange={(e) => handleUserChange('phone', e.target.value)}
-                  className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-r-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all"
+                  className={`flex-1 px-4 py-3 border-2 rounded-r-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
+                    errors.phone 
+                      ? 'border-red-500 focus:border-red-600' 
+                      : userData.phone 
+                        ? 'border-gray-200 focus:border-cyan-500' 
+                        : 'border-gray-200 bg-gray-50 text-gray-500 focus:border-cyan-500'
+                  }`}
                   placeholder="555 123 4567"
                   maxLength="12"
                 />
               </div>
+              {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
               <p className="text-xs text-gray-500 mt-1">
                 Formato: XXX XXX XXXX
               </p>
@@ -387,6 +439,22 @@ export default function Account() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Consultas Button */}
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={() => {
+              window.scrollTo(0, 0);
+              navigate('/contact');
+            }}
+            className="group flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            ¿Tienes Consultas?
+          </button>
         </div>
       </main>
     </div>
