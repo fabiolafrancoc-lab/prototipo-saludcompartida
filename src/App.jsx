@@ -62,16 +62,20 @@ function App() {
 
   const formatUSPhone = (value) => {
     const numbers = value.replace(/\D/g, '');
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `${numbers.slice(0, 3)} ${numbers.slice(3)}`;
-    return `${numbers.slice(0, 3)} ${numbers.slice(3, 6)} ${numbers.slice(6)}`;
+    // Limitar a máximo 10 dígitos
+    const limited = numbers.slice(0, 10);
+    if (limited.length <= 3) return limited;
+    if (limited.length <= 6) return `${limited.slice(0, 3)} ${limited.slice(3)}`;
+    return `${limited.slice(0, 3)} ${limited.slice(3, 6)} ${limited.slice(6)}`;
   };
 
   const formatMXPhone = (value) => {
     const numbers = value.replace(/\D/g, '');
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `${numbers.slice(0, 3)} ${numbers.slice(3)}`;
-    return `${numbers.slice(0, 3)} ${numbers.slice(3, 6)} ${numbers.slice(6)}`;
+    // Limitar a máximo 10 dígitos
+    const limited = numbers.slice(0, 10);
+    if (limited.length <= 3) return limited;
+    if (limited.length <= 6) return `${limited.slice(0, 3)} ${limited.slice(3)}`;
+    return `${limited.slice(0, 3)} ${limited.slice(3, 6)} ${limited.slice(6)}`;
   };
 
   const handleRegister = async () => {
@@ -232,20 +236,21 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
             </p>
           </div>
 
-          <div className="mb-10 text-center">
-            
-            <button
-              onClick={() => navigate('/page3')}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 cursor-pointer"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-              </svg>
-              <div className="text-left">
-                <div className="text-sm font-normal text-emerald-100">¿Ya tienes tu código?</div>
-                <div className="text-lg font-bold">Ingresa el código que recibiste vía WhatsApp</div>
-              </div>
-            </button>
+          <div className="mb-10 flex justify-center">
+            <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 border-2 border-cyan-300 rounded-2xl p-6 shadow-lg max-w-2xl">
+              <button
+                onClick={() => navigate('/page3')}
+                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-600 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+                <div className="text-left">
+                  <div className="text-sm font-normal text-cyan-100">¿Ya tienes tu código?</div>
+                  <div className="text-lg font-bold">Ingresa el código que recibiste vía WhatsApp</div>
+                </div>
+              </button>
+            </div>
           </div>
           
           <div className="grid lg:grid-cols-2 gap-12 items-start">
@@ -383,7 +388,7 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">Apellido Materno</label>
+                          <label className="block text-sm font-semibold text-gray-700 mb-2">Apellido Materno <span className="text-gray-500 font-normal">(opcional)</span></label>
                           <input
                             type="text"
                             value={migrantMotherLastName}
