@@ -379,6 +379,10 @@ export default function Therapy() {
   });
   const [formErrors, setFormErrors] = useState({});
   const [otherPersonErrors, setOtherPersonErrors] = useState({});
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showRescheduleQuestion, setShowRescheduleQuestion] = useState(false);
+  const [showThankYouMessage, setShowThankYouMessage] = useState(false);
+  const [isRescheduling, setIsRescheduling] = useState(false);
 
   // Update form data when localStorage changes (e.g., from account update)
   useEffect(() => {
@@ -506,7 +510,8 @@ export default function Therapy() {
     const dates = [];
     const today = new Date();
     let daysAdded = 0;
-    let currentDay = 16; // Empezar después de 15 días
+    // Si está reprogramando, empezar desde +15 días; si no, desde +16 días
+    let currentDay = isRescheduling ? 15 : 16;
     
     while (daysAdded < 21) { // Generar 3 semanas de fechas disponibles
       const date = new Date(today);
@@ -725,6 +730,33 @@ ${formData.concerns || 'No especificado'}
     return day === 6; // Solo sábado (domingo ya está excluido)
   };
 
+  const handleCancelAppointment = () => {
+    setShowCancelModal(true);
+  };
+
+  const handleConfirmCancel = () => {
+    setShowCancelModal(false);
+    setShowRescheduleQuestion(true);
+  };
+
+  const handleRescheduleNo = () => {
+    // Usuario no quiere reprogramar
+    console.log('Usuario canceló sin reprogramar');
+    setShowRescheduleQuestion(false);
+    setShowThankYouMessage(true);
+  };
+
+  const handleRescheduleYes = () => {
+    // Usuario quiere reprogramar - resetear formulario y mostrar calendario
+    console.log('Usuario quiere reprogramar');
+    setShowRescheduleQuestion(false);
+    setShowConfirmation(false);
+    setIsRescheduling(true);
+    setSelectedDate(null);
+    setSelectedTime(null);
+    window.scrollTo(0, 0);
+  };
+
   const getAvailableTimesForDate = (date) => {
     if (!date) return [];
     
@@ -800,16 +832,26 @@ ${formData.concerns || 'No especificado'}
               </p>
             </div>
 
-            {/* Sección de Cancelación y Reprogramación */}
+            {/* Botón de Cancelar Cita */}
+            <div className="mb-8">
+              <button
+                onClick={handleCancelAppointment}
+                className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg mb-4"
+              >
+                Cancelar Cita
+              </button>
+            </div>
+
+            {/* Sección de Cancelación y Reprogramación (info) */}
             <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 mb-8">
               <div className="flex items-start gap-3 mb-4">
                 <svg className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">¿Necesitas cancelar o reprogramar?</h3>
+                  <h3 className="font-bold text-gray-900 mb-2">¿Necesitas ayuda con tu cita?</h3>
                   <p className="text-sm text-gray-700 mb-3">
-                    Entendemos que a veces surgen imprevistos. Si necesitas cambiar tu cita:
+                    Si tienes dudas o necesitas asistencia, contáctanos:
                   </p>
                   
                   <div className="space-y-2 text-sm text-gray-700">
@@ -817,14 +859,14 @@ ${formData.concerns || 'No especificado'}
                       <svg className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                      <span><strong>Por WhatsApp:</strong> Envía un mensaje al <a href={`https://wa.me/5215512345678?text=${encodeURIComponent('Hola, necesito cancelar/reprogramar mi sesión de terapia del ' + selectedDate.toLocaleDateString('es-MX'))}`} className="text-cyan-600 hover:underline font-semibold">55 1234 5678</a></span>
+                      <span><strong>Por WhatsApp:</strong> Envía un mensaje al <a href={`https://wa.me/5215512345678?text=${encodeURIComponent('Hola, tengo una pregunta sobre mi sesión de terapia del ' + selectedDate.toLocaleDateString('es-MX'))}`} className="text-cyan-600 hover:underline font-semibold">55 1234 5678</a></span>
                     </div>
                     
                     <div className="flex items-start gap-2">
                       <svg className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                      <span><strong>Por email:</strong> Escribe a <a href={`mailto:terapia@saludcompartida.com?subject=Cancelar/Reprogramar sesión&body=Nombre: ${formData.firstName} ${formData.lastName}%0D%0AFecha de cita: ${selectedDate.toLocaleDateString('es-MX')}%0D%0AHora: ${selectedTime}%0D%0A%0D%0AMotivo:`} className="text-cyan-600 hover:underline font-semibold">terapia@saludcompartida.com</a></span>
+                      <span><strong>Por email:</strong> Escribe a <a href={`mailto:terapia@saludcompartida.com?subject=Consulta sobre sesión&body=Nombre: ${formData.firstName} ${formData.lastName}%0D%0AFecha de cita: ${selectedDate.toLocaleDateString('es-MX')}%0D%0AHora: ${selectedTime}%0D%0A%0D%0AConsulta:`} className="text-cyan-600 hover:underline font-semibold">terapia@saludcompartida.com</a></span>
                     </div>
                     
                     <div className="flex items-start gap-2">
@@ -836,11 +878,8 @@ ${formData.concerns || 'No especificado'}
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-yellow-300">
-                    <p className="text-xs text-gray-600 mb-2">
-                      <strong>Importante:</strong> Avísanos con al menos 24 horas de anticipación si necesitas cancelar o reprogramar.
-                    </p>
                     <p className="text-xs text-gray-600">
-                      <strong>Nota sobre reprogramaciones:</strong> Las reprogramaciones están incluidas en tu suscripción, pero las fechas disponibles empiezan después de 15 días desde la fecha de reprogramación.
+                      <strong>Nota:</strong> Avísanos con al menos 24 horas de anticipación para cualquier cambio.
                     </p>
                   </div>
                 </div>
@@ -861,6 +900,7 @@ ${formData.concerns || 'No especificado'}
                   setSessionFor('');
                   setSelectedDate(null);
                   setSelectedTime(null);
+                  setIsRescheduling(false);
                   setFormData({ firstName: '', lastName: '', phone: '', email: '', concerns: '' });
                   setOtherPersonData({ firstName: '', lastName: '', motherLastName: '', email: '', phone: '', relationship: '' });
                 }}
@@ -871,6 +911,131 @@ ${formData.concerns || 'No especificado'}
             </div>
           </div>
         </div>
+
+        {/* Modal de Confirmación de Cancelación */}
+        {showCancelModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+              <div className="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              
+              <h3 className="text-2xl font-bold text-gray-900 text-center mb-4">
+                ¿Seguro que quieres cancelar?
+              </h3>
+              
+              <p className="text-gray-600 text-center mb-6">
+                Tu sesión del {selectedDate.toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })} a las {selectedTime} hrs será cancelada.
+              </p>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={handleConfirmCancel}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition-all"
+                >
+                  Sí, cancelar cita
+                </button>
+                
+                <button
+                  onClick={() => setShowCancelModal(false)}
+                  className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-xl transition-all"
+                >
+                  No, mantener mi cita
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Pregunta de Reprogramación */}
+        {showRescheduleQuestion && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+              <div className="w-16 h-16 bg-cyan-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-8 h-8 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              
+              <h3 className="text-2xl font-bold text-gray-900 text-center mb-4">
+                ¿Quieres reprogramar tu sesión?
+              </h3>
+              
+              <p className="text-gray-600 text-center mb-6">
+                Podemos ayudarte a encontrar una nueva fecha para tu sesión de terapia.
+              </p>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={handleRescheduleYes}
+                  className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg"
+                >
+                  Sí, quiero reprogramar
+                </button>
+                
+                <button
+                  onClick={handleRescheduleNo}
+                  className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-xl transition-all"
+                >
+                  No, solo cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de Mensaje de Agradecimiento */}
+        {showThankYouMessage && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </div>
+              
+              <h3 className="text-2xl font-bold text-gray-900 text-center mb-4">
+                Estamos Aquí para Ti
+              </h3>
+              
+              <p className="text-lg text-gray-700 text-center mb-6">
+                Tu bienestar emocional es nuestra prioridad. Cuando estés listo para tu sesión, <strong className="text-purple-600">estaremos listos para atenderte</strong> con todo el apoyo que mereces.
+              </p>
+              
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 mb-6">
+                <p className="text-sm text-gray-600 text-center italic">
+                  "Cuidar de tu salud mental no es un lujo, es una necesidad. Vuelve cuando lo necesites, siempre tendremos un espacio para ti."
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={() => navigate('/page4')}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg"
+                >
+                  Volver al menú principal
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setShowThankYouMessage(false);
+                    setShowConfirmation(false);
+                    setSessionFor('');
+                    setSelectedDate(null);
+                    setSelectedTime(null);
+                    setIsRescheduling(false);
+                    window.scrollTo(0, 0);
+                  }}
+                  className="w-full text-cyan-600 hover:text-cyan-700 font-semibold py-2"
+                >
+                  Agendar una nueva sesión
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -1069,8 +1234,24 @@ ${formData.concerns || 'No especificado'}
 
         {/* Formulario con campos separados y teléfono +55 */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8">
+          {isRescheduling && (
+            <div className="bg-cyan-50 border-2 border-cyan-200 rounded-xl p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-cyan-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <h3 className="font-bold text-gray-900 mb-1">Reprogramando tu sesión</h3>
+                  <p className="text-sm text-gray-700">
+                    Las nuevas fechas disponibles empiezan <strong>15 días desde hoy</strong>. Selecciona tu nueva fecha y hora.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Agenda tu sesión individual
+            {isRescheduling ? 'Reprograma tu sesión individual' : 'Agenda tu sesión individual'}
           </h2>
 
           {/* Selección: Para Mí o Para Otra Persona */}
