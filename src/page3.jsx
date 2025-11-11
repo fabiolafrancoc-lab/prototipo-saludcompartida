@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGeolocation } from './hooks/useGeolocation';
+import { UserContext } from './contexts/UserContext';
+import { getUserByAccessCode } from './lib/supabase';
 
 // Códigos especiales de acceso para inversores y demos
 const SPECIAL_ACCESS_CODES = {
@@ -45,6 +47,7 @@ const SPECIAL_ACCESS_CODES = {
 export default function Page3() {
   const navigate = useNavigate();
   const { countryCode: detectedCountry, loading: geoLoading } = useGeolocation();
+  const { setCurrentUser } = useContext(UserContext);
   
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -58,6 +61,7 @@ export default function Page3() {
   const [errorMessage, setErrorMessage] = useState('');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [useSpecialCode, setUseSpecialCode] = useState(false); // Toggle entre teléfono y código especial
+  const [userDataLoaded, setUserDataLoaded] = useState(false); // Indica si ya cargamos datos del localStorage
 
   // Auto-select country code based on geolocation (only for Mexico)
   useEffect(() => {
@@ -69,11 +73,36 @@ export default function Page3() {
     }
   }, [detectedCountry, geoLoading]);
 
-  const handleAccessCode = () => {
+  // Auto-load user data when phone number changes
+  useEffect(() => {
+    if (whatsappNumber.trim().length === 10 && !useSpecialCode) {
+      const uniquePhoneId = `${countryCode}${whatsappNumber.trim()}`;
+      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+      
+      if (registeredUsers[uniquePhoneId]) {
+        const userData = registeredUsers[uniquePhoneId];
+        setFirstName(userData.firstName || '');
+        setLastName(userData.lastName || '');
+        setMotherLastName(userData.motherLastName || '');
+        setUserDataLoaded(true);
+      } else {
+        // Si cambia el número y no existe, limpiar campos
+        if (userDataLoaded) {
+          setFirstName('');
+          setLastName('');
+          setMotherLastName('');
+          setUserDataLoaded(false);
+        }
+      }
+    }
+  }, [whatsappNumber, countryCode, useSpecialCode, userDataLoaded]);
+
+  const handleAccessCode = async () => {
     // Si está usando código especial, validar directamente
     if (useSpecialCode && specialCode.trim()) {
       const upperCode = specialCode.trim().toUpperCase();
       
+      // Primero revisar si es un código demo
       if (SPECIAL_ACCESS_CODES[upperCode]) {
         const codeData = SPECIAL_ACCESS_CODES[upperCode];
         
@@ -85,7 +114,7 @@ export default function Page3() {
           isDemo: true
         };
         
-        localStorage.setItem('accessUser', JSON.stringify(userData));
+        localStorage.setItem('currentUser', JSON.stringify(userData));
         
         // Registrar el código usado (para analytics)
         const usedCodes = JSON.parse(localStorage.getItem('usedSpecialCodes') || '[]');
@@ -100,22 +129,50 @@ export default function Page3() {
         setErrors({});
         navigate(codeData.route);
         return;
-      } else {
-        setErrors({ specialCode: 'Código no válido. Verifica e intenta nuevamente.' });
-        return;
       }
+      
+      // Si no es código demo, buscar en Supabase
+      try {
+        const result = await getUserByAccessCode(upperCode);
+        
+        if (result.success && result.data) {
+          const dbUser = result.data;
+          
+          const userData = {
+            firstName: dbUser.first_name,
+            lastName: dbUser.last_name,
+            motherLastName: dbUser.mother_last_name || '',
+            email: dbUser.email,
+            phone: dbUser.phone,
+            countryCode: dbUser.country_code,
+            phoneId: `${dbUser.country_code}${dbUser.phone}`,
+            accessCode: dbUser.access_code,
+            type: dbUser.user_type,
+            registeredAt: dbUser.created_at
+          };
+          
+          localStorage.setItem('currentUser', JSON.stringify(userData));
+          setCurrentUser(userData); // Actualizar contexto
+          setErrors({});
+          
+          // Navegar según el tipo de usuario
+          if (dbUser.user_type === 'migrant' || dbUser.country_code === '+1') {
+            navigate('/migrant');
+          } else {
+            navigate('/page4');
+          }
+        } else {
+          setErrors({ specialCode: 'Código no válido. Verifica e intenta nuevamente.' });
+        }
+      } catch (error) {
+        console.error('Error validando código:', error);
+        setErrors({ specialCode: 'Error al validar código. Intenta nuevamente.' });
+      }
+      return;
     }
     
-    // Validación normal por teléfono
+    // Validación normal por teléfono (fallback a localStorage)
     const newErrors = {};
-    
-    if (!firstName.trim()) {
-      newErrors.firstName = 'El nombre es requerido';
-    }
-    
-    if (!lastName.trim()) {
-      newErrors.lastName = 'El apellido paterno es requerido';
-    }
     
     if (!whatsappNumber.trim()) {
       newErrors.whatsappNumber = 'El número de WhatsApp es requerido';
@@ -136,26 +193,30 @@ export default function Page3() {
     // Construir el ID único con código de país + número
     const uniquePhoneId = `${countryCode}${whatsappNumber.trim()}`;
     
-    // Verificar si el teléfono está registrado
+    // Verificar si el teléfono está registrado en localStorage (compatibilidad)
     const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
     
     if (registeredUsers[uniquePhoneId]) {
-      // Usuario encontrado - cargar sus datos y dar acceso
+      // Usuario encontrado - usar los datos del registro original (ya precargados)
+      const originalData = registeredUsers[uniquePhoneId];
+      
       const userData = {
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        motherLastName: motherLastName.trim(),
-        phone: whatsappNumber.trim(),
+        firstName: originalData.firstName,
+        lastName: originalData.lastName,
+        motherLastName: originalData.motherLastName || '',
+        email: originalData.email || '',
+        phone: originalData.phone,
         countryCode: countryCode,
         phoneId: uniquePhoneId,
-        registeredData: registeredUsers[uniquePhoneId] // datos del registro original
+        type: originalData.type || 'user',
+        registeredAt: originalData.registeredAt
       };
       
-      localStorage.setItem('accessUser', JSON.stringify(userData));
+      localStorage.setItem('currentUser', JSON.stringify(userData));
       
-      // Limpiar errores y navegar según el código de país
+      // Limpiar errores y navegar según el tipo de usuario
       setErrors({});
-      if (countryCode === '+1') {
+      if (originalData.type === 'migrant' || countryCode === '+1') {
         navigate('/migrant');
       } else {
         navigate('/page4');
@@ -453,19 +514,24 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
             {/* NOMBRE */}
             <div>
               <label className="block text-gray-700 font-semibold mb-2">
-                Nombre <span className="text-red-500">*</span>
+                Nombre {userDataLoaded && <span className="text-green-600 text-sm">✓ Datos cargados</span>}
               </label>
               <input
                 type="text"
                 value={firstName}
                 onChange={(e) => {
-                  setFirstName(e.target.value);
-                  setErrors({ ...errors, firstName: '' });
+                  if (!userDataLoaded) {
+                    setFirstName(e.target.value);
+                    setErrors({ ...errors, firstName: '' });
+                  }
                 }}
                 placeholder="Ej: María"
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-cyan-500 text-lg ${
-                  errors.firstName ? 'border-red-500' : 'border-gray-300'
-                }`}
+                readOnly={userDataLoaded}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none text-lg ${
+                  userDataLoaded 
+                    ? 'bg-green-50 border-green-300 cursor-not-allowed' 
+                    : 'focus:border-cyan-500 border-gray-300'
+                } ${errors.firstName ? 'border-red-500' : ''}`}
               />
               {errors.firstName && (
                 <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
@@ -480,19 +546,24 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
             {/* APELLIDO PATERNO */}
             <div>
               <label className="block text-gray-700 font-semibold mb-2">
-                Apellido Paterno <span className="text-red-500">*</span>
+                Apellido Paterno {userDataLoaded && <span className="text-green-600 text-sm">✓</span>}
               </label>
               <input
                 type="text"
                 value={lastName}
                 onChange={(e) => {
-                  setLastName(e.target.value);
-                  setErrors({ ...errors, lastName: '' });
+                  if (!userDataLoaded) {
+                    setLastName(e.target.value);
+                    setErrors({ ...errors, lastName: '' });
+                  }
                 }}
                 placeholder="Ej: González"
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-cyan-500 text-lg ${
-                  errors.lastName ? 'border-red-500' : 'border-gray-300'
-                }`}
+                readOnly={userDataLoaded}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none text-lg ${
+                  userDataLoaded 
+                    ? 'bg-green-50 border-green-300 cursor-not-allowed' 
+                    : 'focus:border-cyan-500 border-gray-300'
+                } ${errors.lastName ? 'border-red-500' : ''}`}
               />
               {errors.lastName && (
                 <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
@@ -512,9 +583,18 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
               <input
                 type="text"
                 value={motherLastName}
-                onChange={(e) => setMotherLastName(e.target.value)}
+                onChange={(e) => {
+                  if (!userDataLoaded) {
+                    setMotherLastName(e.target.value);
+                  }
+                }}
                 placeholder="Ej: Rodríguez"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-cyan-500 text-lg"
+                readOnly={userDataLoaded}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none text-lg ${
+                  userDataLoaded 
+                    ? 'bg-green-50 border-green-300 cursor-not-allowed' 
+                    : 'focus:border-cyan-500 border-gray-300'
+                }`}
               />
             </div>
 

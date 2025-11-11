@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNav from './components/TopNav';
-import UserContext from './contexts/UserContext';
+import { insertUser } from './lib/supabase';
 
 function App() {
   const navigate = useNavigate();
@@ -22,6 +22,10 @@ function App() {
   const [familyLastName, setFamilyLastName] = useState('');
   const [familyMotherLastName, setFamilyMotherLastName] = useState('');
   const [familyPhone, setFamilyPhone] = useState('');
+  
+  // Estados para los códigos de acceso generados
+  const [migrantAccessCode, setMigrantAccessCode] = useState('');
+  const [familyAccessCode, setFamilyAccessCode] = useState('');
 
   const testimonials = [
     "Estoy ahorrando cada mes gracias a SaludCompartida.",
@@ -74,66 +78,97 @@ function App() {
         migrantPhone && familyCountry && familyFirstName && familyLastName && 
         familyPhone) {
       
-      // Prepare registration data
-      const registrationData = {
-        timestamp: new Date().toISOString(),
-        migrant: {
+      try {
+        // Limpiar números de teléfono (quitar espacios)
+        const cleanMigrantPhone = migrantPhone.replace(/\s/g, '');
+        const cleanFamilyPhone = familyPhone.replace(/\s/g, '');
+        
+        // Guardar migrante en Supabase
+        const migrantResult = await insertUser({
+          phone: cleanMigrantPhone,
+          countryCode: '+1',
           firstName: migrantFirstName,
           lastName: migrantLastName,
           motherLastName: migrantMotherLastName,
           email: migrantEmail,
-          phone: `+1 ${migrantPhone}`
-        },
-        family: {
+          userType: 'migrant',
+          linkedPhone: cleanFamilyPhone
+        });
+        
+        if (!migrantResult.success) {
+          alert('Error al registrar migrante: ' + migrantResult.error);
+          return;
+        }
+        
+        // Guardar familiar en Supabase
+        const familyResult = await insertUser({
+          phone: cleanFamilyPhone,
+          countryCode: '+52',
           firstName: familyFirstName,
           lastName: familyLastName,
           motherLastName: familyMotherLastName,
-          phone: `+52 ${familyPhone}`,
-          country: familyCountry
+          email: migrantEmail, // Usar el mismo email del migrante
+          userType: 'family',
+          linkedPhone: cleanMigrantPhone
+        });
+        
+        if (!familyResult.success) {
+          alert('Error al registrar familiar: ' + familyResult.error);
+          return;
         }
-      };
+        
+        // Guardar códigos de acceso generados
+        setMigrantAccessCode(migrantResult.accessCode);
+        setFamilyAccessCode(familyResult.accessCode);
+        
+        console.log('✅ Registro exitoso en Supabase');
+        console.log('Código Migrante:', migrantResult.accessCode);
+        console.log('Código Familiar:', familyResult.accessCode);
+        
+        // También guardar en localStorage para compatibilidad
+        const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+        const migrantPhoneId = `+1${cleanMigrantPhone}`;
+        const familyPhoneId = `+52${cleanFamilyPhone}`;
+        
+        registeredUsers[migrantPhoneId] = {
+          firstName: migrantFirstName,
+          lastName: migrantLastName,
+          motherLastName: migrantMotherLastName,
+          email: migrantEmail,
+          phone: cleanMigrantPhone,
+          accessCode: migrantResult.accessCode,
+          registeredAt: new Date().toISOString(),
+          type: 'migrant',
+          linkedFamilyPhone: familyPhoneId
+        };
+        
+        registeredUsers[familyPhoneId] = {
+          firstName: familyFirstName,
+          lastName: familyLastName,
+          motherLastName: familyMotherLastName,
+          phone: cleanFamilyPhone,
+          accessCode: familyResult.accessCode,
+          registeredAt: new Date().toISOString(),
+          type: 'family',
+          linkedMigrantPhone: migrantPhoneId
+        };
+        
+        localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
 
-      console.log('Datos de registro:', registrationData);
-
-      // Guardar en localStorage usando teléfonos como IDs únicos
-      const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
-      
-      // Guardar ambos usuarios con su teléfono como ID
-      const migrantPhoneId = `+1${migrantPhone.replace(/\s/g, '')}`;
-      const familyPhoneId = `+52${familyPhone.replace(/\s/g, '')}`;
-      
-      registeredUsers[migrantPhoneId] = {
-        ...registrationData.migrant,
-        registeredAt: registrationData.timestamp,
-        type: 'migrant',
-        linkedFamilyPhone: familyPhoneId
-      };
-      
-      registeredUsers[familyPhoneId] = {
-        ...registrationData.family,
-        registeredAt: registrationData.timestamp,
-        type: 'family',
-        linkedMigrantPhone: migrantPhoneId
-      };
-      
-      localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-      console.log('Usuarios registrados:', registeredUsers);
-
-      // Send email with registration data
-      try {
+        // Enviar email con los códigos generados
         const emailMessage = `
-🎉 NUEVO REGISTRO DE PREVENTA
+🎉 NUEVO REGISTRO DE PREVENTA - CÓDIGOS GENERADOS
 
 --- DATOS DEL MIGRANTE EN EEUU ---
 Nombre completo: ${migrantFirstName} ${migrantLastName} ${migrantMotherLastName || ''}
 Email: ${migrantEmail}
 Teléfono (WhatsApp): +1 ${migrantPhone}
-ID de acceso: ${migrantPhoneId}
+🔑 CÓDIGO DE ACCESO: ${migrantResult.accessCode}
 
 --- DATOS DEL FAMILIAR EN MÉXICO ---
 Nombre completo: ${familyFirstName} ${familyLastName} ${familyMotherLastName || ''}
 Teléfono (WhatsApp): +52 ${familyPhone}
-ID de acceso: ${familyPhoneId}
+🔑 CÓDIGO DE ACCESO: ${familyResult.accessCode}
 País: ${familyCountry}
 
 --- INFORMACIÓN ADICIONAL ---
@@ -141,12 +176,12 @@ Fecha de registro: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', d
 Cupos restantes después de este registro: ${spotsLeft - 1}
 
 --- SIGUIENTE PASO ---
-⚠️ IMPORTANTE: Los usuarios pueden ingresar usando su número de teléfono como ID único.
-- Migrante (USA): ${migrantPhoneId}
-- Familiar (México): ${familyPhoneId}
+⚠️ IMPORTANTE: Los usuarios deben usar su código de acceso para ingresar.
+- Migrante (USA): ${migrantResult.accessCode}
+- Familiar (México): ${familyResult.accessCode}
         `.trim();
 
-        const response = await fetch('/api/send-email', {
+        await fetch('/api/send-email', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -159,21 +194,19 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
           }),
         });
 
-        if (!response.ok) {
-          console.error('Error al enviar email de registro');
-        }
+        // Continuar con el flujo de UI
+        setSpotsLeft(prev => Math.max(0, prev - 1));
+        setShowConfetti(true);
+        setCurrentPage('confirmation');
+        
+        setTimeout(() => {
+          setShowConfetti(false);
+        }, 5000);
+        
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error en el registro:', error);
+        alert('Hubo un error al procesar el registro. Por favor intenta nuevamente.');
       }
-
-      // Continue with UI flow
-      setSpotsLeft(prev => Math.max(0, prev - 1));
-      setShowConfetti(true);
-      setCurrentPage('confirmation');
-      
-      setTimeout(() => {
-        setShowConfetti(false);
-      }, 5000);
     } else {
       alert('Por favor completa todos los campos');
     }
@@ -183,12 +216,6 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
 
   if (currentPage === 'register') {
     return (
-      <UserContext.Provider value={{
-        migrantFirstName,
-        migrantLastName,
-        familyFirstName,
-        familyLastName
-      }}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-cyan-50">
   <TopNav />
 
@@ -511,18 +538,11 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
           </div>
         </div>
       </div>
-      </UserContext.Provider>
     );
   }
 
   if (currentPage === 'confirmation') {
     return (
-      <UserContext.Provider value={{
-        migrantFirstName,
-        migrantLastName,
-        familyFirstName,
-        familyLastName
-      }}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-cyan-50 relative">
   <TopNav onBack={() => setCurrentPage('register')} />
         
@@ -604,6 +624,45 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                 </div>
               </div>
 
+              {/* CÓDIGOS DE ACCESO GENERADOS */}
+              {migrantAccessCode && familyAccessCode && (
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-6 mb-6">
+                  <div className="flex items-start gap-3 mb-4">
+                    <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    <div className="flex-1">
+                      <p className="font-bold text-green-900 mb-2 text-lg">🎉 ¡Códigos de Acceso Generados!</p>
+                      <p className="text-sm text-green-700 mb-4">
+                        Guarda estos códigos. Los necesitarás para ingresar a la plataforma.
+                      </p>
+                      
+                      <div className="space-y-3">
+                        <div className="bg-white rounded-lg p-4 border border-green-200">
+                          <p className="text-xs text-gray-600 mb-1">Código Migrante (USA)</p>
+                          <p className="text-2xl font-bold text-green-700 font-mono tracking-wider">
+                            {migrantAccessCode}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Para: {migrantFirstName} {migrantLastName}</p>
+                        </div>
+                        
+                        <div className="bg-white rounded-lg p-4 border border-green-200">
+                          <p className="text-xs text-gray-600 mb-1">Código Familiar (México)</p>
+                          <p className="text-2xl font-bold text-green-700 font-mono tracking-wider">
+                            {familyAccessCode}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Para: {familyFirstName} {familyLastName}</p>
+                        </div>
+                      </div>
+                      
+                      <p className="text-xs text-green-600 mt-3 font-semibold">
+                        💡 También enviamos estos códigos por email a {migrantEmail}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-cyan-50 border border-cyan-200 rounded-2xl p-6">
                 <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -631,7 +690,6 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
           
         </div>
       </div>
-      </UserContext.Provider>
     );
   }
 
