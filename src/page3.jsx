@@ -473,7 +473,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                       setErrors({ ...errors, specialCode: '' });
                     }}
                     onKeyPress={(e) => e.key === 'Enter' && handleAccessCode()}
-                    placeholder="Ej: INVESTOR2025, DEMO-MX"
+                    placeholder="Ingresa tu código de acceso"
                     className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-purple-500 text-lg font-mono uppercase ${
                       errors.specialCode ? 'border-red-500 bg-red-50' : 'border-gray-300'
                     }`}
@@ -486,18 +486,6 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                       {errors.specialCode}
                     </p>
                   )}
-                </div>
-
-                {/* Info sobre códigos especiales */}
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                  <p className="text-sm text-purple-900 font-semibold mb-2">
-                    🎯 Códigos disponibles para demo:
-                  </p>
-                  <ul className="text-xs text-purple-700 space-y-1">
-                    <li>• <span className="font-mono font-bold">INVESTOR2025</span> - Acceso completo de inversores</li>
-                    <li>• <span className="font-mono font-bold">DEMO-MX</span> - Demo usuario México (familia)</li>
-                    <li>• <span className="font-mono font-bold">DEMO-US</span> - Demo usuario USA (migrante)</li>
-                  </ul>
                 </div>
 
                 {/* Botón de acceso con código especial */}
