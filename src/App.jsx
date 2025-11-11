@@ -222,7 +222,7 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
   if (currentPage === 'register') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-cyan-50">
-  <TopNav />
+  <TopNav hideUser={true} />
 
         <div className="max-w-7xl mx-auto px-6 py-8">
           
@@ -570,7 +570,7 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
   if (currentPage === 'confirmation') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-cyan-50 relative">
-  <TopNav onBack={() => setCurrentPage('register')} />
+  <TopNav onBack={() => setCurrentPage('register')} hideUser={true} />
         
         {showConfetti && (
           <div className="fixed inset-0 pointer-events-none z-50">
