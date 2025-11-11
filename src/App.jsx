@@ -97,6 +97,16 @@ function App() {
     if (!migrantFirstName) missing.push('migrantFirstName');
     if (!migrantLastName) missing.push('migrantLastName');
     if (!migrantEmail) missing.push('migrantEmail');
+    
+    // Validar formato de email del migrante
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (migrantEmail && !emailRegex.test(migrantEmail)) {
+      missing.push('migrantEmail');
+      setMissingFields(['migrantEmail']);
+      setFormError('Por favor ingresa un correo electrónico válido (ejemplo: nombre@email.com)');
+      return;
+    }
+    
     if (!migrantPhone || migrantPhone.replace(/\s/g, '').length < 10) missing.push('migrantPhone');
     if (!familyCountry) missing.push('familyCountry');
     if (!familyFirstName) missing.push('familyFirstName');
@@ -511,7 +521,7 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                         </div>
                         <div>
                           <h4 className="text-xl font-bold text-gray-900">Tu Conexión en Casa</h4>
-                          <p className="text-sm text-gray-500">Beneficiario en México</p>
+                          <p className="text-sm text-gray-500">Familiar en México</p>
                         </div>
                       </div>
 
