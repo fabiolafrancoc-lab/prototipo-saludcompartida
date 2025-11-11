@@ -100,7 +100,13 @@ export default function Account() {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      alert('Por favor completa todos los campos requeridos correctamente. Intenta de nuevo.');
+      // Scroll al primer campo con error
+      const firstErrorField = Object.keys(newErrors)[0];
+      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        errorElement.focus();
+      }
       return;
     }
 
@@ -119,6 +125,7 @@ export default function Account() {
     };
     
     localStorage.setItem('accessUser', JSON.stringify(userDataToSave));
+    localStorage.setItem('currentUser', JSON.stringify(userDataToSave));
     
     // Simulate save
     setTimeout(() => {
@@ -200,18 +207,26 @@ export default function Account() {
                 </label>
                 <input
                   type="text"
+                  name="firstName"
                   value={userData.firstName}
                   onChange={(e) => handleUserChange('firstName', e.target.value)}
                   className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
                     errors.firstName 
-                      ? 'border-red-500 focus:border-red-600' 
+                      ? 'border-red-500 focus:border-red-600 bg-red-50' 
                       : userData.firstName 
                         ? 'border-gray-200 focus:border-cyan-500' 
                         : 'border-gray-200 bg-gray-50 text-gray-500 focus:border-cyan-500'
                   }`}
                   placeholder="Tu nombre"
                 />
-                {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
+                {errors.firstName && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm text-red-600 font-medium">{errors.firstName}</p>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -220,18 +235,26 @@ export default function Account() {
                 </label>
                 <input
                   type="text"
+                  name="lastName"
                   value={userData.lastName}
                   onChange={(e) => handleUserChange('lastName', e.target.value)}
                   className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
                     errors.lastName 
-                      ? 'border-red-500 focus:border-red-600' 
+                      ? 'border-red-500 focus:border-red-600 bg-red-50' 
                       : userData.lastName 
                         ? 'border-gray-200 focus:border-cyan-500' 
                         : 'border-gray-200 bg-gray-50 text-gray-500 focus:border-cyan-500'
                   }`}
                   placeholder="Apellido paterno"
                 />
-                {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
+                {errors.lastName && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm text-red-600 font-medium">{errors.lastName}</p>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -259,18 +282,26 @@ export default function Account() {
               </label>
               <input
                 type="date"
+                name="birthDate"
                 value={userData.birthDate}
                 onChange={(e) => handleUserChange('birthDate', e.target.value)}
                 className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
                   errors.birthDate 
-                    ? 'border-red-500 focus:border-red-600' 
+                    ? 'border-red-500 focus:border-red-600 bg-red-50' 
                     : userData.birthDate 
                       ? 'border-gray-200 focus:border-cyan-500' 
                       : 'border-gray-200 bg-gray-50 text-gray-500 focus:border-cyan-500'
                 }`}
                 placeholder="dd/mm/aaaa"
               />
-              {errors.birthDate && <p className="mt-1 text-sm text-red-600">{errors.birthDate}</p>}
+              {errors.birthDate && (
+                <div className="flex items-center gap-2 mt-2">
+                  <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-red-600 font-medium">{errors.birthDate}</p>
+                </div>
+              )}
             </div>
 
             {/* WhatsApp */}
@@ -289,11 +320,12 @@ export default function Account() {
                 </div>
                 <input
                   type="tel"
+                  name="phone"
                   value={formatPhoneDisplay(userData.phone)}
                   onChange={(e) => handleUserChange('phone', e.target.value)}
                   className={`flex-1 px-4 py-3 border-2 rounded-r-xl focus:ring-2 focus:ring-cyan-500 transition-all ${
                     errors.phone 
-                      ? 'border-red-500 focus:border-red-600' 
+                      ? 'border-red-500 focus:border-red-600 bg-red-50' 
                       : userData.phone 
                         ? 'border-gray-200 focus:border-cyan-500' 
                         : 'border-gray-200 bg-gray-50 text-gray-500 focus:border-cyan-500'
@@ -302,7 +334,14 @@ export default function Account() {
                   maxLength="12"
                 />
               </div>
-              {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+              {errors.phone && (
+                <div className="flex items-center gap-2 mt-2">
+                  <svg className="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-red-600 font-medium">{errors.phone}</p>
+                </div>
+              )}
               <p className="text-xs text-gray-500 mt-1">
                 Formato: XXX XXX XXXX
               </p>

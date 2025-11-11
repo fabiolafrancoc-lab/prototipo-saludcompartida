@@ -584,53 +584,67 @@ export default function Therapy() {
     const newOtherPersonErrors = {};
     
     if (!sessionFor) {
-      alert('Por favor indica si la sesión es para ti o para otra persona. Intenta de nuevo.');
+      // Scroll al selector de sesión
+      const sessionSelector = document.querySelector('[data-session-selector]');
+      if (sessionSelector) {
+        sessionSelector.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
 
     if (!selectedDate || !selectedTime) {
-      alert('Por favor selecciona fecha y hora para tu sesión. Intenta de nuevo.');
+      // Scroll al calendario
+      const calendar = document.querySelector('[data-calendar]');
+      if (calendar) {
+        calendar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
 
     // Validar formData (quien agenda)
     if (!formData.firstName) {
-      newFormErrors.firstName = true;
+      newFormErrors.firstName = 'El nombre es requerido';
       hasErrors = true;
     }
     if (!formData.lastName) {
-      newFormErrors.lastName = true;
+      newFormErrors.lastName = 'El apellido es requerido';
       hasErrors = true;
     }
     if (!formData.email) {
-      newFormErrors.email = true;
+      newFormErrors.email = 'El correo es requerido';
+      hasErrors = true;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newFormErrors.email = 'El correo no es válido';
       hasErrors = true;
     }
     if (!formData.phone || formData.phone.length !== 10) {
-      newFormErrors.phone = true;
+      newFormErrors.phone = 'El teléfono debe tener 10 dígitos';
       hasErrors = true;
     }
 
     // Validar otherPersonData si es para otra persona
     if (sessionFor === 'other') {
       if (!otherPersonData.firstName) {
-        newOtherPersonErrors.firstName = true;
+        newOtherPersonErrors.firstName = 'El nombre es requerido';
         hasErrors = true;
       }
       if (!otherPersonData.lastName) {
-        newOtherPersonErrors.lastName = true;
+        newOtherPersonErrors.lastName = 'El apellido es requerido';
         hasErrors = true;
       }
       if (!otherPersonData.email) {
-        newOtherPersonErrors.email = true;
+        newOtherPersonErrors.email = 'El correo es requerido';
+        hasErrors = true;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(otherPersonData.email)) {
+        newOtherPersonErrors.email = 'El correo no es válido';
         hasErrors = true;
       }
       if (!otherPersonData.phone || otherPersonData.phone.length !== 10) {
-        newOtherPersonErrors.phone = true;
+        newOtherPersonErrors.phone = 'El teléfono debe tener 10 dígitos';
         hasErrors = true;
       }
       if (!otherPersonData.relationship) {
-        newOtherPersonErrors.relationship = true;
+        newOtherPersonErrors.relationship = 'La relación es requerida';
         hasErrors = true;
       }
     }
@@ -638,7 +652,15 @@ export default function Therapy() {
     if (hasErrors) {
       setFormErrors(newFormErrors);
       setOtherPersonErrors(newOtherPersonErrors);
-      alert('Por favor completa todos los campos requeridos marcados en rojo. Intenta de nuevo.');
+      // Scroll al primer campo con error
+      const firstError = sessionFor === 'myself' 
+        ? Object.keys(newFormErrors)[0]
+        : Object.keys(newOtherPersonErrors)[0] || Object.keys(newFormErrors)[0];
+      const errorElement = document.querySelector(`[name="${firstError}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        errorElement.focus();
+      }
       return;
     }
 

@@ -176,7 +176,13 @@ export default function Contact() {
     
     if (!isValid) {
       console.log('Formulario inválido. Errores:', errors);
-      alert('Por favor completa todos los campos requeridos y acepta los términos y condiciones. Intenta de nuevo.');
+      // Scroll al primer campo con error
+      const firstErrorField = Object.keys(errors)[0];
+      const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        errorElement.focus();
+      }
       return;
     }
 
@@ -207,7 +213,7 @@ export default function Contact() {
       }, 3000);
     } catch (error) {
       console.error('Error completo:', error);
-      alert(`Hubo un error al procesar tu mensaje. Intenta de nuevo o contáctanos por WhatsApp.`);
+      setErrors({ submit: 'Hubo un error al procesar tu mensaje. Por favor intenta de nuevo o contáctanos por WhatsApp.' });
       setIsSubmitting(false);
     }
   };
