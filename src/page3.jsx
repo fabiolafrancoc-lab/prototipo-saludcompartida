@@ -414,14 +414,21 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
         ) : (
           // FORMULARIO ORIGINAL DE ACCESO
         <div className="bg-white rounded-2xl shadow-2xl p-8">
-          {/* TÍTULO */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-pink-600 bg-clip-text text-transparent mb-3">
-              Ingresa a tu Cuenta
-            </h1>
-            <p className="text-gray-600">
-              Usa el número de WhatsApp que registraste
-            </p>
+          {/* RECUADRO GRANDE - INGRESA TU CÓDIGO */}
+          <div className="mb-8 bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-600 rounded-2xl p-8 shadow-2xl">
+            <div className="text-center text-white">
+              <div className="mb-4">
+                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+              </div>
+              <h1 className="text-4xl font-bold mb-3">
+                Ingresa tu Código
+              </h1>
+              <p className="text-xl text-cyan-50">
+                Para inversionistas y usuarios registrados
+              </p>
+            </div>
           </div>
 
           {/* TOGGLE: Teléfono vs Código Especial */}
@@ -677,36 +684,37 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
             Ingresar a SaludCompartida
           </button>
 
-          {/* SECCIÓN DE CONTACTO - OTRAS CONSULTAS */}
-          <div className="mt-6 bg-gray-50 border border-gray-200 rounded-xl p-6">
+          {/* SECCIÓN DE PREGUNTAS */}
+          <div className="mt-6 bg-gradient-to-br from-cyan-50 to-blue-50 border-2 border-cyan-200 rounded-xl p-6 shadow-md">
             <div className="text-center mb-4">
-              <p className="text-gray-700 font-semibold mb-2">
-                ¿Código erróneo u otras consultas?
+              <p className="text-xl text-gray-800 font-bold mb-2">
+                ¿Preguntas?
               </p>
-              <p className="text-sm text-gray-600">Contáctanos y te ayudaremos</p>
+              <p className="text-sm text-gray-600">Contáctanos a:</p>
+              <p className="text-lg font-semibold text-cyan-700 mt-2">
+                contact@saludcompartida.com
+              </p>
             </div>
             
-            <div className="flex gap-3 justify-center">
+            <div className="flex flex-col gap-3 mt-4">
               <a
-                href="https://wa.me/5215573860842?text=Hola,%20tengo%20una%20consulta%20sobre%20mi%20código%20de%20acceso"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                href="mailto:contact@saludcompartida.com?subject=Código Erróneo&body=Hola, tengo un problema con mi código de acceso."
+                className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
               >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                WhatsApp
+                Código Erróneo
               </a>
               
               <a
-                href="mailto:contact@saludcompartida.com?subject=Consulta sobre código de acceso&body=Hola, tengo una consulta sobre mi código de acceso."
-                className="flex items-center gap-2 px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+                href="mailto:contact@saludcompartida.com?subject=Consulta General&body=Hola, tengo una consulta."
+                className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Email
+                Otras Consultas
               </a>
             </div>
           </div>
