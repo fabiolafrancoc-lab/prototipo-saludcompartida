@@ -435,7 +435,7 @@ export default function Terms() {
                 <p className="text-gray-700 leading-relaxed">
                   Para información detallada sobre cómo recopilamos, usamos y protegemos tus datos personales, consulta nuestro{' '}
                   <button
-                    onClick={() => navigate('/privacy', { state: { from: '/terms' } })}
+                    onClick={() => navigate('/privacy', { state: { from: '/terms', originalFrom: fromPage } })}
                     className="text-purple-700 font-semibold hover:text-purple-900 underline"
                   >
                     Aviso de Privacidad
@@ -679,7 +679,7 @@ export default function Terms() {
             ¿Tienes preguntas sobre privacidad y protección de datos?
           </p>
           <button
-            onClick={() => navigate('/privacy', { state: { from: '/terms' } })}
+            onClick={() => navigate('/privacy', { state: { from: '/terms', originalFrom: fromPage } })}
             className="text-cyan-600 hover:text-cyan-700 font-semibold underline"
           >
             Lee nuestro Aviso de Privacidad →

@@ -101,7 +101,7 @@ function App() {
     if (missing.length > 0) {
       setMissingFields(missing);
       setFormError('Por favor completa toda la información requerida');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // El mensaje está abajo del formulario, cerca del botón, no necesita scroll
       return;
     }
     
@@ -128,7 +128,6 @@ function App() {
         
         if (!migrantResult.success) {
           setFormError('Error al registrar: ' + migrantResult.error);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
         
@@ -146,7 +145,6 @@ function App() {
         
         if (!familyResult.success) {
           setFormError('Error al registrar: ' + familyResult.error);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
         
@@ -263,21 +261,6 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
               ⚡ ¡Apúrate, quedan pocos cupos!
             </p>
           </div>
-
-          {/* Mensaje de Error */}
-          {formError && (
-            <div className="max-w-2xl mx-auto mb-6">
-              <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 flex items-start gap-3">
-                <svg className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <div>
-                  <p className="font-bold text-red-900 mb-1">Error en el registro</p>
-                  <p className="text-sm text-red-700">{formError}</p>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="mb-10 flex justify-center">
             <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 border-2 border-cyan-300 rounded-2xl p-6 shadow-lg max-w-2xl">
@@ -594,6 +577,19 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                         </p>
                       </div>
                     </div>
+
+                    {/* Mensaje de Error antes del botón */}
+                    {formError && (
+                      <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 flex items-start gap-3">
+                        <svg className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div>
+                          <p className="font-bold text-red-900 mb-1">Error en el registro</p>
+                          <p className="text-sm text-red-700">{formError}</p>
+                        </div>
+                      </div>
+                    )}
 
                     <button
                       onClick={handleRegister}

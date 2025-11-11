@@ -11,8 +11,10 @@ export default function Privacy() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Determinar desde dónde vino el usuario
-  const fromPage = location.state?.from || '/page4';
+  // Determinar desde dónde vino el usuario - si viene desde /terms, mantener el origen original
+  const fromPage = location.state?.from === '/terms' && location.state?.originalFrom 
+    ? location.state.originalFrom 
+    : (location.state?.from || '/page4');
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
