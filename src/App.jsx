@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNav from './components/TopNav';
-import { insertUser } from './lib/supabase';
+import { insertRegistration } from './lib/supabase';
 
 function App() {
   const navigate = useNavigate();
@@ -106,7 +106,6 @@ function App() {
     if (missing.length > 0) {
       setMissingFields(missing);
       setFormError('Por favor completa toda la información requerida');
-      // El mensaje está abajo del formulario, cerca del botón, no necesita scroll
       return;
     }
     
@@ -119,47 +118,39 @@ function App() {
         const cleanMigrantPhone = migrantPhone.replace(/\s/g, '');
         const cleanFamilyPhone = familyPhone.replace(/\s/g, '');
         
-        // Guardar migrante en Supabase
-        const migrantResult = await insertUser({
-          phone: cleanMigrantPhone,
-          countryCode: '+1',
-          firstName: migrantFirstName,
-          lastName: migrantLastName,
-          motherLastName: migrantMotherLastName,
-          email: migrantEmail,
-          userType: 'migrant',
-          linkedPhone: cleanFamilyPhone
-        });
+        // Guardar registro completo (migrante + familiar en una sola fila)
+        const result = await insertRegistration(
+          {
+            firstName: migrantFirstName,
+            lastName: migrantLastName,
+            motherLastName: migrantMotherLastName,
+            email: migrantEmail,
+            countryCode: '+1',
+            phone: cleanMigrantPhone
+          },
+          {
+            firstName: familyFirstName,
+            lastName: familyLastName,
+            motherLastName: familyMotherLastName,
+            email: familyEmail,
+            countryCode: '+52',
+            phone: cleanFamilyPhone,
+            country: familyCountry
+          }
+        );
         
-        if (!migrantResult.success) {
-          setFormError('Error al registrar: ' + migrantResult.error);
-          return;
-        }
-        
-        // Guardar familiar en Supabase
-        const familyResult = await insertUser({
-          phone: cleanFamilyPhone,
-          countryCode: '+52',
-          firstName: familyFirstName,
-          lastName: familyLastName,
-          motherLastName: familyMotherLastName,
-          email: familyEmail || migrantEmail, // Usar email del familiar si existe, sino el del migrante
-          userType: 'family',
-          linkedPhone: cleanMigrantPhone
-        });
-        
-        if (!familyResult.success) {
-          setFormError('Error al registrar: ' + familyResult.error);
+        if (!result.success) {
+          setFormError('Error al registrar: ' + result.error);
           return;
         }
         
         // Guardar códigos de acceso generados
-        setMigrantAccessCode(migrantResult.accessCode);
-        setFamilyAccessCode(familyResult.accessCode);
+        setMigrantAccessCode(result.migrantAccessCode);
+        setFamilyAccessCode(result.familyAccessCode);
         
         console.log('✅ Registro exitoso en Supabase');
-        console.log('Código Migrante:', migrantResult.accessCode);
-        console.log('Código Familiar:', familyResult.accessCode);
+        console.log('Código Migrante:', result.migrantAccessCode);
+        console.log('Código Familiar:', result.familyAccessCode);
         
         // También guardar en localStorage para compatibilidad
         const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
@@ -172,7 +163,7 @@ function App() {
           motherLastName: migrantMotherLastName,
           email: migrantEmail,
           phone: cleanMigrantPhone,
-          accessCode: migrantResult.accessCode,
+          accessCode: result.migrantAccessCode,
           registeredAt: new Date().toISOString(),
           type: 'migrant',
           linkedFamilyPhone: familyPhoneId
@@ -183,7 +174,7 @@ function App() {
           lastName: familyLastName,
           motherLastName: familyMotherLastName,
           phone: cleanFamilyPhone,
-          accessCode: familyResult.accessCode,
+          accessCode: result.familyAccessCode,
           registeredAt: new Date().toISOString(),
           type: 'family',
           linkedMigrantPhone: migrantPhoneId

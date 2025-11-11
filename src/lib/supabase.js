@@ -44,27 +44,42 @@ function generateAccessCode() {
   return `${prefix}-${numbers}`;
 }
 
-// Insertar nuevo usuario
-export async function insertUser(userData) {
-  const accessCode = generateAccessCode();
+// Insertar registro completo (migrante + familiar en una sola fila)
+export async function insertRegistration(migrantData, familyData) {
+  const migrantAccessCode = generateAccessCode();
+  const familyAccessCode = generateAccessCode();
   
-  const newUser = {
-    phone: userData.phone,
-    country_code: userData.countryCode,
-    first_name: userData.firstName,
-    last_name: userData.lastName,
-    mother_last_name: userData.motherLastName || null,
-    email: userData.email,
-    access_code: accessCode,
-    user_type: userData.userType || 'family',
-    linked_phone: userData.linkedPhone || null
+  const newRegistration = {
+    // Datos del migrante (columnas 1-11)
+    migrant_first_name: migrantData.firstName,
+    migrant_last_name: migrantData.lastName,
+    migrant_mother_last_name: migrantData.motherLastName || null,
+    migrant_email: migrantData.email,
+    migrant_country_code: migrantData.countryCode || '+1',
+    migrant_phone: migrantData.phone,
+    migrant_access_code: migrantAccessCode,
+    
+    // Datos del familiar (columnas 12-20)
+    family_first_name: familyData.firstName,
+    family_last_name: familyData.lastName,
+    family_mother_last_name: familyData.motherLastName || null,
+    family_email: familyData.email || null,
+    family_country_code: familyData.countryCode || '+52',
+    family_phone: familyData.phone,
+    family_access_code: familyAccessCode,
+    family_country: familyData.country || null
   };
 
   try {
-    const result = await supabaseRequest('registered_users', 'POST', newUser);
-    return { success: true, data: result, accessCode };
+    const result = await supabaseRequest('registered_users', 'POST', newRegistration);
+    return { 
+      success: true, 
+      data: result, 
+      migrantAccessCode,
+      familyAccessCode 
+    };
   } catch (error) {
-    console.error('Error insertando usuario:', error);
+    console.error('Error insertando registro:', error);
     return { success: false, error: error.message };
   }
 }
@@ -108,7 +123,7 @@ export async function getUserByPhone(phone) {
 }
 
 export default {
-  insertUser,
+  insertRegistration,
   getUserByAccessCode,
   getUserByPhone
 };
