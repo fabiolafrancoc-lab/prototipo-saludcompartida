@@ -53,7 +53,7 @@ export default function Account() {
 
   const handleUserChange = (field, value) => {
     // Limpiar error cuando el usuario empieza a escribir
-    setErrors(prev => ({ ...prev, [field]: '' }));
+    setErrors(prev => ({ ...prev, [field]: false }));
 
     if (field === 'phone') {
       const cleaned = value.replace(/\D/g, '').slice(0, 10);
@@ -83,19 +83,19 @@ export default function Account() {
     const newErrors = {};
 
     if (!userData.firstName || !userData.firstName.trim()) {
-      newErrors.firstName = 'El nombre es requerido';
+      newErrors.firstName = true;
     }
 
     if (!userData.lastName || !userData.lastName.trim()) {
-      newErrors.lastName = 'El apellido paterno es requerido';
+      newErrors.lastName = true;
     }
 
     if (!userData.birthDate) {
-      newErrors.birthDate = 'La fecha de nacimiento es requerida';
+      newErrors.birthDate = true;
     }
 
     if (!userData.phone || userData.phone.length !== 10) {
-      newErrors.phone = 'El teléfono debe tener 10 dígitos';
+      newErrors.phone = true;
     }
 
     if (Object.keys(newErrors).length > 0) {

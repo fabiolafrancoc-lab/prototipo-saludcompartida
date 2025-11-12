@@ -384,6 +384,7 @@ export default function Therapy() {
   });
   const [formErrors, setFormErrors] = useState({});
   const [otherPersonErrors, setOtherPersonErrors] = useState({});
+  const [dateTimeErrors, setDateTimeErrors] = useState({ date: false, time: false });
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showRescheduleQuestion, setShowRescheduleQuestion] = useState(false);
   const [showThankYouMessage, setShowThankYouMessage] = useState(false);
@@ -580,10 +581,12 @@ export default function Therapy() {
     // Reset errors
     setFormErrors({});
     setOtherPersonErrors({});
+    setDateTimeErrors({ date: false, time: false });
     
     let hasErrors = false;
     const newFormErrors = {};
     const newOtherPersonErrors = {};
+    const newDateTimeErrors = { date: false, time: false };
     
     if (!sessionFor) {
       // Scroll al selector de sesión
@@ -594,7 +597,18 @@ export default function Therapy() {
       return;
     }
 
+    if (!selectedDate) {
+      newDateTimeErrors.date = true;
+      hasErrors = true;
+    }
+    
+    if (!selectedTime) {
+      newDateTimeErrors.time = true;
+      hasErrors = true;
+    }
+
     if (!selectedDate || !selectedTime) {
+      setDateTimeErrors(newDateTimeErrors);
       // Scroll al calendario
       const calendar = document.querySelector('[data-calendar]');
       if (calendar) {
@@ -1666,9 +1680,9 @@ ${formData.concerns || 'No especificado'}
           {/* Fecha y hora solo si ya eligió Para Mí o Para Otra Persona */}
           {sessionFor && (
             <>
-              <div className="mb-8">
+              <div className="mb-8" data-calendar>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Selecciona el día
+                  Selecciona el día <span className="text-red-500">*</span>
                 </label>
                 <div className="grid grid-cols-7 gap-2">
               {availableDates.map((date, index) => {
@@ -1682,6 +1696,7 @@ ${formData.concerns || 'No especificado'}
                     onClick={() => {
                       setSelectedDate(date);
                       setSelectedTime(null);
+                      setDateTimeErrors({...dateTimeErrors, date: false});
                     }}
                     className={`p-3 rounded-xl text-center transition-all ${
                       isSelected
@@ -1696,6 +1711,14 @@ ${formData.concerns || 'No especificado'}
                 );
               })}
             </div>
+            {dateTimeErrors.date && (
+              <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                Este campo es obligatorio
+              </p>
+            )}
             <p className="text-xs text-gray-500 mt-2">
               * Fechas disponibles después de 15 días. Cerrado los domingos.
             </p>
@@ -1704,14 +1727,17 @@ ${formData.concerns || 'No especificado'}
           {selectedDate && (
             <div className="mb-8">
               <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Selecciona la hora
+                Selecciona la hora <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-4 md:grid-cols-5 gap-3">
                 {getAvailableTimesForDate(selectedDate).map((time) => (
                   <button
                     key={time}
                     type="button"
-                    onClick={() => setSelectedTime(time)}
+                    onClick={() => {
+                      setSelectedTime(time);
+                      setDateTimeErrors({...dateTimeErrors, time: false});
+                    }}
                     className={`py-3 rounded-xl font-semibold transition-all ${
                       selectedTime === time
                         ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg'
@@ -1722,6 +1748,14 @@ ${formData.concerns || 'No especificado'}
                   </button>
                 ))}
               </div>
+              {dateTimeErrors.time && (
+                <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Este campo es obligatorio
+                </p>
+              )}
               <p className="text-xs text-gray-500 mt-2">
                 {isWeekend(selectedDate) 
                   ? '* Sábado: 9:00am - 12:00pm'
