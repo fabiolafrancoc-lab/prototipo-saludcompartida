@@ -237,9 +237,9 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
         setShowConfetti(true);
         setCurrentPage('confirmation');
         
-        // Enviar códigos de acceso por WhatsApp/SMS
+        // Enviar códigos de acceso por WhatsApp/SMS y Email
         try {
-          // Enviar al migrante (USA)
+          // Enviar WhatsApp/SMS al migrante (USA)
           const migrantNotification = await sendAccessCode(
             cleanMigrantPhone,
             result.migrantAccessCode,
@@ -250,7 +250,39 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
             console.log(`✅ Código enviado al migrante por ${migrantNotification.method}`);
           }
 
-          // Enviar al familiar (México)
+          // Enviar Email al migrante
+          if (formData.migrantEmail) {
+            const emailResponse = await fetch('/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: formData.migrantEmail,
+                subject: '🎉 Tu código de acceso - SaludCompartida',
+                message: `Hola ${migrantFirstName},
+
+¡Bienvenido a SaludCompartida! 🎉
+
+Tu código de acceso es: ${result.migrantAccessCode}
+
+Ingresa con tu código en:
+👉 https://prototype.saludcompartida.com
+
+Guarda este código en un lugar seguro. Lo necesitarás para acceder a todos tus servicios de salud.
+
+¿Dudas? Escríbenos al 55 2998 4922 702
+
+¡Estamos para cuidarte! 💙
+SaludCompartida`,
+                type: 'access-code'
+              })
+            });
+            
+            if (emailResponse.ok) {
+              console.log('✅ Email enviado al migrante');
+            }
+          }
+
+          // Enviar WhatsApp/SMS al familiar (México)
           const familyNotification = await sendAccessCode(
             cleanFamilyPhone,
             result.familyAccessCode,
@@ -259,6 +291,38 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
           
           if (familyNotification.success) {
             console.log(`✅ Código enviado al familiar por ${familyNotification.method}`);
+          }
+
+          // Enviar Email al familiar
+          if (formData.familyEmail) {
+            const emailResponse = await fetch('/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: formData.familyEmail,
+                subject: '🎉 Tu código de acceso - SaludCompartida',
+                message: `Hola ${familyFirstName},
+
+¡Bienvenido a SaludCompartida! 🎉
+
+Tu código de acceso es: ${result.familyAccessCode}
+
+Ingresa con tu código en:
+👉 https://prototype.saludcompartida.com
+
+Guarda este código en un lugar seguro. Lo necesitarás para acceder a todos tus servicios de salud.
+
+¿Dudas? Escríbenos al 55 2998 4922 702
+
+¡Estamos para cuidarte! 💙
+SaludCompartida`,
+                type: 'access-code'
+              })
+            });
+            
+            if (emailResponse.ok) {
+              console.log('✅ Email enviado al familiar');
+            }
           }
         } catch (notifError) {
           console.error('Error enviando notificaciones:', notifError);
