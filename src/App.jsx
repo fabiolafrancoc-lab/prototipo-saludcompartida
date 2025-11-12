@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNav from './components/TopNav';
 import { insertRegistration } from './lib/supabase';
+import { sendAccessCode } from './lib/notifications';
 
 function App() {
   const navigate = useNavigate();
@@ -235,6 +236,34 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
         setSpotsLeft(prev => Math.max(0, prev - 1));
         setShowConfetti(true);
         setCurrentPage('confirmation');
+        
+        // Enviar códigos de acceso por WhatsApp/SMS
+        try {
+          // Enviar al migrante (USA)
+          const migrantNotification = await sendAccessCode(
+            cleanMigrantPhone,
+            result.migrantAccessCode,
+            migrantFirstName
+          );
+          
+          if (migrantNotification.success) {
+            console.log(`✅ Código enviado al migrante por ${migrantNotification.method}`);
+          }
+
+          // Enviar al familiar (México)
+          const familyNotification = await sendAccessCode(
+            cleanFamilyPhone,
+            result.familyAccessCode,
+            familyFirstName
+          );
+          
+          if (familyNotification.success) {
+            console.log(`✅ Código enviado al familiar por ${familyNotification.method}`);
+          }
+        } catch (notifError) {
+          console.error('Error enviando notificaciones:', notifError);
+          // No bloqueamos el registro si falla la notificación
+        }
         
         setTimeout(() => {
           setShowConfetti(false);

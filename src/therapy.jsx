@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNav from './components/TopNav';
+import { sendAppointmentConfirmation } from '../lib/notifications';
 
 // Páginas de Tips para cada beneficio
 const AnxietyTips = ({ onBack }) => {
@@ -763,6 +764,30 @@ ${formData.concerns || 'No especificado'}
       }
     } catch (error) {
       console.error('Error:', error);
+    }
+    
+    // Enviar notificación de WhatsApp/SMS al paciente
+    try {
+      const notificationResult = await sendAppointmentConfirmation({
+        phone: sessionFor === 'myself' ? formData.phone : otherPersonData.phone,
+        firstName: sessionFor === 'myself' ? formData.firstName : otherPersonData.firstName,
+        date: selectedDate.toLocaleDateString('es-MX', { 
+          weekday: 'long', 
+          day: 'numeric', 
+          month: 'long' 
+        }),
+        time: selectedTime,
+        type: 'psicología'
+      });
+
+      if (notificationResult.success) {
+        console.log(`✅ Notificación enviada por ${notificationResult.method}:`, notificationResult.messageSid);
+      } else {
+        console.error('❌ Error al enviar notificación:', notificationResult.error);
+      }
+    } catch (error) {
+      console.error('Error enviando notificación:', error);
+      // No bloqueamos el flujo si falla la notificación
     }
     
     setShowConfirmation(true);
