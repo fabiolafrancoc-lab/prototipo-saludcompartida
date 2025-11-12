@@ -252,6 +252,7 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
 
           // Enviar Email al migrante
           if (formData.migrantEmail) {
+            console.log('📧 Intentando enviar email a:', formData.migrantEmail);
             const emailResponse = await fetch('/api/send-email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -277,8 +278,13 @@ SaludCompartida`,
               })
             });
             
+            const emailResult = await emailResponse.json();
+            console.log('📧 Respuesta email migrante:', emailResult);
+            
             if (emailResponse.ok) {
               console.log('✅ Email enviado al migrante');
+            } else {
+              console.error('❌ Error enviando email al migrante:', emailResult);
             }
           }
 

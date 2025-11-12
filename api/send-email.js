@@ -131,8 +131,8 @@ export default async function handler(req, res) {
           </div>
           <div class="content">
             <div class="info-box">
-              <p><span class="label">Nombre:</span> ${name}</p>
-              ${email && email !== 'Sin email proporcionado' ? `<p><span class="label">Email:</span> ${email}</p>` : '<p><span class="label">Email:</span> <em>No proporcionado</em></p>'}
+              ${name ? `<p><span class="label">Nombre:</span> ${name}</p>` : ''}
+              ${email && email !== 'Sin email proporcionado' ? `<p><span class="label">Email:</span> ${email}</p>` : ''}
               ${phone ? `<p><span class="label">Teléfono:</span> ${phone}</p>` : ''}
             </div>
             <div class="info-box">
