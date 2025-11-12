@@ -31,7 +31,7 @@ export default function MigrantContact() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const whatsappNumber = '5215573860842';
+  const whatsappNumber = '5529984922702';
   const whatsappMessage = encodeURIComponent(
     firstName 
       ? `Hello, I'm ${firstName}. 

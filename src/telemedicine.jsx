@@ -67,7 +67,7 @@ export default function Telemedicine() {
       `Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos. ⏱️\n\n` +
       `📞 Horario: Lunes a Viernes, 9:00 AM - 5:00 PM`
     );
-    window.open(`https://wa.me/5215573860842?text=${whatsappMessage}`, '_blank');
+    window.open(`https://wa.me/5529984922702?text=${whatsappMessage}`, '_blank');
   };
 
   return (

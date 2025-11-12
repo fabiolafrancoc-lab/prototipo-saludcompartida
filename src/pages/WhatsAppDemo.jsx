@@ -11,7 +11,7 @@ import {
 
 export default function WhatsAppDemo() {
   const navigate = useNavigate();
-  const whatsappNumber = '5215573860842';
+  const whatsappNumber = '5529984922702';
   const whatsappMessage = encodeURIComponent('Hola! Estoy interesado en los servicios de SaludCompartida 🌟');
 
   return (
@@ -244,14 +244,14 @@ import {
 
 // Usar botón Magenta
 <WhatsAppButtonMagenta
-  href="https://wa.me/5215573860842?text=Hola"
+  href="https://wa.me/5529984922702?text=Hola"
 >
   Chatea con Nosotros
 </WhatsAppButtonMagenta>
 
 // Usar botón Cyan
 <WhatsAppButtonCyan
-  href="https://wa.me/5215573860842?text=Hello"
+  href="https://wa.me/5529984922702?text=Hello"
 >
   Chat with Us
 </WhatsAppButtonCyan>

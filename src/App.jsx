@@ -651,7 +651,7 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
                       
                       <div className="flex gap-3 justify-center">
                         <a
-                          href="https://wa.me/5215573860842?text=Hola,%20quiero%20saber%20más%20sobre%20SaludCompartida"
+                          href="https://wa.me/5529984922702?text=Hola,%20quiero%20saber%20más%20sobre%20SaludCompartida"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"

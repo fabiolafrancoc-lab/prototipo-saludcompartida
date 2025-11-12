@@ -226,7 +226,7 @@ export default function Contact() {
     return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
   };
 
-  const whatsappNumber = '5215573860842';
+  const whatsappNumber = '5529984922702';
   const whatsappMessage = encodeURIComponent(
     firstName 
       ? `Hola, soy ${firstName}. 
