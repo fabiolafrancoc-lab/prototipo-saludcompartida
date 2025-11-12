@@ -25,53 +25,94 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, email, phone, message, type } = req.body;
+    const { name, email, phone, message, type, to, subject: customSubject } = req.body;
 
     // Validate required fields
-    if (!name || !message) {
+    if (!message) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // Si se proporciona 'to', es un email directo al usuario (no notificación al admin)
+    const isDirectEmail = !!to;
+    const recipientEmail = to || 'ffranco@saludcompartida.com';
+
     // Define subject and email styling based on type
-    let subject = '';
+    let subject = customSubject || '';
     let headerColor = '#06B6D4'; // cyan default
     let headerText = '';
     
-    switch(type) {
-      case 'migrant':
-        subject = `[🇺🇸 USA] Contacto Migrante - ${name}`;
-        headerColor = '#06B6D4'; // cyan
-        headerText = 'Nuevo Contacto desde USA';
-        break;
-      case 'rating':
-        subject = `[⭐ CALIFICACIÓN] ${name}`;
-        headerColor = '#F59E0B'; // amber
-        headerText = 'Nueva Calificación de Servicio';
-        break;
-      case 'blog-topic':
-        subject = `[💡 SUGERENCIA BLOG] ${name}`;
-        headerColor = '#8B5CF6'; // purple
-        headerText = 'Nueva Sugerencia de Tema para Blog';
-        break;
-      case 'therapy':
-        subject = `[🧠 CITA TERAPIA] ${name}`;
-        headerColor = '#10B981'; // green
-        headerText = '🗓️ Nueva Cita de Terapia Agendada';
-        break;
-      case 'mexico':
-      default:
-        subject = `[📞 CONTACTO] ${name}`;
-        headerColor = '#E91E63'; // magenta
-        headerText = 'Nuevo Mensaje de Contacto';
-        break;
+    // Si es un email directo al usuario, usar formato simple
+    if (isDirectEmail) {
+      headerColor = '#06B6D4';
+      headerText = customSubject || 'SaludCompartida';
+    } else {
+      // Email de notificación al admin
+      switch(type) {
+        case 'migrant':
+          subject = `[🇺🇸 USA] Contacto Migrante - ${name}`;
+          headerColor = '#06B6D4';
+          headerText = 'Nuevo Contacto desde USA';
+          break;
+        case 'rating':
+          subject = `[⭐ CALIFICACIÓN] ${name}`;
+          headerColor = '#F59E0B';
+          headerText = 'Nueva Calificación de Servicio';
+          break;
+        case 'blog-topic':
+          subject = `[💡 SUGERENCIA BLOG] ${name}`;
+          headerColor = '#8B5CF6';
+          headerText = 'Nueva Sugerencia de Tema para Blog';
+          break;
+        case 'therapy':
+          subject = `[🧠 CITA TERAPIA] ${name}`;
+          headerColor = '#10B981';
+          headerText = '🗓️ Nueva Cita de Terapia Agendada';
+          break;
+        case 'mexico':
+        default:
+          subject = `[📞 CONTACTO] ${name}`;
+          headerColor = '#E91E63';
+          headerText = 'Nuevo Mensaje de Contacto';
+          break;
+      }
     }
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
       from: 'SaludCompartida <onboarding@resend.dev>',
-      to: ['ffranco@saludcompartida.com'],
+      to: [recipientEmail],
       subject: subject,
-      html: `
+      html: isDirectEmail ? 
+        // Email simple para usuarios
+        `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
+            .header { background: ${headerColor}; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { padding: 30px; background: #f9f9f9; }
+            .message { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; white-space: pre-wrap; }
+            .footer { background: #333; color: white; padding: 15px; text-align: center; font-size: 12px; border-radius: 0 0 8px 8px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2>${headerText}</h2>
+          </div>
+          <div class="content">
+            <div class="message">${message}</div>
+          </div>
+          <div class="footer">
+            <p>SaludCompartida © 2025</p>
+            <p>¿Necesitas ayuda? Escríbenos al 55 2998 4922 702</p>
+          </div>
+        </body>
+        </html>
+        `
+        :
+        // Email detallado para admin
+        `
         <!DOCTYPE html>
         <html>
         <head>
