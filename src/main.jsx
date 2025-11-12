@@ -23,7 +23,7 @@ import { UserProvider } from './contexts/UserContext'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <UserProvider>
-      <BrowserRouter basename="/prototype">
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/page3" element={<Page3 />} /> {/* 👈 Page3 (código entrada) */}
