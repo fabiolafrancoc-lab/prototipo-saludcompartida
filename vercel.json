@@ -2,14 +2,21 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "basePath": "/prototype",
   "rewrites": [
     {
-      "source": "/api/:path*",
+      "source": "/prototype/api/:path*",
       "destination": "/api/:path*"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/prototype/:path*",
+      "destination": "/prototype/:path*"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/prototype/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
