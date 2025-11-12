@@ -554,6 +554,7 @@ export default function Therapy() {
     const value = e.target.value.replace(/\D/g, ''); // Solo números
     if (value.length <= 10) {
       setFormData({...formData, phone: value});
+      setFormErrors({...formErrors, phone: false});
     }
   };
 
@@ -561,6 +562,7 @@ export default function Therapy() {
     const value = e.target.value.replace(/\D/g, ''); // Solo números
     if (value.length <= 10) {
       setOtherPersonData({...otherPersonData, phone: value});
+      setOtherPersonErrors({...otherPersonErrors, phone: false});
     }
   };
 
@@ -602,49 +604,49 @@ export default function Therapy() {
     }
 
     // Validar formData (quien agenda)
-    if (!formData.firstName) {
-      newFormErrors.firstName = 'El nombre es requerido';
+    if (!formData.firstName || !formData.firstName.trim()) {
+      newFormErrors.firstName = true;
       hasErrors = true;
     }
-    if (!formData.lastName) {
-      newFormErrors.lastName = 'El apellido es requerido';
+    if (!formData.lastName || !formData.lastName.trim()) {
+      newFormErrors.lastName = true;
       hasErrors = true;
     }
-    if (!formData.email) {
-      newFormErrors.email = 'El correo es requerido';
+    if (!formData.email || !formData.email.trim()) {
+      newFormErrors.email = true;
       hasErrors = true;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newFormErrors.email = 'El correo no es válido';
+      newFormErrors.email = true;
       hasErrors = true;
     }
     if (!formData.phone || formData.phone.length !== 10) {
-      newFormErrors.phone = 'El teléfono debe tener 10 dígitos';
+      newFormErrors.phone = true;
       hasErrors = true;
     }
 
     // Validar otherPersonData si es para otra persona
     if (sessionFor === 'other') {
-      if (!otherPersonData.firstName) {
-        newOtherPersonErrors.firstName = 'El nombre es requerido';
+      if (!otherPersonData.firstName || !otherPersonData.firstName.trim()) {
+        newOtherPersonErrors.firstName = true;
         hasErrors = true;
       }
-      if (!otherPersonData.lastName) {
-        newOtherPersonErrors.lastName = 'El apellido es requerido';
+      if (!otherPersonData.lastName || !otherPersonData.lastName.trim()) {
+        newOtherPersonErrors.lastName = true;
         hasErrors = true;
       }
-      if (!otherPersonData.email) {
-        newOtherPersonErrors.email = 'El correo es requerido';
+      if (!otherPersonData.email || !otherPersonData.email.trim()) {
+        newOtherPersonErrors.email = true;
         hasErrors = true;
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(otherPersonData.email)) {
-        newOtherPersonErrors.email = 'El correo no es válido';
+        newOtherPersonErrors.email = true;
         hasErrors = true;
       }
       if (!otherPersonData.phone || otherPersonData.phone.length !== 10) {
-        newOtherPersonErrors.phone = 'El teléfono debe tener 10 dígitos';
+        newOtherPersonErrors.phone = true;
         hasErrors = true;
       }
-      if (!otherPersonData.relationship) {
-        newOtherPersonErrors.relationship = 'La relación es requerida';
+      if (!otherPersonData.relationship || !otherPersonData.relationship.trim()) {
+        newOtherPersonErrors.relationship = true;
         hasErrors = true;
       }
     }
@@ -1357,9 +1359,13 @@ ${formData.concerns || 'No especificado'}
                     </label>
                     <input
                       type="text"
+                      name="firstName"
                       required
                       value={formData.firstName}
-                      onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                      onChange={(e) => {
+                        setFormData({...formData, firstName: e.target.value});
+                        setFormErrors({...formErrors, firstName: false});
+                      }}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
                         formErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'
                       }`}
@@ -1381,9 +1387,13 @@ ${formData.concerns || 'No especificado'}
                     </label>
                     <input
                       type="text"
+                      name="lastName"
                       required
                       value={formData.lastName}
-                      onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                      onChange={(e) => {
+                        setFormData({...formData, lastName: e.target.value});
+                        setFormErrors({...formErrors, lastName: false});
+                      }}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
                         formErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'
                       }`}
@@ -1406,9 +1416,13 @@ ${formData.concerns || 'No especificado'}
                   </label>
                   <input
                     type="email"
+                    name="email"
                     required
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, email: e.target.value});
+                      setFormErrors({...formErrors, email: false});
+                    }}
                     className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
                       formErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
                     }`}
@@ -1479,9 +1493,13 @@ ${formData.concerns || 'No especificado'}
                       </label>
                       <input
                         type="text"
+                        name="otherFirstName"
                         required
                         value={otherPersonData.firstName}
-                        onChange={(e) => setOtherPersonData({...otherPersonData, firstName: e.target.value})}
+                        onChange={(e) => {
+                          setOtherPersonData({...otherPersonData, firstName: e.target.value});
+                          setOtherPersonErrors({...otherPersonErrors, firstName: false});
+                        }}
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
                           otherPersonErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'
                         }`}
@@ -1503,9 +1521,13 @@ ${formData.concerns || 'No especificado'}
                       </label>
                       <input
                         type="text"
+                        name="otherLastName"
                         required
                         value={otherPersonData.lastName}
-                        onChange={(e) => setOtherPersonData({...otherPersonData, lastName: e.target.value})}
+                        onChange={(e) => {
+                          setOtherPersonData({...otherPersonData, lastName: e.target.value});
+                          setOtherPersonErrors({...otherPersonErrors, lastName: false});
+                        }}
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
                           otherPersonErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'
                         }`}
@@ -1541,9 +1563,13 @@ ${formData.concerns || 'No especificado'}
                     </label>
                     <input
                       type="email"
+                      name="otherEmail"
                       required
                       value={otherPersonData.email}
-                      onChange={(e) => setOtherPersonData({...otherPersonData, email: e.target.value})}
+                      onChange={(e) => {
+                        setOtherPersonData({...otherPersonData, email: e.target.value});
+                        setOtherPersonErrors({...otherPersonErrors, email: false});
+                      }}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
                         otherPersonErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
                       }`}
@@ -1601,9 +1627,13 @@ ${formData.concerns || 'No especificado'}
                       Parentesco <span className="text-red-500">*</span>
                     </label>
                     <select
+                      name="relationship"
                       required
                       value={otherPersonData.relationship}
-                      onChange={(e) => setOtherPersonData({...otherPersonData, relationship: e.target.value})}
+                      onChange={(e) => {
+                        setOtherPersonData({...otherPersonData, relationship: e.target.value});
+                        setOtherPersonErrors({...otherPersonErrors, relationship: false});
+                      }}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
                         otherPersonErrors.relationship ? 'border-red-500 bg-red-50' : 'border-gray-300'
                       }`}
