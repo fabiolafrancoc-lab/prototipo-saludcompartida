@@ -561,7 +561,10 @@ export default function Therapy() {
     const value = e.target.value.replace(/\D/g, ''); // Solo números
     if (value.length <= 10) {
       setFormData({...formData, telefono: value});
-      setFormErrors({...formErrors, telefono: false});
+      // Validar si está vacío o incompleto
+      if (value.length === 0 || value.length === 10) {
+        setFormErrors({...formErrors, telefono: value.length !== 10});
+      }
     }
   };
 
@@ -569,7 +572,10 @@ export default function Therapy() {
     const value = e.target.value.replace(/\D/g, ''); // Solo números
     if (value.length <= 10) {
       setOtherPersonData({...otherPersonData, telefono: value});
-      setOtherPersonErrors({...otherPersonErrors, telefono: false});
+      // Validar si está vacío o incompleto
+      if (value.length === 0 || value.length === 10) {
+        setOtherPersonErrors({...otherPersonErrors, telefono: value.length !== 10});
+      }
     }
   };
 
@@ -1539,7 +1545,13 @@ ${formData.concerns || 'No especificado'}
                       value={formData.nombre}
                       onChange={(e) => {
                         setFormData({...formData, nombre: e.target.value});
-                        setFormErrors({...formErrors, nombre: false});
+                      }}
+                      onBlur={(e) => {
+                        if (!e.target.value.trim()) {
+                          setFormErrors({...formErrors, nombre: true});
+                        } else {
+                          setFormErrors({...formErrors, nombre: false});
+                        }
                       }}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
                         formErrors.nombre ? 'border-red-500 bg-red-50' : 'border-gray-300'
@@ -1566,7 +1578,13 @@ ${formData.concerns || 'No especificado'}
                       value={formData.apellidoPaterno}
                       onChange={(e) => {
                         setFormData({...formData, apellidoPaterno: e.target.value});
-                        setFormErrors({...formErrors, apellidoPaterno: false});
+                      }}
+                      onBlur={(e) => {
+                        if (!e.target.value.trim()) {
+                          setFormErrors({...formErrors, apellidoPaterno: true});
+                        } else {
+                          setFormErrors({...formErrors, apellidoPaterno: false});
+                        }
                       }}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
                         formErrors.apellidoPaterno ? 'border-red-500 bg-red-50' : 'border-gray-300'
@@ -1594,7 +1612,14 @@ ${formData.concerns || 'No especificado'}
                     value={formData.email}
                     onChange={(e) => {
                       setFormData({...formData, email: e.target.value});
-                      setFormErrors({...formErrors, email: false});
+                    }}
+                    onBlur={(e) => {
+                      const value = e.target.value.trim();
+                      if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                        setFormErrors({...formErrors, email: true});
+                      } else {
+                        setFormErrors({...formErrors, email: false});
+                      }
                     }}
                     className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
                       formErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
@@ -1669,7 +1694,13 @@ ${formData.concerns || 'No especificado'}
                         value={otherPersonData.nombre}
                         onChange={(e) => {
                           setOtherPersonData({...otherPersonData, nombre: e.target.value});
-                          setOtherPersonErrors({...otherPersonErrors, nombre: false});
+                        }}
+                        onBlur={(e) => {
+                          if (!e.target.value.trim()) {
+                            setOtherPersonErrors({...otherPersonErrors, nombre: true});
+                          } else {
+                            setOtherPersonErrors({...otherPersonErrors, nombre: false});
+                          }
                         }}
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
                           otherPersonErrors.nombre ? 'border-red-500 bg-red-50' : 'border-gray-300'
@@ -1696,7 +1727,13 @@ ${formData.concerns || 'No especificado'}
                         value={otherPersonData.apellidoPaterno}
                         onChange={(e) => {
                           setOtherPersonData({...otherPersonData, apellidoPaterno: e.target.value});
-                          setOtherPersonErrors({...otherPersonErrors, apellidoPaterno: false});
+                        }}
+                        onBlur={(e) => {
+                          if (!e.target.value.trim()) {
+                            setOtherPersonErrors({...otherPersonErrors, apellidoPaterno: true});
+                          } else {
+                            setOtherPersonErrors({...otherPersonErrors, apellidoPaterno: false});
+                          }
                         }}
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
                           otherPersonErrors.apellidoPaterno ? 'border-red-500 bg-red-50' : 'border-gray-300'
@@ -1737,7 +1774,14 @@ ${formData.concerns || 'No especificado'}
                       value={otherPersonData.email}
                       onChange={(e) => {
                         setOtherPersonData({...otherPersonData, email: e.target.value});
-                        setOtherPersonErrors({...otherPersonErrors, email: false});
+                      }}
+                      onBlur={(e) => {
+                        const value = e.target.value.trim();
+                        if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                          setOtherPersonErrors({...otherPersonErrors, email: true});
+                        } else {
+                          setOtherPersonErrors({...otherPersonErrors, email: false});
+                        }
                       }}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
                         otherPersonErrors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
