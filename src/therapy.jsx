@@ -346,11 +346,6 @@ const StressTips = ({ onBack }) => {
 export default function Therapy() {
   const navigate = useNavigate();
   
-  // Estados para login de usuarios recurrentes
-  const [showLoginModal, setShowLoginModal] = useState(true);
-  const [loginPhone, setLoginPhone] = useState('');
-  const [isReturningUser, setIsReturningUser] = useState(false);
-  
   // Get user data from localStorage
   let storedUserData = null;
   try {
@@ -366,6 +361,12 @@ export default function Therapy() {
   } catch (e) {
     storedUserData = null;
   }
+  
+  // Estados para login de usuarios recurrentes
+  // Si ya hay un usuario logueado (currentUser), NO mostrar modal
+  const [showLoginModal, setShowLoginModal] = useState(!storedUserData);
+  const [loginPhone, setLoginPhone] = useState('');
+  const [isReturningUser, setIsReturningUser] = useState(!!storedUserData);
   
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
