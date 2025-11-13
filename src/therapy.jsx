@@ -1004,7 +1004,7 @@ ${formData.concerns || 'No especificado'}
 
             <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-6 mb-8">
               <p className="text-sm text-gray-600 mb-2">
-                {sessionFor === 'myself' ? 'Tu sesión' : `Sesión de ${otherPersonData.firstName} ${otherPersonData.lastName}`}
+                {sessionFor === 'myself' ? 'Tu sesión' : `Sesión de ${otherPersonData.nombre} ${otherPersonData.apellidoPaterno}`}
               </p>
               <p className="text-2xl font-bold text-gray-900 mb-1">
                 {selectedDate.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}
@@ -1016,10 +1016,10 @@ ${formData.concerns || 'No especificado'}
             <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-4 mb-8">
               <p className="text-sm text-gray-700">
                 <strong>Te vamos a contactar 24 horas antes</strong> al{' '}
-                <span className="font-semibold">+52 {formatPhoneDisplay(formData.phone)}</span>
+                <span className="font-semibold">+52 {formatPhoneDisplay(formData.telefono)}</span>
                 {sessionFor === 'other' && (
                   <>
-                    {' '}y al <span className="font-semibold">+52 {formatPhoneDisplay(otherPersonData.phone)}</span>
+                    {' '}y al <span className="font-semibold">+52 {formatPhoneDisplay(otherPersonData.telefono)}</span>
                   </>
                 )}
                 {' '}para confirmar {sessionFor === 'myself' ? 'tu' : 'la'} sesión y mandar el link de la videollamada.
@@ -1060,7 +1060,7 @@ ${formData.concerns || 'No especificado'}
                       <svg className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                      <span><strong>Por email:</strong> Escribe a <a href={`mailto:terapia@saludcompartida.com?subject=Consulta sobre sesión&body=Nombre: ${formData.firstName} ${formData.lastName}%0D%0AFecha de cita: ${selectedDate.toLocaleDateString('es-MX')}%0D%0AHora: ${selectedTime}%0D%0A%0D%0AConsulta:`} className="text-cyan-600 hover:underline font-semibold">terapia@saludcompartida.com</a></span>
+                      <span><strong>Por email:</strong> Escribe a <a href={`mailto:terapia@saludcompartida.com?subject=Consulta sobre sesión&body=Nombre: ${formData.nombre} ${formData.apellidoPaterno}%0D%0AFecha de cita: ${selectedDate.toLocaleDateString('es-MX')}%0D%0AHora: ${selectedTime}%0D%0A%0D%0AConsulta:`} className="text-cyan-600 hover:underline font-semibold">terapia@saludcompartida.com</a></span>
                     </div>
                     
                     <div className="flex items-start gap-2">
