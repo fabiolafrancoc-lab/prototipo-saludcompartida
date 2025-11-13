@@ -374,18 +374,18 @@ export default function Therapy() {
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
   const [sessionFor, setSessionFor] = useState(''); // 'myself' o 'other'
   const [formData, setFormData] = useState({
-    firstName: storedUserData?.firstName || '',
-    lastName: storedUserData?.lastName || '',
-    phone: storedUserData?.phone || '',
+    nombre: storedUserData?.firstName || '',
+    apellidoPaterno: storedUserData?.lastName || '',
+    telefono: storedUserData?.phone || '',
     email: storedUserData?.email || '',
     concerns: ''
   });
   const [otherPersonData, setOtherPersonData] = useState({
-    firstName: '',
-    lastName: '',
-    motherLastName: '',
+    nombre: '',
+    apellidoPaterno: '',
+    apellidoMaterno: '',
     email: '',
-    phone: '',
+    telefono: '',
     relationship: ''
   });
   const [formErrors, setFormErrors] = useState({});
@@ -415,9 +415,9 @@ export default function Therapy() {
         if (userData) {
           setFormData(prev => ({
             ...prev,
-            firstName: userData?.firstName || prev.firstName,
-            lastName: userData?.lastName || prev.lastName,
-            phone: userData?.phone || prev.phone,
+            nombre: userData?.firstName || prev.nombre,
+            apellidoPaterno: userData?.lastName || prev.apellidoPaterno,
+            telefono: userData?.phone || prev.telefono,
             email: userData?.email || prev.email
           }));
         }
@@ -560,16 +560,16 @@ export default function Therapy() {
   const handlePhoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, ''); // Solo números
     if (value.length <= 10) {
-      setFormData({...formData, phone: value});
-      setFormErrors({...formErrors, phone: false});
+      setFormData({...formData, telefono: value});
+      setFormErrors({...formErrors, telefono: false});
     }
   };
 
   const handleOtherPersonPhoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, ''); // Solo números
     if (value.length <= 10) {
-      setOtherPersonData({...otherPersonData, phone: value});
-      setOtherPersonErrors({...otherPersonErrors, phone: false});
+      setOtherPersonData({...otherPersonData, telefono: value});
+      setOtherPersonErrors({...otherPersonErrors, telefono: false});
     }
   };
 
@@ -596,15 +596,15 @@ export default function Therapy() {
       // Usuario encontrado - autocompletar datos
       const userData = therapyUsers[uniquePhoneId];
       setFormData({
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        phone: userData.phone,
+        nombre: userData.nombre,
+        apellidoPaterno: userData.apellidoPaterno,
+        telefono: userData.telefono,
         email: userData.email,
         concerns: ''
       });
       setIsReturningUser(true);
       setShowLoginModal(false);
-      console.log('✅ Usuario recurrente identificado:', userData.firstName);
+      console.log('✅ Usuario recurrente identificado:', userData.nombre);
     } else {
       // Usuario nuevo
       setIsReturningUser(false);
@@ -659,12 +659,12 @@ export default function Therapy() {
     }
 
     // Validar formData (quien agenda)
-    if (!formData.firstName || !formData.firstName.trim()) {
-      newFormErrors.firstName = true;
+    if (!formData.nombre || !formData.nombre.trim()) {
+      newFormErrors.nombre = true;
       hasErrors = true;
     }
-    if (!formData.lastName || !formData.lastName.trim()) {
-      newFormErrors.lastName = true;
+    if (!formData.apellidoPaterno || !formData.apellidoPaterno.trim()) {
+      newFormErrors.apellidoPaterno = true;
       hasErrors = true;
     }
     if (!formData.email || !formData.email.trim()) {
@@ -674,19 +674,19 @@ export default function Therapy() {
       newFormErrors.email = true;
       hasErrors = true;
     }
-    if (!formData.phone || formData.phone.length !== 10) {
-      newFormErrors.phone = true;
+    if (!formData.telefono || formData.telefono.length !== 10) {
+      newFormErrors.telefono = true;
       hasErrors = true;
     }
 
     // Validar otherPersonData si es para otra persona
     if (sessionFor === 'other') {
-      if (!otherPersonData.firstName || !otherPersonData.firstName.trim()) {
-        newOtherPersonErrors.firstName = true;
+      if (!otherPersonData.nombre || !otherPersonData.nombre.trim()) {
+        newOtherPersonErrors.nombre = true;
         hasErrors = true;
       }
-      if (!otherPersonData.lastName || !otherPersonData.lastName.trim()) {
-        newOtherPersonErrors.lastName = true;
+      if (!otherPersonData.apellidoPaterno || !otherPersonData.apellidoPaterno.trim()) {
+        newOtherPersonErrors.apellidoPaterno = true;
         hasErrors = true;
       }
       if (!otherPersonData.email || !otherPersonData.email.trim()) {
@@ -696,8 +696,8 @@ export default function Therapy() {
         newOtherPersonErrors.email = true;
         hasErrors = true;
       }
-      if (!otherPersonData.phone || otherPersonData.phone.length !== 10) {
-        newOtherPersonErrors.phone = true;
+      if (!otherPersonData.telefono || otherPersonData.telefono.length !== 10) {
+        newOtherPersonErrors.telefono = true;
         hasErrors = true;
       }
       if (!otherPersonData.relationship || !otherPersonData.relationship.trim()) {
@@ -722,12 +722,12 @@ export default function Therapy() {
     }
 
     const patientInfo = sessionFor === 'myself' 
-      ? `${formData.firstName} ${formData.lastName}`
-      : `${otherPersonData.firstName} ${otherPersonData.lastName} ${otherPersonData.motherLastName || ''}`.trim();
+      ? `${formData.nombre} ${formData.apellidoPaterno}`
+      : `${otherPersonData.nombre} ${otherPersonData.apellidoPaterno} ${otherPersonData.apellidoMaterno || ''}`.trim();
 
     const patientPhone = sessionFor === 'myself'
-      ? `+52${formData.phone}`
-      : `+52${otherPersonData.phone}`;
+      ? `+52${formData.telefono}`
+      : `+52${otherPersonData.telefono}`;
 
     const patientEmail = sessionFor === 'myself'
       ? formData.email
@@ -739,8 +739,8 @@ export default function Therapy() {
       patientName: patientInfo,
       patientPhone: patientPhone,
       patientEmail: patientEmail,
-      contactName: `${formData.firstName} ${formData.lastName}`,
-      contactPhone: `+52${formData.phone}`,
+      contactName: `${formData.nombre} ${formData.apellidoPaterno}`,
+      contactPhone: `+52${formData.telefono}`,
       contactEmail: formData.email,
       relationship: sessionFor === 'other' ? otherPersonData.relationship : 'Propio paciente',
       sessionType: 'Individual',
@@ -767,8 +767,8 @@ Email: ${patientEmail}
 ${sessionFor === 'other' ? `Parentesco: ${otherPersonData.relationship}` : ''}
 
 --- Información de Contacto (quien agenda) ---
-Nombre: ${formData.firstName} ${formData.lastName}
-Teléfono: +52${formData.phone}
+Nombre: ${formData.nombre} ${formData.apellidoPaterno}
+Teléfono: +52${formData.telefono}
 Email: ${formData.email}
 
 --- Detalles de la Sesión ---
@@ -791,8 +791,8 @@ ${formData.concerns || 'No especificado'}
         },
         body: JSON.stringify({
           name: sessionFor === 'myself' 
-            ? `${formData.firstName} ${formData.lastName}` 
-            : `${otherPersonData.firstName} ${otherPersonData.lastName} (agendado por ${formData.firstName})`,
+            ? `${formData.nombre} ${formData.apellidoPaterno}` 
+            : `${otherPersonData.nombre} ${otherPersonData.apellidoPaterno} (agendado por ${formData.nombre})`,
           phone: patientPhone,
           message: emailMessage,
           type: 'therapy'
@@ -809,8 +809,8 @@ ${formData.concerns || 'No especificado'}
     // Enviar notificación de WhatsApp/SMS al paciente
     try {
       const notificationResult = await sendAppointmentConfirmation({
-        phone: sessionFor === 'myself' ? formData.phone : otherPersonData.phone,
-        firstName: sessionFor === 'myself' ? formData.firstName : otherPersonData.firstName,
+        phone: sessionFor === 'myself' ? formData.telefono : otherPersonData.telefono,
+        firstName: sessionFor === 'myself' ? formData.nombre : otherPersonData.nombre,
         date: selectedDate.toLocaleDateString('es-MX', { 
           weekday: 'long', 
           day: 'numeric', 
@@ -831,14 +831,14 @@ ${formData.concerns || 'No especificado'}
     }
     
     // Guardar usuario en localStorage para futuras sesiones
-    const uniquePhoneId = `+52${formData.phone}`;
+    const uniquePhoneId = `+52${formData.telefono}`;
     const therapyUsers = JSON.parse(localStorage.getItem('therapyUsers') || '{}');
     
     therapyUsers[uniquePhoneId] = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
+      nombre: formData.nombre,
+      apellidoPaterno: formData.apellidoPaterno,
       email: formData.email,
-      phone: formData.phone,
+      telefono: formData.telefono,
       countryCode: '+52',
       lastAppointment: new Date().toISOString()
     };
@@ -1095,8 +1095,8 @@ ${formData.concerns || 'No especificado'}
                   setSelectedDate(null);
                   setSelectedTime(null);
                   setIsRescheduling(false);
-                  setFormData({ firstName: '', lastName: '', phone: '', email: '', concerns: '' });
-                  setOtherPersonData({ firstName: '', lastName: '', motherLastName: '', email: '', phone: '', relationship: '' });
+                  setFormData({ nombre: '', apellidoPaterno: '', telefono: '', email: '', concerns: '' });
+                  setOtherPersonData({ nombre: '', apellidoPaterno: '', apellidoMaterno: '', email: '', telefono: '', relationship: '' });
                 }}
                 className="w-full text-gray-600 hover:text-gray-900 font-medium"
               >
@@ -1279,7 +1279,7 @@ ${formData.concerns || 'No especificado'}
         </div>
 
         {/* Mensaje de bienvenida para usuarios recurrentes */}
-        {isReturningUser && formData.firstName && (
+        {isReturningUser && formData.nombre && (
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 mb-8 max-w-3xl mx-auto">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
@@ -1289,7 +1289,7 @@ ${formData.concerns || 'No especificado'}
               </div>
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  ¡Qué bien verte de nuevo, {formData.firstName}!
+                  ¡Qué bien verte de nuevo, {formData.nombre}!
                 </h3>
                 <p className="text-gray-700">
                   Nos alegra que sigas cuidando tu salud mental. Tus datos ya están listos, solo selecciona tu nueva fecha.
@@ -1535,18 +1535,18 @@ ${formData.concerns || 'No especificado'}
                     </label>
                     <input
                       type="text"
-                      name="firstName"
-                      value={formData.firstName}
+                      name="nombre"
+                      value={formData.nombre}
                       onChange={(e) => {
-                        setFormData({...formData, firstName: e.target.value});
-                        setFormErrors({...formErrors, firstName: false});
+                        setFormData({...formData, nombre: e.target.value});
+                        setFormErrors({...formErrors, nombre: false});
                       }}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
-                        formErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        formErrors.nombre ? 'border-red-500 bg-red-50' : 'border-gray-300'
                       }`}
                       placeholder="Tu nombre"
                     />
-                    {formErrors.firstName && (
+                    {formErrors.nombre && (
                       <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -1562,18 +1562,18 @@ ${formData.concerns || 'No especificado'}
                     </label>
                     <input
                       type="text"
-                      name="lastName"
-                      value={formData.lastName}
+                      name="apellidoPaterno"
+                      value={formData.apellidoPaterno}
                       onChange={(e) => {
-                        setFormData({...formData, lastName: e.target.value});
-                        setFormErrors({...formErrors, lastName: false});
+                        setFormData({...formData, apellidoPaterno: e.target.value});
+                        setFormErrors({...formErrors, apellidoPaterno: false});
                       }}
                       className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-500 ${
-                        formErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        formErrors.apellidoPaterno ? 'border-red-500 bg-red-50' : 'border-gray-300'
                       }`}
                       placeholder="Tu apellido"
                     />
-                    {formErrors.lastName && (
+                    {formErrors.apellidoPaterno && (
                       <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -1620,22 +1620,22 @@ ${formData.concerns || 'No especificado'}
                   </label>
                   <div className="flex">
                     <div className={`flex items-center bg-gray-100 border border-r-0 rounded-l-xl px-4 ${
-                      formErrors.phone ? 'border-red-500' : 'border-gray-300'
+                      formErrors.telefono ? 'border-red-500' : 'border-gray-300'
                     }`}>
                       <span className="text-gray-700 font-medium">+52</span>
                     </div>
                     <input
                       type="tel"
-                      value={formatPhoneDisplay(formData.phone)}
+                      value={formatPhoneDisplay(formData.telefono)}
                       onChange={handlePhoneChange}
                       className={`flex-1 px-4 py-3 border rounded-r-xl focus:ring-2 focus:ring-cyan-500 ${
-                        formErrors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                        formErrors.telefono ? 'border-red-500 bg-red-50' : 'border-gray-300'
                       }`}
                       placeholder="555 123 4567"
                       maxLength="12"
                     />
                   </div>
-                  {formErrors.phone ? (
+                  {formErrors.telefono ? (
                     <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -1665,18 +1665,18 @@ ${formData.concerns || 'No especificado'}
                       </label>
                       <input
                         type="text"
-                        name="otherFirstName"
-                        value={otherPersonData.firstName}
+                        name="otherNombre"
+                        value={otherPersonData.nombre}
                         onChange={(e) => {
-                          setOtherPersonData({...otherPersonData, firstName: e.target.value});
-                          setOtherPersonErrors({...otherPersonErrors, firstName: false});
+                          setOtherPersonData({...otherPersonData, nombre: e.target.value});
+                          setOtherPersonErrors({...otherPersonErrors, nombre: false});
                         }}
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
-                          otherPersonErrors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                          otherPersonErrors.nombre ? 'border-red-500 bg-red-50' : 'border-gray-300'
                         }`}
                         placeholder="Nombre"
                       />
-                      {otherPersonErrors.firstName && (
+                      {otherPersonErrors.nombre && (
                         <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -1692,18 +1692,18 @@ ${formData.concerns || 'No especificado'}
                       </label>
                       <input
                         type="text"
-                        name="otherLastName"
-                        value={otherPersonData.lastName}
+                        name="otherApellidoPaterno"
+                        value={otherPersonData.apellidoPaterno}
                         onChange={(e) => {
-                          setOtherPersonData({...otherPersonData, lastName: e.target.value});
-                          setOtherPersonErrors({...otherPersonErrors, lastName: false});
+                          setOtherPersonData({...otherPersonData, apellidoPaterno: e.target.value});
+                          setOtherPersonErrors({...otherPersonErrors, apellidoPaterno: false});
                         }}
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-pink-500 ${
-                          otherPersonErrors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                          otherPersonErrors.apellidoPaterno ? 'border-red-500 bg-red-50' : 'border-gray-300'
                         }`}
                         placeholder="Apellido paterno"
                       />
-                      {otherPersonErrors.lastName && (
+                      {otherPersonErrors.apellidoPaterno && (
                         <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -1719,8 +1719,8 @@ ${formData.concerns || 'No especificado'}
                       </label>
                       <input
                         type="text"
-                        value={otherPersonData.motherLastName}
-                        onChange={(e) => setOtherPersonData({...otherPersonData, motherLastName: e.target.value})}
+                        value={otherPersonData.apellidoMaterno}
+                        onChange={(e) => setOtherPersonData({...otherPersonData, apellidoMaterno: e.target.value})}
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                         placeholder="Apellido materno"
                       />
@@ -1763,22 +1763,22 @@ ${formData.concerns || 'No especificado'}
                     </label>
                     <div className="flex">
                       <div className={`flex items-center bg-gray-100 border border-r-0 rounded-l-xl px-4 ${
-                        otherPersonErrors.phone ? 'border-red-500' : 'border-gray-300'
+                        otherPersonErrors.telefono ? 'border-red-500' : 'border-gray-300'
                       }`}>
                         <span className="text-gray-700 font-medium">+52</span>
                       </div>
                       <input
                         type="tel"
-                        value={formatPhoneDisplay(otherPersonData.phone)}
+                        value={formatPhoneDisplay(otherPersonData.telefono)}
                         onChange={handleOtherPersonPhoneChange}
                         className={`flex-1 px-4 py-3 border rounded-r-xl focus:ring-2 focus:ring-pink-500 ${
-                          otherPersonErrors.phone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                          otherPersonErrors.telefono ? 'border-red-500 bg-red-50' : 'border-gray-300'
                         }`}
                         placeholder="555 123 4567"
                         maxLength="12"
                       />
                     </div>
-                    {otherPersonErrors.phone ? (
+                    {otherPersonErrors.telefono ? (
                       <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
