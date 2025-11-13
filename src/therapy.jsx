@@ -398,6 +398,35 @@ export default function Therapy() {
   const [isRescheduling, setIsRescheduling] = useState(false);
 
   // Update form data when localStorage changes (e.g., from account update)
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    try {
+      let userData = null;
+      const currentUserStored = localStorage.getItem('currentUser');
+      if (currentUserStored) {
+        userData = JSON.parse(currentUserStored);
+      } else {
+        const accessUserStored = localStorage.getItem('accessUser');
+        if (accessUserStored) {
+          userData = JSON.parse(accessUserStored);
+        }
+      }
+      
+      if (userData) {
+        setFormData(prev => ({
+          ...prev,
+          nombre: userData?.firstName || prev.nombre,
+          apellidoPaterno: userData?.lastName || prev.apellidoPaterno,
+          telefono: userData?.phone || prev.telefono,
+          email: userData?.email || prev.email
+        }));
+        setIsReturningUser(true);
+      }
+    } catch (e) {
+      console.error('Error loading user data:', e);
+    }
+  }, []); // Solo al montar
+
   useEffect(() => {
     const handleStorageChange = () => {
       try {
