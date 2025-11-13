@@ -346,6 +346,11 @@ const StressTips = ({ onBack }) => {
 export default function Therapy() {
   const navigate = useNavigate();
   
+  // Estados para login de usuarios recurrentes
+  const [showLoginModal, setShowLoginModal] = useState(true);
+  const [loginPhone, setLoginPhone] = useState('');
+  const [isReturningUser, setIsReturningUser] = useState(false);
+  
   // Get user data from localStorage
   let storedUserData = null;
   try {
@@ -576,6 +581,43 @@ export default function Therapy() {
     return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
   };
 
+  const handleLoginSubmit = () => {
+    const cleaned = loginPhone.replace(/\D/g, '');
+    
+    if (cleaned.length !== 10) {
+      alert('Por favor ingresa un número de teléfono válido de 10 dígitos');
+      return;
+    }
+    
+    const uniquePhoneId = `+52${cleaned}`;
+    const therapyUsers = JSON.parse(localStorage.getItem('therapyUsers') || '{}');
+    
+    if (therapyUsers[uniquePhoneId]) {
+      // Usuario encontrado - autocompletar datos
+      const userData = therapyUsers[uniquePhoneId];
+      setFormData({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phone: userData.phone,
+        email: userData.email,
+        concerns: ''
+      });
+      setIsReturningUser(true);
+      setShowLoginModal(false);
+      console.log('✅ Usuario recurrente identificado:', userData.firstName);
+    } else {
+      // Usuario nuevo
+      setIsReturningUser(false);
+      setShowLoginModal(false);
+      console.log('👤 Usuario nuevo');
+    }
+  };
+
+  const handleSkipLogin = () => {
+    setIsReturningUser(false);
+    setShowLoginModal(false);
+  };
+
   const handleSubmit = async () => {
     // Reset errors
     setFormErrors({});
@@ -788,6 +830,22 @@ ${formData.concerns || 'No especificado'}
       // No bloqueamos el flujo si falla la notificación
     }
     
+    // Guardar usuario en localStorage para futuras sesiones
+    const uniquePhoneId = `+52${formData.phone}`;
+    const therapyUsers = JSON.parse(localStorage.getItem('therapyUsers') || '{}');
+    
+    therapyUsers[uniquePhoneId] = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      countryCode: '+52',
+      lastAppointment: new Date().toISOString()
+    };
+    
+    localStorage.setItem('therapyUsers', JSON.stringify(therapyUsers));
+    console.log('✅ Usuario guardado en localStorage:', uniquePhoneId);
+    
     setShowConfirmation(true);
   };
 
@@ -858,6 +916,66 @@ ${formData.concerns || 'No especificado'}
 
   if (currentView === 'stress') {
     return <StressTips onBack={() => setCurrentView('main')} />;
+  }
+
+  // Modal de login para usuarios recurrentes
+  if (showLoginModal) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-cyan-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+              <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">¡Bienvenido!</h2>
+            <p className="text-gray-600">¿Ya has agendado una sesión antes?</p>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Ingresa tu teléfono
+              </label>
+              <div className="flex gap-2">
+                <div className="flex items-center bg-gray-100 border border-gray-300 rounded-xl px-4">
+                  <span className="text-gray-700 font-medium">+52</span>
+                </div>
+                <input
+                  type="tel"
+                  value={loginPhone}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 10) {
+                      setLoginPhone(value);
+                    }
+                  }}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="555 123 4567"
+                  maxLength="10"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">Autocompletaremos tus datos si ya agendaste antes</p>
+            </div>
+
+            <button
+              onClick={handleLoginSubmit}
+              className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all"
+            >
+              Continuar
+            </button>
+
+            <button
+              onClick={handleSkipLogin}
+              className="w-full py-3 text-gray-600 font-semibold hover:text-gray-900 transition-colors"
+            >
+              Soy nuevo, llenar datos manualmente
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (showConfirmation) {
@@ -1159,6 +1277,27 @@ ${formData.concerns || 'No especificado'}
             </span>
           </div>
         </div>
+
+        {/* Mensaje de bienvenida para usuarios recurrentes */}
+        {isReturningUser && formData.firstName && (
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 mb-8 max-w-3xl mx-auto">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  ¡Qué bien verte de nuevo, {formData.firstName}!
+                </h3>
+                <p className="text-gray-700">
+                  Nos alegra que sigas cuidando tu salud mental. Tus datos ya están listos, solo selecciona tu nueva fecha.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
