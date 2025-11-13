@@ -576,9 +576,7 @@ export default function Therapy() {
     return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     // Reset errors
     setFormErrors({});
     setOtherPersonErrors({});
@@ -1311,7 +1309,7 @@ ${formData.concerns || 'No especificado'}
         </div>
 
         {/* Formulario con campos separados y teléfono +55 */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white rounded-2xl shadow-xl p-8">
           {isRescheduling && (
             <div className="bg-cyan-50 border-2 border-cyan-200 rounded-xl p-4 mb-6">
               <div className="flex items-start gap-3">
@@ -1795,7 +1793,8 @@ ${formData.concerns || 'No especificado'}
           </div>
 
           <button
-            type="submit"
+            type="button"
+            onClick={handleSubmit}
             disabled={!selectedDate || !selectedTime || !sessionFor}
             className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
               selectedDate && selectedTime && sessionFor
@@ -1811,7 +1810,7 @@ ${formData.concerns || 'No especificado'}
           </p>
             </>
           )}
-        </form>
+        </div>
 
         <div className="mt-12 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-8">
           <div className="flex items-start">
