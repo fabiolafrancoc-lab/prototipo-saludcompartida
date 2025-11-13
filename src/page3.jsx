@@ -744,10 +744,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
               <p className="text-xl text-gray-800 font-bold mb-2">
                 ¿Preguntas?
               </p>
-              <p className="text-sm text-gray-600">Contáctanos a:</p>
-              <p className="text-lg font-semibold text-cyan-700 mt-2">
-                contact@saludcompartida.com
-              </p>
+              <p className="text-sm text-gray-600">Contáctanos:</p>
             </div>
             
             <div className="flex flex-col gap-3 mt-4">
