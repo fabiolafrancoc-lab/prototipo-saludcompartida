@@ -1399,7 +1399,6 @@ ${formData.concerns || 'No especificado'}
                     <input
                       type="text"
                       name="firstName"
-                      required
                       value={formData.firstName}
                       onChange={(e) => {
                         setFormData({...formData, firstName: e.target.value});
@@ -1427,7 +1426,6 @@ ${formData.concerns || 'No especificado'}
                     <input
                       type="text"
                       name="lastName"
-                      required
                       value={formData.lastName}
                       onChange={(e) => {
                         setFormData({...formData, lastName: e.target.value});
@@ -1456,7 +1454,6 @@ ${formData.concerns || 'No especificado'}
                   <input
                     type="email"
                     name="email"
-                    required
                     value={formData.email}
                     onChange={(e) => {
                       setFormData({...formData, email: e.target.value});
@@ -1492,7 +1489,6 @@ ${formData.concerns || 'No especificado'}
                     </div>
                     <input
                       type="tel"
-                      required
                       value={formatPhoneDisplay(formData.phone)}
                       onChange={handlePhoneChange}
                       className={`flex-1 px-4 py-3 border rounded-r-xl focus:ring-2 focus:ring-cyan-500 ${
@@ -1533,7 +1529,6 @@ ${formData.concerns || 'No especificado'}
                       <input
                         type="text"
                         name="otherFirstName"
-                        required
                         value={otherPersonData.firstName}
                         onChange={(e) => {
                           setOtherPersonData({...otherPersonData, firstName: e.target.value});
@@ -1561,7 +1556,6 @@ ${formData.concerns || 'No especificado'}
                       <input
                         type="text"
                         name="otherLastName"
-                        required
                         value={otherPersonData.lastName}
                         onChange={(e) => {
                           setOtherPersonData({...otherPersonData, lastName: e.target.value});
@@ -1603,7 +1597,6 @@ ${formData.concerns || 'No especificado'}
                     <input
                       type="email"
                       name="otherEmail"
-                      required
                       value={otherPersonData.email}
                       onChange={(e) => {
                         setOtherPersonData({...otherPersonData, email: e.target.value});
@@ -1639,7 +1632,6 @@ ${formData.concerns || 'No especificado'}
                       </div>
                       <input
                         type="tel"
-                        required
                         value={formatPhoneDisplay(otherPersonData.phone)}
                         onChange={handleOtherPersonPhoneChange}
                         className={`flex-1 px-4 py-3 border rounded-r-xl focus:ring-2 focus:ring-pink-500 ${
@@ -1667,7 +1659,6 @@ ${formData.concerns || 'No especificado'}
                     </label>
                     <select
                       name="relationship"
-                      required
                       value={otherPersonData.relationship}
                       onChange={(e) => {
                         setOtherPersonData({...otherPersonData, relationship: e.target.value});
