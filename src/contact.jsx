@@ -204,12 +204,9 @@ export default function Contact() {
       console.log('Mensaje registrado exitosamente');
       setShowSuccess(true);
       setTimeout(() => {
-        // pasamos el primer nombre si deseas usarlo en /page4
-        if (firstName) {
-          navigate('/page4', { state: { name: firstName } });
-        } else {
-          navigate('/page4');
-        }
+        // Regresar a la página de origen
+        const fromPage = location.state?.from || '/page4';
+        navigate(fromPage);
       }, 3000);
     } catch (error) {
       console.error('Error completo:', error);
@@ -293,7 +290,10 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
             className="h-16 object-contain"
           />
           <button
-            onClick={() => navigate('/page4')}
+            onClick={() => {
+              const fromPage = location.state?.from || '/page4';
+              navigate(fromPage);
+            }}
             className="text-gray-600 hover:text-gray-900 font-medium"
           >
             Volver

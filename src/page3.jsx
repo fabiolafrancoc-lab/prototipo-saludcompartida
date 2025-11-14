@@ -346,40 +346,9 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
   };
 
   // Handler para botón "Otras Consultas"
-  const handleOtrasConsultas = async () => {
-    try {
-      const emailBody = `
-📋 CONSULTA GENERAL
-
-Usuario solicita información general.
-
---- INFORMACIÓN ADICIONAL ---
-Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-      `.trim();
-
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: 'Usuario',
-          email: 'usuario@saludcompartida.com',
-          message: emailBody,
-          type: 'consulta-general',
-          to: 'consultas@saludcompartida.com'
-        }),
-      });
-
-      if (response.ok) {
-        setShowSuccessMessage(true);
-        setTimeout(() => {
-          setShowSuccessMessage(false);
-        }, 3000);
-      }
-    } catch (error) {
-      console.error('Error al enviar:', error);
-    }
+  const handleOtrasConsultas = () => {
+    window.scrollTo(0, 0);
+    navigate('/contact', { state: { from: '/page3' } });
   };
 
   return (
