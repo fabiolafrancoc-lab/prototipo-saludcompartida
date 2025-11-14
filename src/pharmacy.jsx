@@ -57,10 +57,10 @@ export default function Pharmacy() {
   // Datos de medicamentos con precios
   const medicamentos = [
     { nombre: 'Omeprazol', dosis: '20 mg, 30 cápsulas', benavides: 84.00, ahorro: 137.00, guadalajara: 41.50 },
-    { nombre: 'Aspirina', dosis: '500 mg, 40 tabletas', benavides: 50.00, ahorro: 95.00, guadalajara: 44.25 },
-    { nombre: 'Ibuprofeno', dosis: '400 mg, 20 cápsulas', benavides: 79.00, ahorro: 84.00, guadalajara: 30.00 },
-    { nombre: 'Naproxeno', dosis: '500 mg, 20 tabletas', benavides: 67.00, ahorro: 67.00, guadalajara: 42.50 },
-    { nombre: 'Losartán', dosis: '50 mg, 30 tabletas', benavides: 177.00, ahorro: 181.00, guadalajara: 158.00 }
+    { nombre: 'Aspirina', dosis: '500 mg, 40 tabletas', benavides: 44.25, ahorro: 95.00, guadalajara: 50.85 },
+    { nombre: 'Ibuprofeno', dosis: '400 mg, 20 cápsulas', benavides: 79.00, ahorro: 84.00, guadalajara: 74.00 },
+    { nombre: 'Naproxeno', dosis: '500 mg, 20 tabletas', benavides: 67.00, ahorro: 53.50, guadalajara: 55.80 },
+    { nombre: 'Losartán', dosis: '50 mg, 30 tabletas', benavides: 177.00, ahorro: 155.80, guadalajara: 158.00 }
   ];
 
   // Ofertas del día - Benavides
