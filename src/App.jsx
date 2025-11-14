@@ -251,13 +251,13 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
           }
 
           // Enviar Email al migrante
-          if (formData.migrantEmail) {
-            console.log('📧 Intentando enviar email a:', formData.migrantEmail);
+          if (migrantEmail) {
+            console.log('📧 Intentando enviar email a:', migrantEmail);
             const emailResponse = await fetch('/api/send-email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                to: formData.migrantEmail,
+                to: migrantEmail,
                 subject: '🎉 Tu código de acceso - SaludCompartida',
                 message: `Hola ${migrantFirstName},
 
@@ -300,12 +300,12 @@ SaludCompartida`,
           }
 
           // Enviar Email al familiar
-          if (formData.familyEmail) {
+          if (familyEmail) {
             const emailResponse = await fetch('/api/send-email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                to: formData.familyEmail,
+                to: familyEmail,
                 subject: '🎉 Tu código de acceso - SaludCompartida',
                 message: `Hola ${familyFirstName},
 
