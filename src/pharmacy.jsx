@@ -3,10 +3,25 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Pharmacy() {
   const navigate = useNavigate();
-  const [locationShared, setLocationShared] = useState(false);
   const [nombreUsuario, setNombreUsuario] = useState('');
   const [apellidoPaterno, setApellidoPaterno] = useState('');
   const convenioNumber = 'SC-2025-8472';
+
+  // Estados para el flujo de ubicación
+  const [step, setStep] = useState('initial'); // initial, chooseMethod, manualAddress, showResults
+  const [locationMethod, setLocationMethod] = useState(null); // 'manual' o 'current'
+  const [addressData, setAddressData] = useState({
+    calle: '',
+    numeroExterior: '',
+    numeroInterior: '',
+    colonia: '',
+    alcaldia: '',
+    codigoPostal: '',
+    ciudad: '',
+    estado: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [selectedMedicine, setSelectedMedicine] = useState(null); // null, medicamento específico, o 'none'
 
   // Cargar nombre del usuario desde localStorage
   useEffect(() => {
@@ -38,6 +53,38 @@ export default function Pharmacy() {
     }
   }, []);
 
+  // Datos de medicamentos con precios
+  const medicamentos = [
+    { nombre: 'Omeprazol', dosis: '20 mg, 30 cápsulas', benavides: 84, ahorro: 137, guadalajara: 41.50 },
+    { nombre: 'Aspirina', dosis: '500 mg, 40 tabletas', benavides: 50, ahorro: 95, guadalajara: 44.25 },
+    { nombre: 'Ibuprofeno', dosis: '400 mg, 20 cápsulas', benavides: 79, ahorro: 84, guadalajara: 30 },
+    { nombre: 'Naproxeno', dosis: '500 mg, 20 tabletas', benavides: 67, ahorro: 67, guadalajara: 42.50 },
+    { nombre: 'Losartán', dosis: '50 mg, 30 tabletas', benavides: 177, ahorro: 181, guadalajara: 158 }
+  ];
+
+  // Ofertas del día - Benavides
+  const ofertasBenavides = [
+    { producto: 'KleenBebé Suavelastic', presentacion: 'Recién Nacido, 40 unidades', precio: 160 },
+    { producto: 'Huggies Supreme', presentacion: 'Etapa 4, 36 unidades', precio: 387 },
+    { producto: 'Huggies Ultraconfort', presentacion: 'Etapa 5, 40 unidades', precio: 387 }
+  ];
+
+  // Ofertas del día - Guadalajara
+  const ofertasGuadalajara = [
+    { producto: 'Nido Pre-Escolar', presentacion: '2+ años, 1.5 kg', precio: 211 },
+    { producto: "Johnson's Baby Original", presentacion: '200 ml', precio: 58 },
+    { producto: "Smudy's Manzanilla", presentacion: '250 ml', precio: 19 },
+    { producto: 'Mustela Shampoo Suave', presentacion: '500 ml', precio: 148.5 }
+  ];
+
+  // Ofertas del día - Del Ahorro
+  const ofertasAhorro = [
+    { producto: 'Acetona Marca del Ahorro', presentacion: '200 ml', precio: 48 },
+    { producto: 'Naturella Nocturna', presentacion: '8 unidades', precio: 27.50 },
+    { producto: 'Kotex Ultradelgada con Alas', presentacion: '10 piezas', precio: 25.50 },
+    { producto: 'Always Ultra-Gel Nocturna', presentacion: '14 unidades', precio: 67 }
+  ];
+
   const nearbyPharmacies = [
     { name: 'Farmacia Guadalajara', distance: '0.3 km', discount: '75%', logo: '/guadalajara.jpeg', featured: true },
     { name: 'Farmacia Benavides', distance: '0.8 km', discount: '68%', logo: '/benavides.jpeg', featured: true },
@@ -46,22 +93,97 @@ export default function Pharmacy() {
     { name: 'Farmacia Similares', distance: '2.1 km', discount: '58%', logo: '🏥', featured: false },
   ];
 
+  // Funciones auxiliares
+  const getMejorPrecio = (med) => {
+    return Math.min(med.benavides, med.ahorro, med.guadalajara);
+  };
+
+  const getFarmaciaBarata = (med) => {
+    const minPrice = getMejorPrecio(med);
+    if (med.benavides === minPrice) return 'Benavides';
+    if (med.ahorro === minPrice) return 'Del Ahorro';
+    return 'Guadalajara';
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    if (!addressData.calle.trim()) errors.calle = true;
+    if (!addressData.numeroExterior.trim()) errors.numeroExterior = true;
+    if (!addressData.colonia.trim()) errors.colonia = true;
+    if (!addressData.alcaldia.trim()) errors.alcaldia = true;
+    if (!addressData.codigoPostal.trim() || addressData.codigoPostal.length !== 5) errors.codigoPostal = true;
+    if (!addressData.ciudad.trim()) errors.ciudad = true;
+    if (!addressData.estado.trim()) errors.estado = true;
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Handlers de navegación
   const handleShareLocation = () => {
-    setLocationShared(true);
-    // Scroll to the pharmacy finder section
+    setStep('chooseMethod');
     setTimeout(() => {
-      const pharmacySection = document.getElementById('pharmacy-finder-section');
-      if (pharmacySection) {
-        pharmacySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      document.getElementById('location-section')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   };
 
+  const handleChooseManual = () => {
+    setLocationMethod('manual');
+    setStep('manualAddress');
+    setTimeout(() => {
+      document.getElementById('manual-form')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handleChooseCurrent = () => {
+    setLocationMethod('current');
+    setStep('showResults');
+    // Simular obtención de ubicación actual
+    setAddressData({
+      calle: 'Reforma',
+      numeroExterior: '123',
+      numeroInterior: '',
+      colonia: 'Centro',
+      alcaldia: 'Cuauhtémoc',
+      codigoPostal: '06000',
+      ciudad: 'Ciudad de México',
+      estado: 'CDMX'
+    });
+    setTimeout(() => {
+      document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handleSubmitAddress = () => {
+    if (validateForm()) {
+      setStep('showResults');
+      setTimeout(() => {
+        document.getElementById('results-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
+
   const handleVolver = () => {
-    if (locationShared) {
-      setLocationShared(false);
-      // Scroll al inicio cuando vuelve
+    if (step === 'chooseMethod') {
+      setStep('initial');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (step === 'manualAddress') {
+      setStep('chooseMethod');
+      setTimeout(() => {
+        document.getElementById('location-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else if (step === 'showResults') {
+      if (locationMethod === 'manual') {
+        setStep('manualAddress');
+        setTimeout(() => {
+          document.getElementById('manual-form')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } else {
+        setStep('chooseMethod');
+        setTimeout(() => {
+          document.getElementById('location-section')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
     } else {
       window.scrollTo(0, 0);
       navigate('/page4');
@@ -281,7 +403,7 @@ export default function Pharmacy() {
             Encuentra Farmacias Cerca de Ti
           </h2>
 
-          {!locationShared ? (
+          {step === 'initial' && (
             <div className="max-w-md mx-auto bg-white rounded-2xl p-8 shadow-xl text-center">
               <svg className="w-20 h-20 mx-auto mb-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -301,119 +423,356 @@ export default function Pharmacy() {
                 Tu privacidad es importante. Solo usamos tu ubicación para este propósito.
               </p>
             </div>
-          ) : (
-            <div>
-              {/* ESTADÍSTICA DESTACADA */}
-              <div className="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-xl p-6 mb-6 text-center shadow-xl">
-                <div className="text-5xl font-bold mb-2">+1,700</div>
-                <div className="text-xl">Farmacias en toda la red</div>
-              </div>
+          )}
 
-              {/* LISTA DE FARMACIAS CERCANAS */}
+          {/* SELECCIÓN DE MÉTODO DE UBICACIÓN */}
+          {step === 'chooseMethod' && (
+            <div id="location-section" className="max-w-4xl mx-auto space-y-6">
+              <h3 className="text-xl font-bold text-gray-800 text-center mb-6">
+                ¿Cómo quieres proporcionar tu ubicación?
+              </h3>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* OPCIÓN MANUAL */}
+                <div 
+                  onClick={handleChooseManual}
+                  className="bg-white rounded-2xl p-8 shadow-xl border-2 border-gray-200 hover:border-cyan-500 cursor-pointer transition-all hover:shadow-2xl group"
+                >
+                  <svg className="w-16 h-16 mx-auto mb-4 text-cyan-600 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <h4 className="text-xl font-bold text-gray-800 mb-2 text-center">Ingresa tu Dirección</h4>
+                  <p className="text-gray-600 text-center">
+                    Escribe manualmente tu dirección completa
+                  </p>
+                </div>
+
+                {/* OPCIÓN UBICACIÓN ACTUAL */}
+                <div 
+                  onClick={handleChooseCurrent}
+                  className="bg-white rounded-2xl p-8 shadow-xl border-2 border-gray-200 hover:border-pink-500 cursor-pointer transition-all hover:shadow-2xl group"
+                >
+                  <svg className="w-16 h-16 mx-auto mb-4 text-pink-600 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <h4 className="text-xl font-bold text-gray-800 mb-2 text-center">Compartir mi Ubicación Actual</h4>
+                  <p className="text-gray-600 text-center">
+                    Detectamos automáticamente dónde te encuentras
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* FORMULARIO DE DIRECCIÓN MANUAL */}
+          {step === 'manualAddress' && (
+            <div id="manual-form" className="max-w-3xl mx-auto bg-white rounded-2xl p-8 shadow-xl">
+              <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">
+                Ingresa tu Dirección
+              </h3>
+              
               <div className="space-y-4">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">
-                  Farmacias cercanas con mayores descuentos:
-                </h3>
-                
-                {nearbyPharmacies.map((pharmacy, index) => (
-                  <div 
-                    key={index}
-                    className={`relative bg-white rounded-xl p-5 shadow-lg hover:shadow-xl transition-all ${
-                      pharmacy.featured 
-                        ? 'border-3 border-gradient-to-r from-yellow-400 to-amber-500 ring-2 ring-yellow-400 ring-opacity-50' 
-                        : 'border-2 border-gray-100 hover:border-cyan-300'
-                    }`}
-                  >
-                    {pharmacy.featured && (
-                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                        <span className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                          ⭐ FARMACIA DESTACADA
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-16 h-16 rounded-lg overflow-hidden flex items-center justify-center bg-white ${
-                          pharmacy.featured ? 'border-2 border-yellow-400' : 'border border-gray-200'
-                        }`}>
-                          {typeof pharmacy.logo === 'string' && pharmacy.logo.startsWith('/') ? (
-                            <img src={pharmacy.logo} alt={pharmacy.name} className="w-full h-full object-contain p-1" />
-                          ) : (
-                            <span className="text-3xl">{pharmacy.logo}</span>
-                          )}
-                        </div>
-                        <div>
-                          <div className={`font-bold text-lg ${pharmacy.featured ? 'text-amber-600' : 'text-gray-800'}`}>
-                            {pharmacy.name}
-                          </div>
-                          <div className="text-gray-500 text-sm flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                            </svg>
-                            {pharmacy.distance}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className={`text-3xl font-bold ${pharmacy.featured ? 'text-amber-600' : 'text-pink-600'}`}>
-                          {pharmacy.discount}
-                        </div>
-                        <div className="text-xs text-gray-500">descuento</div>
-                      </div>
-                    </div>
-                    
-                    <button className={`w-full mt-4 py-2 rounded-lg font-semibold transition-all ${
-                      pharmacy.featured 
-                        ? 'bg-gradient-to-r from-yellow-400 to-amber-500 text-white hover:from-yellow-500 hover:to-amber-600' 
-                        : 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white hover:from-cyan-600 hover:to-cyan-700'
-                    }`}>
-                      Ver Mapa y Dirección
-                    </button>
+                {/* Calle */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Calle <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={addressData.calle}
+                    onChange={(e) => setAddressData({...addressData, calle: e.target.value})}
+                    className={`w-full px-4 py-3 rounded-lg border-2 ${formErrors.calle ? 'border-red-500' : 'border-gray-300'} focus:border-cyan-500 focus:outline-none`}
+                    placeholder="Ej: Reforma"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Ejemplo: Reforma</p>
+                </div>
+
+                {/* Número Exterior e Interior */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Número Exterior <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={addressData.numeroExterior}
+                      onChange={(e) => setAddressData({...addressData, numeroExterior: e.target.value})}
+                      className={`w-full px-4 py-3 rounded-lg border-2 ${formErrors.numeroExterior ? 'border-red-500' : 'border-gray-300'} focus:border-cyan-500 focus:outline-none`}
+                      placeholder="123"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Ejemplo: 123</p>
                   </div>
-                ))}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Número Interior
+                    </label>
+                    <input
+                      type="text"
+                      value={addressData.numeroInterior}
+                      onChange={(e) => setAddressData({...addressData, numeroInterior: e.target.value})}
+                      className="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-cyan-500 focus:outline-none"
+                      placeholder="Apto 4B"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Ejemplo: Apto 4B (opcional)</p>
+                  </div>
+                </div>
+
+                {/* Colonia y Alcaldía */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Colonia <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={addressData.colonia}
+                      onChange={(e) => setAddressData({...addressData, colonia: e.target.value})}
+                      className={`w-full px-4 py-3 rounded-lg border-2 ${formErrors.colonia ? 'border-red-500' : 'border-gray-300'} focus:border-cyan-500 focus:outline-none`}
+                      placeholder="Centro"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Ejemplo: Centro</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Alcaldía/Municipio <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={addressData.alcaldia}
+                      onChange={(e) => setAddressData({...addressData, alcaldia: e.target.value})}
+                      className={`w-full px-4 py-3 rounded-lg border-2 ${formErrors.alcaldia ? 'border-red-500' : 'border-gray-300'} focus:border-cyan-500 focus:outline-none`}
+                      placeholder="Cuauhtémoc"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Ejemplo: Cuauhtémoc</p>
+                  </div>
+                </div>
+
+                {/* Código Postal, Ciudad y Estado */}
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Código Postal <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={5}
+                      value={addressData.codigoPostal}
+                      onChange={(e) => setAddressData({...addressData, codigoPostal: e.target.value})}
+                      className={`w-full px-4 py-3 rounded-lg border-2 ${formErrors.codigoPostal ? 'border-red-500' : 'border-gray-300'} focus:border-cyan-500 focus:outline-none`}
+                      placeholder="06000"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Ejemplo: 06000</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Ciudad <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={addressData.ciudad}
+                      onChange={(e) => setAddressData({...addressData, ciudad: e.target.value})}
+                      className={`w-full px-4 py-3 rounded-lg border-2 ${formErrors.ciudad ? 'border-red-500' : 'border-gray-300'} focus:border-cyan-500 focus:outline-none`}
+                      placeholder="Ciudad de México"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Ejemplo: CDMX</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Estado <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={addressData.estado}
+                      onChange={(e) => setAddressData({...addressData, estado: e.target.value})}
+                      className={`w-full px-4 py-3 rounded-lg border-2 ${formErrors.estado ? 'border-red-500' : 'border-gray-300'} focus:border-cyan-500 focus:outline-none`}
+                      placeholder="CDMX"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Ejemplo: CDMX</p>
+                  </div>
+                </div>
+
+                {/* Botón Buscar */}
+                <button
+                  onClick={handleSubmitAddress}
+                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 text-white py-4 rounded-xl font-bold text-lg hover:from-cyan-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl mt-6"
+                >
+                  Buscar Farmacias
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* VISTA DE RESULTADOS */}
+          {step === 'showResults' && (
+            <div id="results-section" className="space-y-6">
+              {/* Dirección Actual */}
+              <div className="bg-cyan-50 border-l-4 border-cyan-500 p-4 rounded-r-lg">
+                <p className="text-sm text-gray-700">
+                  <span className="font-bold">📍 Ubicación:</span> {addressData.calle} {addressData.numeroExterior}, {addressData.colonia}, {addressData.alcaldia}, {addressData.codigoPostal}
+                </p>
               </div>
 
-              {/* LOGOS DE FARMACIAS PRINCIPALES */}
-              <div className="mt-8 bg-white rounded-xl p-6 shadow-lg">
-                <h4 className="text-center text-gray-600 mb-4 font-semibold">Red de farmacias participantes:</h4>
-                <div className="flex flex-wrap justify-center items-center gap-6">
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-red-100 to-red-50 rounded-lg flex items-center justify-center mb-2 border-2 border-red-200 shadow-sm">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-red-600">FG</div>
-                        <div className="text-[8px] text-red-500 font-semibold">FARMACIA</div>
+              {/* Layout 50/50 */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* COLUMNA IZQUIERDA: MAPA */}
+                <div className="bg-white rounded-xl p-6 shadow-xl">
+                  <h3 className="text-lg font-bold text-gray-800 mb-4">Mapa de Farmacias</h3>
+                  
+                  {/* PLACEHOLDER DE GOOGLE MAPS */}
+                  <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden">
+                    {/* Simulación de mapa con pins */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-green-100">
+                      {/* Pin Magenta (más barata) */}
+                      <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <svg className="w-10 h-10 text-pink-600 drop-shadow-lg animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
+                        <div className="text-xs font-bold text-pink-600 text-center mt-1">Mejor precio</div>
+                      </div>
+                      {/* Pin Cyan (cercana) */}
+                      <div className="absolute top-1/2 left-1/3">
+                        <svg className="w-8 h-8 text-cyan-600 drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      {/* Pin Cyan (cercana) */}
+                      <div className="absolute top-1/4 right-1/3">
+                        <svg className="w-8 h-8 text-cyan-600 drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-600 font-medium">Farmacia<br/>Guadalajara</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg flex items-center justify-center mb-2 border-2 border-blue-200 shadow-sm">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-blue-600">FB</div>
-                        <div className="text-[8px] text-blue-500 font-semibold">FARMACIA</div>
-                      </div>
+                    <div className="relative z-10 text-gray-600 text-center p-4">
+                      <svg className="w-16 h-16 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                      <p className="font-semibold">Google Maps Integration</p>
+                      <p className="text-sm">(Se integrará)</p>
                     </div>
-                    <p className="text-xs text-gray-600 font-medium">Farmacia<br/>Benavides</p>
                   </div>
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-50 rounded-lg flex items-center justify-center mb-2 border-2 border-green-200 shadow-sm">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-green-600">FA</div>
-                        <div className="text-[8px] text-green-500 font-semibold">FARMACIA</div>
-                      </div>
+
+                  {/* Leyenda */}
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-pink-600 rounded-full"></div>
+                      <span className="text-sm text-gray-700"><strong>Magenta:</strong> Farmacia más barata</span>
                     </div>
-                    <p className="text-xs text-gray-600 font-medium">Farmacia<br/>del Ahorro</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-50 rounded-lg flex items-center justify-center mb-2 border-2 border-orange-200 shadow-sm">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-orange-600">SP</div>
-                        <div className="text-[8px] text-orange-500 font-semibold">FARMACIA</div>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-cyan-600 rounded-full"></div>
+                      <span className="text-sm text-gray-700"><strong>Cyan:</strong> Farmacias cercanas</span>
                     </div>
-                    <p className="text-xs text-gray-600 font-medium">San<br/>Pablo</p>
                   </div>
-                  <div className="text-gray-400 font-semibold text-sm">+ 1,693 más</div>
+                </div>
+
+                {/* COLUMNA DERECHA: TABLAS DE PRECIOS Y OFERTAS */}
+                <div className="space-y-6">
+                  {/* TABLA DE MEDICAMENTOS */}
+                  <div className="bg-white rounded-xl p-6 shadow-xl">
+                    <h3 className="text-lg font-bold text-gray-800 mb-4">Compara Precios de Medicamentos</h3>
+                    
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b-2 border-gray-200">
+                            <th className="text-left py-3 px-2 font-bold text-gray-700">Medicamento</th>
+                            <th className="text-center py-3 px-2 font-bold text-red-600">Benavides</th>
+                            <th className="text-center py-3 px-2 font-bold text-red-600">Guadalajara</th>
+                            <th className="text-center py-3 px-2 font-bold text-green-600">Del Ahorro</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {medicamentos.map((med, idx) => {
+                            const mejorPrecio = getMejorPrecio(med);
+                            const farmaciaBarata = getFarmaciaBarata(med);
+                            return (
+                              <tr 
+                                key={idx}
+                                onClick={() => setSelectedMedicine(med.nombre)}
+                                className={`border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
+                                  selectedMedicine === med.nombre ? 'bg-cyan-50' : ''
+                                }`}
+                              >
+                                <td className="py-3 px-2 font-semibold text-gray-800">
+                                  {med.nombre}
+                                  {selectedMedicine === med.nombre && (
+                                    <span className="ml-2 text-cyan-600">←</span>
+                                  )}
+                                </td>
+                                <td className={`text-center py-3 px-2 font-bold ${
+                                  farmaciaBarata === 'Benavides' ? 'text-pink-600 text-lg' : 'text-gray-600'
+                                }`}>
+                                  ${med.benavides}
+                                  {farmaciaBarata === 'Benavides' && <span className="ml-1">🏆</span>}
+                                </td>
+                                <td className={`text-center py-3 px-2 font-bold ${
+                                  farmaciaBarata === 'Guadalajara' ? 'text-pink-600 text-lg' : 'text-gray-600'
+                                }`}>
+                                  ${med.guadalajara}
+                                  {farmaciaBarata === 'Guadalajara' && <span className="ml-1">🏆</span>}
+                                </td>
+                                <td className={`text-center py-3 px-2 font-bold ${
+                                  farmaciaBarata === 'Del Ahorro' ? 'text-pink-600 text-lg' : 'text-gray-600'
+                                }`}>
+                                  ${med.ahorro}
+                                  {farmaciaBarata === 'Del Ahorro' && <span className="ml-1">🏆</span>}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <p className="text-xs text-gray-500 mt-4 text-center italic">
+                      Haz clic en un medicamento para ver su ubicación en el mapa
+                    </p>
+                  </div>
+
+                  {/* OFERTAS ESPECIALES BENAVIDES */}
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 shadow-lg border-2 border-blue-200">
+                    <h4 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
+                      <span className="text-2xl">🎯</span> Ofertas Benavides
+                    </h4>
+                    <div className="space-y-2">
+                      {ofertasBenavides.map((oferta, idx) => (
+                        <div key={idx} className="bg-white rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-gray-800">{oferta.producto}</p>
+                          <p className="text-xs text-gray-600 mt-1">{oferta.descuento}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* OFERTAS ESPECIALES GUADALAJARA */}
+                  <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 shadow-lg border-2 border-red-200">
+                    <h4 className="text-lg font-bold text-red-800 mb-3 flex items-center gap-2">
+                      <span className="text-2xl">🔥</span> Ofertas Guadalajara
+                    </h4>
+                    <div className="space-y-2">
+                      {ofertasGuadalajara.map((oferta, idx) => (
+                        <div key={idx} className="bg-white rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-gray-800">{oferta.producto}</p>
+                          <p className="text-xs text-gray-600 mt-1">{oferta.descuento}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* OFERTAS ESPECIALES DEL AHORRO */}
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 shadow-lg border-2 border-green-200">
+                    <h4 className="text-lg font-bold text-green-800 mb-3 flex items-center gap-2">
+                      <span className="text-2xl">💰</span> Ofertas Del Ahorro
+                    </h4>
+                    <div className="space-y-2">
+                      {ofertasAhorro.map((oferta, idx) => (
+                        <div key={idx} className="bg-white rounded-lg p-3 shadow-sm">
+                          <p className="text-sm font-semibold text-gray-800">{oferta.producto}</p>
+                          <p className="text-xs text-gray-600 mt-1">{oferta.descuento}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
