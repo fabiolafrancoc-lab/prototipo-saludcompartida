@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopNav from './components/TopNav';
-import { sendAppointmentConfirmation } from '../lib/notifications';
+import { sendAppointmentConfirmation } from './lib/notifications';
 
 // Páginas de Tips para cada beneficio
 const AnxietyTips = ({ onBack }) => {
