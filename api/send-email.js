@@ -68,6 +68,16 @@ export default async function handler(req, res) {
           headerColor = '#10B981';
           headerText = '🗓️ Nueva Cita de Terapia Agendada';
           break;
+        case 'codigo-erroneo':
+          subject = `[🔴 CÓDIGO ERRÓNEO] Solicitud de Ayuda`;
+          headerColor = '#EF4444';
+          headerText = '🔴 Código Erróneo - Usuario necesita ayuda';
+          break;
+        case 'consulta-general':
+          subject = `[📋 CONSULTA GENERAL] ${name}`;
+          headerColor = '#06B6D4';
+          headerText = '📋 Consulta General';
+          break;
         case 'mexico':
         default:
           subject = `[📞 CONTACTO] ${name}`;
@@ -146,6 +156,8 @@ export default async function handler(req, res) {
               type === 'rating' ? 'Sistema de Calificaciones' : 
               type === 'blog-topic' ? 'Blog - Sugerencias' : 
               type === 'therapy' ? 'Sistema de Agendamiento de Terapia' :
+              type === 'codigo-erroneo' ? 'Página de Acceso - Código Erróneo' :
+              type === 'consulta-general' ? 'Página de Acceso - Consulta General' :
               'Formulario de Contacto México'
             }</p>
             <p>SaludCompartida © 2025</p>
