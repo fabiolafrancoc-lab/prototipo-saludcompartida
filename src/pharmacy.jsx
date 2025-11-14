@@ -268,7 +268,7 @@ export default function Pharmacy() {
         {/* HERO SECTION CON VIDEOS */}
         <div className="mb-12">
           {nombreUsuario && nombreUsuario !== 'Usuario' && (
-            <p className="text-center text-2xl text-gray-700 mb-4">
+            <p className="text-center text-4xl md:text-5xl text-gray-700 mb-4">
               ¡Hola <span className="font-bold text-cyan-600">{nombreUsuario}</span>!
             </p>
           )}
