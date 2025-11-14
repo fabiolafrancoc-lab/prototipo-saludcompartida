@@ -838,6 +838,74 @@ ${formData.concerns || 'No especificado'}
       if (!response.ok) {
         console.error('Error al enviar email de confirmación');
       }
+
+      // Enviar email de confirmación al paciente
+      if (patientEmail) {
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: patientEmail,
+            subject: '📅 Confirmación de Cita - Sesión de Terapia',
+            message: `Hola ${patientInfo.split(' ')[0]},
+
+¡Tu cita de terapia ha sido agendada exitosamente! 🎉
+
+📅 **Detalles de tu sesión:**
+• Fecha: ${selectedDate.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+• Hora: ${selectedTime} hrs
+• Tipo: Sesión Individual
+• Modalidad: Videollamada
+
+📞 **Contacto:**
+Recibirás el link de videollamada 24 horas antes de tu cita.
+
+💙 **Recordatorio:**
+Es importante que estés en un lugar tranquilo y privado para tu sesión.
+
+¿Dudas? Escríbenos al 55 2998 4922 702
+
+¡Nos vemos pronto!
+SaludCompartida`,
+            type: 'therapy-confirmation'
+          })
+        });
+      }
+
+      // Si la cita es para otra persona, enviar email también al contacto
+      if (sessionFor === 'other' && formData.email && formData.email !== patientEmail) {
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: formData.email,
+            subject: '📅 Confirmación - Cita de Terapia Agendada',
+            message: `Hola ${formData.nombre},
+
+Has agendado exitosamente una cita de terapia para ${patientInfo} 🎉
+
+📅 **Detalles de la sesión:**
+• Paciente: ${patientInfo}
+• Fecha: ${selectedDate.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+• Hora: ${selectedTime} hrs
+• Tipo: Sesión Individual
+• Modalidad: Videollamada
+
+📞 **Información importante:**
+El link de videollamada será enviado al paciente 24 horas antes de la cita.
+
+💙 **Tu apoyo es importante:**
+Asegúrate de recordarle al paciente sobre la cita.
+
+¿Dudas? Escríbenos al 55 2998 4922 702
+
+Gracias por cuidar de tu familia.
+SaludCompartida`,
+            type: 'therapy-confirmation'
+          })
+        });
+      }
+
     } catch (error) {
       console.error('Error:', error);
     }

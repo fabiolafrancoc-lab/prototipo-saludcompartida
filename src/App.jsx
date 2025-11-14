@@ -286,6 +286,44 @@ SaludCompartida`,
             } else {
               console.error('❌ Error enviando email al migrante:', emailResult);
             }
+
+            // Enviar email de confirmación de registro exitoso
+            await fetch('/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: migrantEmail,
+                subject: '✅ Registro Recibido - SaludCompartida',
+                message: `Hola ${migrantFirstName},
+
+¡Tu registro ha sido recibido exitosamente! 🎉
+
+📋 **Estado de tu solicitud:**
+Has sido registrado en nuestro programa piloto. Estamos revisando todas las solicitudes y seleccionaremos a los 1,000 participantes.
+
+🔔 **¿Qué sigue?**
+• Recibirás una notificación si eres seleccionado
+• El código de acceso será enviado por WhatsApp
+• Quedan solo ${spotsLeft} cupos disponibles
+
+⏰ **Plazo de selección:**
+Los participantes serán notificados en los próximos 3 días.
+
+👨‍👩‍👧 **Datos registrados:**
+• Tu información: ${migrantFirstName} ${migrantLastName}
+• Familiar en México: ${familyFirstName} ${familyLastName}
+• País: ${familyCountry === 'MX' ? '🇲🇽 México' : familyCountry}
+
+💡 **Importante:**
+Mantén tu WhatsApp activo en +1 ${migrantPhone} para recibir notificaciones.
+
+¿Dudas? Escríbenos al 55 2998 4922 702
+
+¡Gracias por confiar en SaludCompartida! 💙
+Equipo SaludCompartida`,
+                type: 'registration-confirmation'
+              })
+            });
           }
 
           // Enviar WhatsApp/SMS al familiar (México)
@@ -329,6 +367,49 @@ SaludCompartida`,
             if (emailResponse.ok) {
               console.log('✅ Email enviado al familiar');
             }
+
+            // Enviar email de confirmación de registro exitoso al familiar
+            await fetch('/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: familyEmail,
+                subject: '✅ Registro Recibido - SaludCompartida',
+                message: `Hola ${familyFirstName},
+
+¡Tu registro ha sido recibido exitosamente! 🎉
+
+📋 **Estado de tu solicitud:**
+Has sido registrado en nuestro programa piloto junto con tu familiar en Estados Unidos. Estamos revisando todas las solicitudes.
+
+🔔 **¿Qué sigue?**
+• Recibirás una notificación si son seleccionados
+• El código de acceso será enviado por WhatsApp
+• Quedan solo ${spotsLeft} cupos disponibles
+
+⏰ **Plazo de selección:**
+Los participantes serán notificados en los próximos 3 días.
+
+👨‍👩‍👧 **Datos registrados:**
+• Tu información: ${familyFirstName} ${familyLastName}
+• Familiar en USA: ${migrantFirstName} ${migrantLastName}
+• País: 🇲🇽 México
+
+💡 **Importante:**
+Mantén tu WhatsApp activo en +52 ${familyPhone} para recibir notificaciones.
+
+🏥 **Servicios incluidos:**
+• Telemedicina 24/7
+• Descuentos en farmacias (40-75%)
+• Sesiones de terapia semanales
+
+¿Dudas? Escríbenos al 55 2998 4922 702
+
+¡Gracias por confiar en SaludCompartida! 💙
+Equipo SaludCompartida`,
+                type: 'registration-confirmation'
+              })
+            });
           }
         } catch (notifError) {
           console.error('Error enviando notificaciones:', notifError);
