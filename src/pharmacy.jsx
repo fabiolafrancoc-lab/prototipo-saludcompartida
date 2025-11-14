@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import PharmacyMap from './components/PharmacyMap';
 
 export default function Pharmacy() {
   const navigate = useNavigate();
@@ -55,11 +56,11 @@ export default function Pharmacy() {
 
   // Datos de medicamentos con precios
   const medicamentos = [
-    { nombre: 'Omeprazol', dosis: '20 mg, 30 cápsulas', benavides: 84, ahorro: 137, guadalajara: 41.50 },
-    { nombre: 'Aspirina', dosis: '500 mg, 40 tabletas', benavides: 50, ahorro: 95, guadalajara: 44.25 },
-    { nombre: 'Ibuprofeno', dosis: '400 mg, 20 cápsulas', benavides: 79, ahorro: 84, guadalajara: 30 },
-    { nombre: 'Naproxeno', dosis: '500 mg, 20 tabletas', benavides: 67, ahorro: 67, guadalajara: 42.50 },
-    { nombre: 'Losartán', dosis: '50 mg, 30 tabletas', benavides: 177, ahorro: 181, guadalajara: 158 }
+    { nombre: 'Omeprazol', dosis: '20 mg, 30 cápsulas', benavides: 84.00, ahorro: 137.00, guadalajara: 41.50 },
+    { nombre: 'Aspirina', dosis: '500 mg, 40 tabletas', benavides: 50.00, ahorro: 95.00, guadalajara: 44.25 },
+    { nombre: 'Ibuprofeno', dosis: '400 mg, 20 cápsulas', benavides: 79.00, ahorro: 84.00, guadalajara: 30.00 },
+    { nombre: 'Naproxeno', dosis: '500 mg, 20 tabletas', benavides: 67.00, ahorro: 67.00, guadalajara: 42.50 },
+    { nombre: 'Losartán', dosis: '50 mg, 30 tabletas', benavides: 177.00, ahorro: 181.00, guadalajara: 158.00 }
   ];
 
   // Ofertas del día - Benavides
@@ -670,95 +671,19 @@ export default function Pharmacy() {
                 <div className="bg-white rounded-xl p-6 shadow-xl">
                   <h3 className="text-lg font-bold text-gray-800 mb-4">Mapa de Farmacias</h3>
                   
-                  {/* PLACEHOLDER DE GOOGLE MAPS */}
-                  <div className="w-full h-[600px] bg-gradient-to-br from-blue-100 via-cyan-50 to-green-50 rounded-lg flex items-center justify-center relative overflow-hidden shadow-inner">
-                    {/* Simulación de mapa con pins */}
-                    <div className="absolute inset-0">
-                      {/* Grid de calles simulado */}
-                      <div className="absolute inset-0 opacity-20">
-                        <div className="absolute top-1/4 left-0 right-0 h-px bg-gray-400"></div>
-                        <div className="absolute top-2/4 left-0 right-0 h-px bg-gray-400"></div>
-                        <div className="absolute top-3/4 left-0 right-0 h-px bg-gray-400"></div>
-                        <div className="absolute left-1/4 top-0 bottom-0 w-px bg-gray-400"></div>
-                        <div className="absolute left-2/4 top-0 bottom-0 w-px bg-gray-400"></div>
-                        <div className="absolute left-3/4 top-0 bottom-0 w-px bg-gray-400"></div>
-                      </div>
-                      
-                      {/* Pin Magenta (más barata) */}
-                      <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-bounce">
-                        <div className="relative">
-                          <svg className="w-12 h-12 text-pink-600 drop-shadow-2xl" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                          </svg>
-                          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-white px-2 py-1 rounded shadow-lg text-xs font-bold text-pink-600">
-                            Mejor precio
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Pin Cyan (cercana) #1 */}
-                      <div className="absolute top-1/2 left-1/3">
-                        <div className="relative">
-                          <svg className="w-10 h-10 text-cyan-600 drop-shadow-xl" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                          </svg>
-                          <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-white px-2 py-1 rounded shadow text-xs font-semibold text-cyan-600">
-                            0.8 km
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Pin Cyan (cercana) #2 */}
-                      <div className="absolute top-1/4 right-1/3">
-                        <div className="relative">
-                          <svg className="w-10 h-10 text-cyan-600 drop-shadow-xl" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                          </svg>
-                          <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-white px-2 py-1 rounded shadow text-xs font-semibold text-cyan-600">
-                            1.2 km
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Pin Cyan (cercana) #3 */}
-                      <div className="absolute bottom-1/3 right-1/4">
-                        <div className="relative">
-                          <svg className="w-10 h-10 text-cyan-600 drop-shadow-xl" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                          </svg>
-                          <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-white px-2 py-1 rounded shadow text-xs font-semibold text-cyan-600">
-                            1.5 km
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Watermark de Google Maps */}
-                    <div className="relative z-10 bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-2xl text-center max-w-sm">
-                      <div className="text-6xl mb-3">🗺️</div>
-                      <p className="font-bold text-gray-800 text-lg mb-2">Integración con Google Maps</p>
-                      <p className="text-sm text-gray-600">El mapa interactivo se mostrará aquí con las ubicaciones exactas de las farmacias</p>
-                    </div>
-                  </div>
-
-                  {/* Leyenda */}
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-pink-600 rounded-full"></div>
-                      <span className="text-sm text-gray-700"><strong>Magenta:</strong> Farmacia más barata</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 bg-cyan-600 rounded-full"></div>
-                      <span className="text-sm text-gray-700"><strong>Cyan:</strong> Farmacias cercanas</span>
-                    </div>
-                  </div>
+                  {/* GOOGLE MAPS */}
+                  <PharmacyMap 
+                    selectedMedicine={selectedMedicine}
+                    address={addressData}
+                  />
                 </div>
 
                 {/* COLUMNA DERECHA: TABLAS DE PRECIOS Y OFERTAS */}
                 <div className="space-y-6">
                   {/* TABLA DE MEDICAMENTOS */}
                   <div className="bg-white rounded-xl p-6 shadow-xl">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4">Compara Precios de Medicamentos</h3>
+                    <h3 className="text-lg font-bold text-gray-800 mb-2">Compara Precios de Medicamentos</h3>
+                    <p className="text-sm text-gray-600 mb-4">Precios en MX$</p>
                     
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
@@ -789,19 +714,19 @@ export default function Pharmacy() {
                                   )}
                                 </td>
                                 <td className={`text-center py-3 px-2 font-bold ${
-                                  farmaciaBarata === 'Benavides' ? 'text-pink-600 text-lg' : 'text-gray-600'
+                                  farmaciaBarata === 'Benavides' ? 'text-pink-600' : 'text-gray-600'
                                 }`}>
-                                  ${med.benavides}
+                                  ${med.benavides.toFixed(2)}
                                 </td>
                                 <td className={`text-center py-3 px-2 font-bold ${
-                                  farmaciaBarata === 'Guadalajara' ? 'text-pink-600 text-lg' : 'text-gray-600'
+                                  farmaciaBarata === 'Guadalajara' ? 'text-pink-600' : 'text-gray-600'
                                 }`}>
-                                  ${med.guadalajara}
+                                  ${med.guadalajara.toFixed(2)}
                                 </td>
                                 <td className={`text-center py-3 px-2 font-bold ${
-                                  farmaciaBarata === 'Del Ahorro' ? 'text-pink-600 text-lg' : 'text-gray-600'
+                                  farmaciaBarata === 'Del Ahorro' ? 'text-pink-600' : 'text-gray-600'
                                 }`}>
-                                  ${med.ahorro}
+                                  ${med.ahorro.toFixed(2)}
                                 </td>
                               </tr>
                             );

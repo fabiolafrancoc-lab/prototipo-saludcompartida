@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.7",
     "@vercel/blob": "^2.0.0",
     "esbuild": "^0.25.12",
     "lucide-react": "^0.292.0",
