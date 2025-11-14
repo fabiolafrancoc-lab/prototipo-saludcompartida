@@ -253,40 +253,19 @@ export default function Telemedicine() {
             <span>Llama Ahora por WhatsApp</span>
           </button>
 
-          <div className="mt-10 bg-gradient-to-br from-cyan-400/30 to-blue-400/30 backdrop-blur-sm rounded-3xl p-8 max-w-3xl mx-auto border-2 border-cyan-200 shadow-2xl">
-            <div className="flex items-center gap-6">
-              <div className="bg-white rounded-2xl p-4 flex-shrink-0 shadow-lg">
-                <svg className="w-12 h-12 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <div className="flex-1 text-left">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-3xl">💊</span>
-                  <h3 className="text-2xl font-bold text-white">
-                    ¿Recibiste una receta médica?
-                  </h3>
-                </div>
-                <p className="text-white/95 text-lg mb-4 leading-relaxed">
-                  Ahorra hasta <span className="font-bold text-yellow-300 text-xl">75% en medicamentos</span> comparando precios en las principales farmacias
-                </p>
-                <button
-                  onClick={() => {
-                    window.scrollTo(0, 0);
-                    navigate('/pharmacy');
-                  }}
-                  className="group bg-white text-cyan-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-cyan-50 transition-all inline-flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105 transform"
-                >
-                  <svg className="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <span>Ver Farmacias con Descuento</span>
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-            </div>
+          <div className="mt-6">
+            <p className="text-white/90 text-base mb-3">
+              ¿Recibiste una receta médica? Ahorra hasta <span className="font-bold text-yellow-300">75%</span>
+            </p>
+            <button
+              onClick={() => {
+                window.scrollTo(0, 0);
+                navigate('/pharmacy');
+              }}
+              className="bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg font-semibold text-base transition-all"
+            >
+              Ver Farmacias con Descuento
+            </button>
           </div>
         </div>
 
