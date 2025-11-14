@@ -317,9 +317,10 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
         },
         body: JSON.stringify({
           name: 'Usuario',
-          email: 'contact@saludcompartida.com',
+          email: 'usuario@saludcompartida.com',
           message: emailBody,
-          type: 'codigo-erroneo'
+          type: 'codigo-erroneo',
+          to: 'contact@saludcompartida.com'
         }),
       });
 
@@ -353,9 +354,10 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
         },
         body: JSON.stringify({
           name: 'Usuario',
-          email: 'contact@saludcompartida.com',
+          email: 'usuario@saludcompartida.com',
           message: emailBody,
-          type: 'consulta-general'
+          type: 'consulta-general',
+          to: 'contact@saludcompartida.com'
         }),
       });
 
@@ -400,13 +402,10 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                 </svg>
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Tu mensaje ha sido enviado con Éxito
+                Hemos recibido tu mensaje con Éxito, en unos momentos te contactaremos
               </h2>
-              <p className="text-gray-700 leading-relaxed mb-2">
-                Gracias por comunicarte con SaludCompartida.
-              </p>
               <p className="text-gray-700 leading-relaxed mb-4">
-                En 15 minutos responderemos tu consulta.
+                Gracias por comunicarte con SaludCompartida.
               </p>
               <div className="bg-cyan-50 border border-cyan-200 rounded-lg p-4">
                 <p className="text-cyan-700 font-semibold">
@@ -744,6 +743,29 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
               <span className="font-semibold text-cyan-700">💡 ¿Cómo funciona?</span><br />
               Ingresa tu código de acceso y completa tus datos para acceder a todos tus beneficios.
             </p>
+          </div>
+
+          {/* BOTONES DE CONSULTA */}
+          <div className="mt-6 space-y-3">
+            <button
+              onClick={handleCodigoErroneo}
+              className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              Código Erróneo
+            </button>
+            
+            <button
+              onClick={handleOtrasConsultas}
+              className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Otras Consultas
+            </button>
           </div>
           </div>
         </div>
