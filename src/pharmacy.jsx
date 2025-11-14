@@ -730,7 +730,7 @@ export default function Pharmacy() {
                       {ofertasBenavides.map((oferta, idx) => (
                         <div key={idx} className="bg-white rounded-lg p-3 shadow-sm">
                           <p className="text-sm font-semibold text-gray-800">{oferta.producto}</p>
-                          <p className="text-xs text-gray-600 mt-1">{oferta.descuento}</p>
+                          <p className="text-xs text-gray-600 mt-1">{oferta.presentacion} - ${oferta.precio}</p>
                         </div>
                       ))}
                     </div>
@@ -745,7 +745,7 @@ export default function Pharmacy() {
                       {ofertasGuadalajara.map((oferta, idx) => (
                         <div key={idx} className="bg-white rounded-lg p-3 shadow-sm">
                           <p className="text-sm font-semibold text-gray-800">{oferta.producto}</p>
-                          <p className="text-xs text-gray-600 mt-1">{oferta.descuento}</p>
+                          <p className="text-xs text-gray-600 mt-1">{oferta.presentacion} - ${oferta.precio}</p>
                         </div>
                       ))}
                     </div>
@@ -760,7 +760,7 @@ export default function Pharmacy() {
                       {ofertasAhorro.map((oferta, idx) => (
                         <div key={idx} className="bg-white rounded-lg p-3 shadow-sm">
                           <p className="text-sm font-semibold text-gray-800">{oferta.producto}</p>
-                          <p className="text-xs text-gray-600 mt-1">{oferta.descuento}</p>
+                          <p className="text-xs text-gray-600 mt-1">{oferta.presentacion} - ${oferta.precio}</p>
                         </div>
                       ))}
                     </div>
