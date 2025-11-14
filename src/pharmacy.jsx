@@ -396,23 +396,22 @@ export default function Pharmacy() {
           </h2>
 
           {step === 'initial' && (
-            <div className="max-w-md mx-auto bg-white rounded-2xl p-8 shadow-xl text-center">
-              <svg className="w-20 h-20 mx-auto mb-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">¿Compartir mi ubicación?</h3>
-              <p className="text-gray-600 mb-6">
+            <div className="max-w-md mx-auto bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl p-8 shadow-xl text-center border-2 border-cyan-200">
+              <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full flex items-center justify-center">
+                <span className="text-5xl">📍</span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3">¿Compartir mi ubicación?</h3>
+              <p className="text-gray-700 mb-6 text-lg leading-relaxed">
                 Te mostraremos las farmacias más cercanas con los mejores descuentos
               </p>
               <button
                 onClick={handleShareLocation}
-                className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 text-white py-4 rounded-xl font-bold text-lg hover:from-cyan-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl"
+                className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 text-white py-4 rounded-xl font-bold text-lg hover:from-cyan-600 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 Compartir Ubicación
               </button>
-              <p className="text-xs text-gray-500 mt-3">
-                Tu privacidad es importante. Solo usamos tu ubicación para este propósito.
+              <p className="text-sm text-gray-600 mt-4 italic">
+                🔒 Tu privacidad es importante. Solo usamos tu ubicación para este propósito.
               </p>
             </div>
           )}
@@ -420,7 +419,7 @@ export default function Pharmacy() {
           {/* SELECCIÓN DE MÉTODO DE UBICACIÓN */}
           {step === 'chooseMethod' && (
             <div id="location-section" className="max-w-4xl mx-auto space-y-6">
-              <h3 className="text-xl font-bold text-gray-800 text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-800 text-center mb-8">
                 ¿Cómo quieres proporcionar tu ubicación?
               </h3>
               
@@ -428,13 +427,13 @@ export default function Pharmacy() {
                 {/* OPCIÓN MANUAL */}
                 <div 
                   onClick={handleChooseManual}
-                  className="bg-white rounded-2xl p-8 shadow-xl border-2 border-gray-200 hover:border-cyan-500 cursor-pointer transition-all hover:shadow-2xl group"
+                  className="bg-gradient-to-br from-white to-cyan-50 rounded-2xl p-10 shadow-xl border-2 border-cyan-200 hover:border-cyan-500 cursor-pointer transition-all hover:shadow-2xl group transform hover:scale-105"
                 >
-                  <svg className="w-16 h-16 mx-auto mb-4 text-cyan-600 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  <h4 className="text-xl font-bold text-gray-800 mb-2 text-center">Ingresa tu Dirección</h4>
-                  <p className="text-gray-600 text-center">
+                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span className="text-4xl">✍️</span>
+                  </div>
+                  <h4 className="text-2xl font-bold text-gray-800 mb-3 text-center">Ingresa tu Dirección</h4>
+                  <p className="text-gray-600 text-center text-lg">
                     Escribe manualmente tu dirección completa
                   </p>
                 </div>
@@ -442,14 +441,13 @@ export default function Pharmacy() {
                 {/* OPCIÓN UBICACIÓN ACTUAL */}
                 <div 
                   onClick={handleChooseCurrent}
-                  className="bg-white rounded-2xl p-8 shadow-xl border-2 border-gray-200 hover:border-pink-500 cursor-pointer transition-all hover:shadow-2xl group"
+                  className="bg-gradient-to-br from-white to-pink-50 rounded-2xl p-10 shadow-xl border-2 border-pink-200 hover:border-pink-500 cursor-pointer transition-all hover:shadow-2xl group transform hover:scale-105"
                 >
-                  <svg className="w-16 h-16 mx-auto mb-4 text-pink-600 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <h4 className="text-xl font-bold text-gray-800 mb-2 text-center">Compartir mi Ubicación Actual</h4>
-                  <p className="text-gray-600 text-center">
+                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span className="text-4xl">📱</span>
+                  </div>
+                  <h4 className="text-2xl font-bold text-gray-800 mb-3 text-center">Compartir mi Ubicación Actual</h4>
+                  <p className="text-gray-600 text-center text-lg">
                     Detectamos automáticamente dónde te encuentras
                   </p>
                 </div>
@@ -612,35 +610,73 @@ export default function Pharmacy() {
                   <h3 className="text-lg font-bold text-gray-800 mb-4">Mapa de Farmacias</h3>
                   
                   {/* PLACEHOLDER DE GOOGLE MAPS */}
-                  <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden">
+                  <div className="w-full h-[600px] bg-gradient-to-br from-blue-100 via-cyan-50 to-green-50 rounded-lg flex items-center justify-center relative overflow-hidden shadow-inner">
                     {/* Simulación de mapa con pins */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-green-100">
+                    <div className="absolute inset-0">
+                      {/* Grid de calles simulado */}
+                      <div className="absolute inset-0 opacity-20">
+                        <div className="absolute top-1/4 left-0 right-0 h-px bg-gray-400"></div>
+                        <div className="absolute top-2/4 left-0 right-0 h-px bg-gray-400"></div>
+                        <div className="absolute top-3/4 left-0 right-0 h-px bg-gray-400"></div>
+                        <div className="absolute left-1/4 top-0 bottom-0 w-px bg-gray-400"></div>
+                        <div className="absolute left-2/4 top-0 bottom-0 w-px bg-gray-400"></div>
+                        <div className="absolute left-3/4 top-0 bottom-0 w-px bg-gray-400"></div>
+                      </div>
+                      
                       {/* Pin Magenta (más barata) */}
-                      <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <svg className="w-10 h-10 text-pink-600 drop-shadow-lg animate-bounce" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                        <div className="text-xs font-bold text-pink-600 text-center mt-1">Mejor precio</div>
+                      <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-bounce">
+                        <div className="relative">
+                          <svg className="w-12 h-12 text-pink-600 drop-shadow-2xl" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                          </svg>
+                          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-white px-2 py-1 rounded shadow-lg text-xs font-bold text-pink-600">
+                            Mejor precio
+                          </div>
+                        </div>
                       </div>
-                      {/* Pin Cyan (cercana) */}
+                      
+                      {/* Pin Cyan (cercana) #1 */}
                       <div className="absolute top-1/2 left-1/3">
-                        <svg className="w-8 h-8 text-cyan-600 drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
+                        <div className="relative">
+                          <svg className="w-10 h-10 text-cyan-600 drop-shadow-xl" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                          </svg>
+                          <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-white px-2 py-1 rounded shadow text-xs font-semibold text-cyan-600">
+                            0.8 km
+                          </div>
+                        </div>
                       </div>
-                      {/* Pin Cyan (cercana) */}
+                      
+                      {/* Pin Cyan (cercana) #2 */}
                       <div className="absolute top-1/4 right-1/3">
-                        <svg className="w-8 h-8 text-cyan-600 drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
+                        <div className="relative">
+                          <svg className="w-10 h-10 text-cyan-600 drop-shadow-xl" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                          </svg>
+                          <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-white px-2 py-1 rounded shadow text-xs font-semibold text-cyan-600">
+                            1.2 km
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Pin Cyan (cercana) #3 */}
+                      <div className="absolute bottom-1/3 right-1/4">
+                        <div className="relative">
+                          <svg className="w-10 h-10 text-cyan-600 drop-shadow-xl" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                          </svg>
+                          <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-white px-2 py-1 rounded shadow text-xs font-semibold text-cyan-600">
+                            1.5 km
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="relative z-10 text-gray-600 text-center p-4">
-                      <svg className="w-16 h-16 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                      </svg>
-                      <p className="font-semibold">Google Maps Integration</p>
-                      <p className="text-sm">(Se integrará)</p>
+                    
+                    {/* Watermark de Google Maps */}
+                    <div className="relative z-10 bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-2xl text-center max-w-sm">
+                      <div className="text-6xl mb-3">🗺️</div>
+                      <p className="font-bold text-gray-800 text-lg mb-2">Integración con Google Maps</p>
+                      <p className="text-sm text-gray-600">El mapa interactivo se mostrará aquí con las ubicaciones exactas de las farmacias</p>
                     </div>
                   </div>
 

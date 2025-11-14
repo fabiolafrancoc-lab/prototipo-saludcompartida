@@ -35,10 +35,10 @@ const TopNav = ({ logoSrc = '/saludcompartida logo WT.png', logoAlt = 'SaludComp
         <div className="flex items-center gap-4">
           {!hideUser && currentUser && (
             <div className="flex items-center gap-2 bg-gradient-to-r from-cyan-50 to-pink-50 px-4 py-2 rounded-full border border-cyan-200">
-              <svg className="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              <span className="text-sm font-semibold text-gray-700">
+              <span className="text-lg font-semibold text-gray-700">
                 {currentUser.firstName} {currentUser.lastName}
               </span>
             </div>

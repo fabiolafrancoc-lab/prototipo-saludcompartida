@@ -161,6 +161,9 @@ export default function Page3() {
       });
       localStorage.setItem('usedSpecialCodes', JSON.stringify(usedCodes));
       
+      // Scroll al top antes de navegar
+      window.scrollTo(0, 0);
+      
       // Navegar a la ruta correspondiente
       setErrors({});
       navigate(codeData.route);
@@ -190,6 +193,9 @@ export default function Page3() {
         localStorage.setItem('currentUser', JSON.stringify(userData));
         setCurrentUser(userData); // Actualizar contexto
         setErrors({});
+        
+        // Scroll al top antes de navegar
+        window.scrollTo(0, 0);
         
         // Navegar según el tipo de usuario
         if (dbUser.user_type === 'migrant' || dbUser.country_code === '+1') {
@@ -230,6 +236,10 @@ export default function Page3() {
       
       // Limpiar errores y navegar según el tipo de usuario
       setErrors({});
+      
+      // Scroll al top antes de navegar
+      window.scrollTo(0, 0);
+      
       if (originalData.type === 'migrant') {
         navigate('/migrant');
       } else {
