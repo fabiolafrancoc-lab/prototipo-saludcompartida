@@ -330,7 +330,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
           email: 'usuario@saludcompartida.com',
           message: emailBody,
           type: 'codigo-erroneo',
-          to: 'contact@saludcompartida.com'
+          to: 'consultas@saludcompartida.com'
         }),
       });
 
@@ -367,7 +367,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
           email: 'usuario@saludcompartida.com',
           message: emailBody,
           type: 'consulta-general',
-          to: 'contact@saludcompartida.com'
+          to: 'consultas@saludcompartida.com'
         }),
       });
 
