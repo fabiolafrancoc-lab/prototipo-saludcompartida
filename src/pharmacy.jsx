@@ -113,6 +113,19 @@ export default function Pharmacy() {
 
   // Handlers de navegación
   const handleShareLocation = () => {
+    // Limpiar datos de dirección cuando se inicia el proceso
+    setAddressData({
+      calle: '',
+      numeroExterior: '',
+      numeroInterior: '',
+      colonia: '',
+      alcaldia: '',
+      codigoPostal: '',
+      ciudad: '',
+      estado: ''
+    });
+    setFormErrors({});
+    setSelectedMedicine(null);
     setStep('chooseMethod');
     setTimeout(() => {
       document.getElementById('location-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -120,6 +133,18 @@ export default function Pharmacy() {
   };
 
   const handleChooseManual = () => {
+    // Asegurar que el formulario esté limpio
+    setAddressData({
+      calle: '',
+      numeroExterior: '',
+      numeroInterior: '',
+      colonia: '',
+      alcaldia: '',
+      codigoPostal: '',
+      ciudad: '',
+      estado: ''
+    });
+    setFormErrors({});
     setLocationMethod('manual');
     setStep('manualAddress');
     setTimeout(() => {
@@ -157,9 +182,34 @@ export default function Pharmacy() {
 
   const handleVolver = () => {
     if (step === 'chooseMethod') {
+      // Limpiar todo cuando se regresa al inicio
+      setAddressData({
+        calle: '',
+        numeroExterior: '',
+        numeroInterior: '',
+        colonia: '',
+        alcaldia: '',
+        codigoPostal: '',
+        ciudad: '',
+        estado: ''
+      });
+      setFormErrors({});
+      setSelectedMedicine(null);
       setStep('initial');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (step === 'manualAddress') {
+      // Limpiar formulario cuando se regresa a elegir método
+      setAddressData({
+        calle: '',
+        numeroExterior: '',
+        numeroInterior: '',
+        colonia: '',
+        alcaldia: '',
+        codigoPostal: '',
+        ciudad: '',
+        estado: ''
+      });
+      setFormErrors({});
       setStep('chooseMethod');
       setTimeout(() => {
         document.getElementById('location-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -171,6 +221,17 @@ export default function Pharmacy() {
           document.getElementById('manual-form')?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
       } else {
+        // Si vuelve desde current location, limpiar datos
+        setAddressData({
+          calle: '',
+          numeroExterior: '',
+          numeroInterior: '',
+          colonia: '',
+          alcaldia: '',
+          codigoPostal: '',
+          ciudad: '',
+          estado: ''
+        });
         setStep('chooseMethod');
         setTimeout(() => {
           document.getElementById('location-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -731,19 +792,16 @@ export default function Pharmacy() {
                                   farmaciaBarata === 'Benavides' ? 'text-pink-600 text-lg' : 'text-gray-600'
                                 }`}>
                                   ${med.benavides}
-                                  {farmaciaBarata === 'Benavides' && <span className="ml-1">🏆</span>}
                                 </td>
                                 <td className={`text-center py-3 px-2 font-bold ${
                                   farmaciaBarata === 'Guadalajara' ? 'text-pink-600 text-lg' : 'text-gray-600'
                                 }`}>
                                   ${med.guadalajara}
-                                  {farmaciaBarata === 'Guadalajara' && <span className="ml-1">🏆</span>}
                                 </td>
                                 <td className={`text-center py-3 px-2 font-bold ${
                                   farmaciaBarata === 'Del Ahorro' ? 'text-pink-600 text-lg' : 'text-gray-600'
                                 }`}>
                                   ${med.ahorro}
-                                  {farmaciaBarata === 'Del Ahorro' && <span className="ml-1">🏆</span>}
                                 </td>
                               </tr>
                             );
@@ -759,8 +817,8 @@ export default function Pharmacy() {
 
                   {/* OFERTAS ESPECIALES BENAVIDES */}
                   <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 shadow-lg border-2 border-blue-200">
-                    <h4 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-                      <span className="text-2xl">🎯</span> Ofertas Benavides
+                    <h4 className="text-lg font-bold text-blue-800 mb-3">
+                      Ofertas Benavides
                     </h4>
                     <div className="space-y-2">
                       {ofertasBenavides.map((oferta, idx) => (
@@ -774,8 +832,8 @@ export default function Pharmacy() {
 
                   {/* OFERTAS ESPECIALES GUADALAJARA */}
                   <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 shadow-lg border-2 border-red-200">
-                    <h4 className="text-lg font-bold text-red-800 mb-3 flex items-center gap-2">
-                      <span className="text-2xl">🔥</span> Ofertas Guadalajara
+                    <h4 className="text-lg font-bold text-red-800 mb-3">
+                      Ofertas Guadalajara
                     </h4>
                     <div className="space-y-2">
                       {ofertasGuadalajara.map((oferta, idx) => (
@@ -789,8 +847,8 @@ export default function Pharmacy() {
 
                   {/* OFERTAS ESPECIALES DEL AHORRO */}
                   <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 shadow-lg border-2 border-green-200">
-                    <h4 className="text-lg font-bold text-green-800 mb-3 flex items-center gap-2">
-                      <span className="text-2xl">💰</span> Ofertas Del Ahorro
+                    <h4 className="text-lg font-bold text-green-800 mb-3">
+                      Ofertas Del Ahorro
                     </h4>
                     <div className="space-y-2">
                       {ofertasAhorro.map((oferta, idx) => (
