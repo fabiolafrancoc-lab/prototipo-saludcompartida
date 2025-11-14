@@ -85,14 +85,6 @@ export default function Pharmacy() {
     { producto: 'Always Ultra-Gel Nocturna', presentacion: '14 unidades', precio: 67 }
   ];
 
-  const nearbyPharmacies = [
-    { name: 'Farmacia Guadalajara', distance: '0.3 km', discount: '75%', logo: '/guadalajara.jpeg', featured: true },
-    { name: 'Farmacia Benavides', distance: '0.8 km', discount: '68%', logo: '/benavides.jpeg', featured: true },
-    { name: 'Farmacia del Ahorro', distance: '1.2 km', discount: '65%', logo: '/delahorro.jpeg', featured: true },
-    { name: 'Farmacia San Pablo', distance: '1.5 km', discount: '62%', logo: '🏥', featured: false },
-    { name: 'Farmacia Similares', distance: '2.1 km', discount: '58%', logo: '🏥', featured: false },
-  ];
-
   // Funciones auxiliares
   const getMejorPrecio = (med) => {
     return Math.min(med.benavides, med.ahorro, med.guadalajara);
