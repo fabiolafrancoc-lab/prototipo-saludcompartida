@@ -396,9 +396,7 @@ Equipo SaludCompartida`,
                 subject: '✅ Registro Exitoso - SaludCompartida',
                 message: `Hola ${familyFirstName},
 
-¡Gracias por registrarte en SaludCompartida! 🎉
-
-${migrantFirstName} ${migrantLastName} (tu familiar en Estados Unidos) te registró en nuestro programa piloto. Tu solicitud ha sido recibida exitosamente.
+${migrantFirstName} ${migrantLastName} (tu familiar en Estados Unidos) te registró en nuestro programa piloto. Su solicitud ha sido recibida exitosamente.
 
 📋 **Estado de tu registro:**
 Estamos revisando todas las solicitudes para seleccionar a los primeros 1,000 participantes.
