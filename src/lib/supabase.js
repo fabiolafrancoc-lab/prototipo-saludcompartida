@@ -71,7 +71,7 @@ export async function insertRegistration(migrantData, familyData) {
   };
 
   try {
-    const result = await supabaseRequest('registered_users', 'POST', newRegistration);
+    const result = await supabaseRequest('registrations', 'POST', newRegistration);
     return { 
       success: true, 
       data: result, 
@@ -87,16 +87,57 @@ export async function insertRegistration(migrantData, familyData) {
 // Buscar usuario por código de acceso
 export async function getUserByAccessCode(accessCode) {
   try {
-    const result = await supabaseRequest(
-      `registered_users?access_code=eq.${accessCode}&select=*`,
+    // Buscar en códigos de migrante
+    let result = await supabaseRequest(
+      `registrations?migrant_access_code=eq.${accessCode}&select=*`,
       'GET'
     );
     
     if (result && result.length > 0) {
-      return { success: true, data: result[0] };
-    } else {
-      return { success: false, error: 'Código no encontrado' };
+      // Código de migrante encontrado - retornar datos del migrante
+      const user = result[0];
+      return { 
+        success: true, 
+        data: {
+          first_name: user.migrant_first_name,
+          last_name: user.migrant_last_name,
+          mother_last_name: user.migrant_mother_last_name,
+          email: user.migrant_email,
+          phone: user.migrant_phone,
+          country_code: user.migrant_country_code,
+          access_code: user.migrant_access_code,
+          user_type: 'migrant',
+          created_at: user.created_at
+        }
+      };
     }
+    
+    // Si no es código de migrante, buscar en códigos de familiar
+    result = await supabaseRequest(
+      `registrations?family_access_code=eq.${accessCode}&select=*`,
+      'GET'
+    );
+    
+    if (result && result.length > 0) {
+      // Código de familiar encontrado - retornar datos del familiar
+      const user = result[0];
+      return { 
+        success: true, 
+        data: {
+          first_name: user.family_first_name,
+          last_name: user.family_last_name,
+          mother_last_name: user.family_mother_last_name,
+          email: user.family_email,
+          phone: user.family_phone,
+          country_code: user.family_country_code,
+          access_code: user.family_access_code,
+          user_type: 'family',
+          created_at: user.created_at
+        }
+      };
+    }
+    
+    return { success: false, error: 'Código no encontrado' };
   } catch (error) {
     console.error('Error buscando usuario:', error);
     return { success: false, error: error.message };
@@ -106,16 +147,55 @@ export async function getUserByAccessCode(accessCode) {
 // Buscar usuario por teléfono
 export async function getUserByPhone(phone) {
   try {
-    const result = await supabaseRequest(
-      `registered_users?phone=eq.${phone}&select=*`,
+    // Buscar en teléfonos de migrante
+    let result = await supabaseRequest(
+      `registrations?migrant_phone=eq.${phone}&select=*`,
       'GET'
     );
     
     if (result && result.length > 0) {
-      return { success: true, data: result[0] };
-    } else {
-      return { success: false, error: 'Teléfono no encontrado' };
+      const user = result[0];
+      return { 
+        success: true, 
+        data: {
+          first_name: user.migrant_first_name,
+          last_name: user.migrant_last_name,
+          mother_last_name: user.migrant_mother_last_name,
+          email: user.migrant_email,
+          phone: user.migrant_phone,
+          country_code: user.migrant_country_code,
+          access_code: user.migrant_access_code,
+          user_type: 'migrant',
+          created_at: user.created_at
+        }
+      };
     }
+    
+    // Si no es teléfono de migrante, buscar en teléfonos de familiar
+    result = await supabaseRequest(
+      `registrations?family_phone=eq.${phone}&select=*`,
+      'GET'
+    );
+    
+    if (result && result.length > 0) {
+      const user = result[0];
+      return { 
+        success: true, 
+        data: {
+          first_name: user.family_first_name,
+          last_name: user.family_last_name,
+          mother_last_name: user.family_mother_last_name,
+          email: user.family_email,
+          phone: user.family_phone,
+          country_code: user.family_country_code,
+          access_code: user.family_access_code,
+          user_type: 'family',
+          created_at: user.created_at
+        }
+      };
+    }
+    
+    return { success: false, error: 'Teléfono no encontrado' };
   } catch (error) {
     console.error('Error buscando usuario:', error);
     return { success: false, error: error.message };
