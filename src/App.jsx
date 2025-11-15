@@ -352,24 +352,24 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
 
 Tu solicitud ha sido recibida exitosamente. 
 
-📋 **Estado de tu registro:**
+📋 Estado de tu registro:
 Has sido registrado en nuestro programa piloto. Estamos revisando todas las solicitudes para seleccionar a los primeros 1,000 participantes.
 
-🔔 **¿Qué sigue?**
+🔔 ¿Qué sigue?
 En los próximos 3 días recibirás un email con:
 • Tu código de acceso personalizado
 • Instrucciones para activar tu cuenta
 • Acceso inmediato a todos los servicios
 
-⏰ **Fecha estimada de respuesta:**
+⏰ Fecha estimada de respuesta:
 Recibirás notificación antes del 18 de noviembre de 2025.
 
-👨‍👩‍👧 **Datos registrados:**
+👨‍👩‍👧 Datos registrados:
 • Migrante (USA): ${migrantFirstName} ${migrantLastName}
 • Familiar (México): ${familyFirstName} ${familyLastName}
 • Cupos restantes: ${spotsLeft} de 1,000
 
-💡 **Importante:**
+💡 Importante:
 Mantén tu email activo. Te contactaremos a: ${migrantEmail}
 
 ¿Dudas? Escríbenos a contact@saludcompartida.com
@@ -443,30 +443,30 @@ Equipo SaludCompartida`,
 
 ${migrantFirstName} ${migrantLastName} (tu familiar en Estados Unidos) te registró en nuestro programa piloto. Su solicitud ha sido recibida exitosamente.
 
-📋 **Estado de tu registro:**
+📋 Estado de tu registro:
 Estamos revisando todas las solicitudes para seleccionar a los primeros 1,000 participantes.
 
-🔔 **¿Qué sigue?**
+🔔 ¿Qué sigue?
 En los próximos 3 días recibirás un email con:
 • Tu código de acceso personalizado
 • Instrucciones para activar tu cuenta
 • Acceso inmediato a todos los servicios
 
-⏰ **Fecha estimada de respuesta:**
+⏰ Fecha estimada de respuesta:
 Recibirás notificación antes del 18 de noviembre de 2025.
 
-👨‍👩‍👧 **Datos registrados:**
+👨‍👩‍👧 Datos registrados:
 • Familiar (México): ${familyFirstName} ${familyLastName}
 • Migrante (USA): ${migrantFirstName} ${migrantLastName}
 • Cupos restantes: ${spotsLeft} de 1,000
 
-🏥 **Servicios incluidos si eres seleccionado:**
+🏥 Servicios incluidos si eres seleccionado:
 • Telemedicina 24/7
 • Descuentos en farmacias (40-75%)
 • Sesiones de terapia semanales
 • 30 días completamente GRATIS
 
-💡 **Importante:**
+💡 Importante:
 Mantén tu email activo. Te contactaremos a: ${familyEmail}
 
 ¿Dudas? Escríbenos a contact@saludcompartida.com

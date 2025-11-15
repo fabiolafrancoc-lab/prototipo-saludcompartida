@@ -115,7 +115,7 @@ export default async function handler(req, res) {
           </div>
           <div class="footer">
             <p>SaludCompartida © 2025</p>
-            <p>¿Necesitas ayuda? Escríbenos al 55 2998 4922 702</p>
+            <p>¿Necesitas ayuda? Escríbenos a contact@saludcompartida.com</p>
           </div>
         </body>
         </html>

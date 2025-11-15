@@ -863,7 +863,7 @@ Recibirás el link de videollamada 24 horas antes de tu cita.
 💙 **Recordatorio:**
 Es importante que estés en un lugar tranquilo y privado para tu sesión.
 
-¿Dudas? Escríbenos al 55 2998 4922 702
+¿Dudas? Escríbenos a contact@saludcompartida.com
 
 ¡Nos vemos pronto!
 SaludCompartida`,
@@ -897,7 +897,7 @@ El link de videollamada será enviado al paciente 24 horas antes de la cita.
 💙 **Tu apoyo es importante:**
 Asegúrate de recordarle al paciente sobre la cita.
 
-¿Dudas? Escríbenos al 55 2998 4922 702
+¿Dudas? Escríbenos a contact@saludcompartida.com
 
 Gracias por cuidar de tu familia.
 SaludCompartida`,

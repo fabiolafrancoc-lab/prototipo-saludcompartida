@@ -133,7 +133,7 @@ Ingresa con tu código en:
 
 Guarda este código en un lugar seguro. Lo necesitarás para acceder a todos tus servicios de salud.
 
-¿Dudas? Escríbenos al 55 2998 4922 702
+¿Dudas? Escríbenos a contact@saludcompartida.com
 
 ¡Estamos para cuidarte! 💙
   `.trim();
