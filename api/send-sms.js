@@ -1,4 +1,6 @@
 // API para enviar SMS usando Twilio
+import twilio from 'twilio';
+
 export default async function handler(req, res) {
   // Solo permitir POST
   if (req.method !== 'POST') {
@@ -30,7 +32,6 @@ export default async function handler(req, res) {
     const formattedTo = to.startsWith('+') ? to : `+52${to.replace(/\D/g, '')}`;
 
     // Inicializar cliente de Twilio
-    const twilio = require('twilio');
     const client = twilio(accountSid, authToken);
 
     // Enviar SMS
