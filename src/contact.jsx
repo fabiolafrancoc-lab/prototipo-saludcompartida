@@ -164,20 +164,66 @@ export default function Contact() {
     // Validar solo campos requeridos (mensaje es opcional)
     const fieldsToValidate = ['nombre', 'apellidoPaterno', 'telefono', 'categoria', 'aceptaTerminos'];
     let isValid = true;
+    const newErrors = {};
 
+    // Validar cada campo requerido
     fieldsToValidate.forEach(field => {
-      if (!validateField(field, formData[field])) {
-        console.log(`Campo inválido: ${field}`, formData[field]);
-        isValid = false;
+      const value = formData[field];
+      
+      // Validar cada campo según su tipo
+      if (field === 'nombre') {
+        const v = (value || '').trim();
+        if (!v) {
+          newErrors.nombre = 'El nombre es requerido';
+          isValid = false;
+        } else if (v.length < 2) {
+          newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
+          isValid = false;
+        }
+      } else if (field === 'apellidoPaterno') {
+        const v = (value || '').trim();
+        if (!v) {
+          newErrors.apellidoPaterno = 'El apellido paterno es requerido';
+          isValid = false;
+        } else if (v.length < 2) {
+          newErrors.apellidoPaterno = 'El apellido debe tener al menos 2 caracteres';
+          isValid = false;
+        }
+      } else if (field === 'telefono') {
+        const cleanPhone = String(value || '').replace(/\D/g, '');
+        if (!cleanPhone) {
+          newErrors.telefono = 'El teléfono es requerido';
+          isValid = false;
+        } else if (cleanPhone.length !== 10) {
+          newErrors.telefono = 'El teléfono debe tener 10 dígitos';
+          isValid = false;
+        }
+      } else if (field === 'categoria') {
+        if (!value) {
+          newErrors.categoria = 'Selecciona una categoría';
+          isValid = false;
+        }
+      } else if (field === 'aceptaTerminos') {
+        if (!value) {
+          newErrors.aceptaTerminos = 'Debes aceptar los términos y condiciones';
+          isValid = false;
+        }
       }
     });
 
-    if (formData.email && !validateField('email', formData.email)) isValid = false;
+    // Validar email si está presente
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'El email no es válido';
+      isValid = false;
+    }
+
+    // Actualizar errores
+    setErrors(newErrors);
     
     if (!isValid) {
-      console.log('Formulario inválido. Errores:', errors);
+      console.log('Formulario inválido. Errores:', newErrors);
       // Scroll al primer campo con error
-      const firstErrorField = Object.keys(errors)[0];
+      const firstErrorField = Object.keys(newErrors)[0];
       const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
       if (errorElement) {
         errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -467,14 +513,16 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
               </div>
 
               {/* Términos */}
-              <div>
+              <div className={`p-3 rounded-lg ${errors.aceptaTerminos ? 'bg-red-50 border-2 border-red-300' : ''}`}>
                 <label className="flex items-start gap-3 cursor-pointer group">
                   <input
                     type="checkbox"
                     name="aceptaTerminos"
                     checked={formData.aceptaTerminos}
                     onChange={handleChange}
-                    className="mt-1 w-5 h-5 text-cyan-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-cyan-500 cursor-pointer"
+                    className={`mt-1 w-5 h-5 text-cyan-600 rounded focus:ring-2 cursor-pointer ${
+                      errors.aceptaTerminos ? 'border-2 border-red-500' : 'border-2 border-gray-300 focus:ring-cyan-500'
+                    }`}
                   />
                   <span className="text-sm text-gray-700 leading-relaxed">
                     Acepto los{' '}
@@ -495,7 +543,14 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
                     </button>
                   </span>
                 </label>
-                {errors.aceptaTerminos && <p className="mt-2 text-sm text-red-600">{errors.aceptaTerminos}</p>}
+                {errors.aceptaTerminos && (
+                  <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.aceptaTerminos}
+                  </p>
+                )}
               </div>
 
               <button
@@ -540,12 +595,9 @@ Deja tu mensaje de voz y te devolveremos la llamada en máximo 15 minutos.
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
-                <a 
-                  href="mailto:contact@saludcompartida.com"
-                  className="text-cyan-600 hover:text-cyan-700 hover:underline transition-colors"
-                >
+                <p className="text-cyan-600 font-semibold">
                   contact@saludcompartida.com
-                </a>
+                </p>
               </div>
             </div>
 
