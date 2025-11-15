@@ -756,30 +756,6 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
             </p>
           </div>
 
-          {/* BOTONES DE CONSULTA */}
-          <div className="mt-6">
-            <button
-              onClick={handleCodigoErroneo}
-              className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              Código Erróneo
-            </button>
-            
-            <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
-              <p className="text-gray-700 font-semibold mb-1">
-                Otras Consultas
-              </p>
-              <p className="text-gray-600 text-sm mb-1">
-                Escríbenos a:
-              </p>
-              <p className="text-cyan-600 font-bold">
-                contact@saludcompartida.com
-              </p>
-            </div>
-          </div>
           </div>
         </div>
         )}
