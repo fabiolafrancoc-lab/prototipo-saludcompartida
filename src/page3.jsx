@@ -99,7 +99,67 @@ export default function Page3() {
     }
   }, [whatsappNumber, countryCode, useSpecialCode, userDataLoaded]);
 
-  const handleAccessCode = async () => {
+  // Auto-verificar código cuando se ingresa
+  useEffect(() => {
+    const verifyCodeAutomatically = async () => {
+      if (!specialCode.trim() || specialCode.trim().length < 5) {
+        // Código muy corto, no verificar aún
+        return;
+      }
+
+      const upperCode = specialCode.trim().toUpperCase();
+      
+      // Verificar si es código demo/especial
+      if (SPECIAL_ACCESS_CODES[upperCode]) {
+        const codeData = SPECIAL_ACCESS_CODES[upperCode];
+        const demoUser = codeData.demoUser;
+        
+        setFirstName(demoUser.firstName);
+        setLastName(demoUser.lastName);
+        setMotherLastName(demoUser.motherLastName);
+        setEmail(demoUser.email);
+        setWhatsappNumber(demoUser.phone.replace(/^(\d{3})(\d{3})(\d{4})$/, '$1 $2 $3'));
+        setCountryCode(demoUser.countryCode);
+        setCodeVerified(true);
+        return;
+      }
+      
+      // Buscar en Supabase
+      try {
+        const result = await getUserByAccessCode(upperCode);
+        
+        if (result.success && result.data) {
+          const dbUser = result.data;
+          
+          // Auto-llenar campos con datos de la base de datos
+          setFirstName(dbUser.first_name);
+          setLastName(dbUser.last_name);
+          setMotherLastName(dbUser.mother_last_name || '');
+          setEmail(dbUser.email || '');
+          
+          // Formatear teléfono con espacios para visualización
+          const formattedPhone = dbUser.phone.replace(/^(\d{3})(\d{3})(\d{4})$/, '$1 $2 $3');
+          setWhatsappNumber(formattedPhone);
+          setCountryCode(dbUser.country_code);
+          
+          setCodeVerified(true);
+          setErrors({}); // Limpiar errores
+          
+          console.log('✅ Código verificado automáticamente:', upperCode);
+          console.log('Usuario cargado:', dbUser.first_name, dbUser.last_name);
+        }
+      } catch (error) {
+        console.error('Error verificando código:', error);
+      }
+    };
+
+    // Ejecutar verificación con un pequeño delay para evitar muchas llamadas
+    const timeoutId = setTimeout(verifyCodeAutomatically, 500);
+    
+    return () => clearTimeout(timeoutId);
+  }, [specialCode]);
+
+  const handleAccessCode = async () {
     // Validar campos requeridos
     const newErrors = {};
     
