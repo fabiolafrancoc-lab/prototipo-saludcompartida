@@ -864,38 +864,17 @@ Equipo SaludCompartida`,
 
                     {/* Sección de contacto */}
                     <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-                      <div className="text-center mb-4">
+                      <div className="text-center">
                         <p className="text-gray-700 font-semibold mb-2">
                           ¿Quieres saber más sobre el servicio?
                         </p>
-                        <p className="text-sm text-gray-600">Contáctanos y te ayudaremos</p>
+                        <p className="text-gray-600 text-sm mb-2">
+                          Consultas, escríbenos a:
+                        </p>
+                        <p className="text-cyan-600 font-bold text-lg">
+                          contact@saludcompartida.com
+                        </p>
                       </div>
-                      
-                      <button
-                        onClick={handleContactRequest}
-                        disabled={isSubmittingContact}
-                        className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all ${
-                          isSubmittingContact 
-                            ? 'bg-gray-400 cursor-not-allowed' 
-                            : 'bg-cyan-500 hover:bg-cyan-600 text-white'
-                        }`}
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        {isSubmittingContact ? 'Enviando...' : 'Enviar Consulta'}
-                      </button>
-
-                      {showContactSuccess && (
-                        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                          <p className="text-green-700 text-sm font-semibold text-center flex items-center justify-center gap-2">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            ¡Tu mensaje ha sido enviado con éxito!
-                          </p>
-                        </div>
-                      )}
                     </div>
 
                     <p className="text-center text-sm text-gray-500 leading-relaxed">

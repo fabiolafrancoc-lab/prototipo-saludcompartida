@@ -757,7 +757,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
           </div>
 
           {/* BOTONES DE CONSULTA */}
-          <div className="mt-6 space-y-3">
+          <div className="mt-6">
             <button
               onClick={handleCodigoErroneo}
               className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center justify-center gap-2"
@@ -768,26 +768,17 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
               Código Erróneo
             </button>
             
-            <button
-              onClick={handleOtrasConsultas}
-              className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center justify-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Otras Consultas
-            </button>
-
-            {showSuccessMessage && (
-              <div className="mt-3 p-4 bg-green-50 border-2 border-green-200 rounded-lg animate-fade-in">
-                <p className="text-green-700 font-semibold text-center flex items-center justify-center gap-2">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  ¡Tu mensaje ha sido enviado con éxito!
-                </p>
-              </div>
-            )}
+            <div className="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
+              <p className="text-gray-700 font-semibold mb-1">
+                Otras Consultas
+              </p>
+              <p className="text-gray-600 text-sm mb-1">
+                Escríbenos a:
+              </p>
+              <p className="text-cyan-600 font-bold">
+                contact@saludcompartida.com
+              </p>
+            </div>
           </div>
           </div>
         </div>
