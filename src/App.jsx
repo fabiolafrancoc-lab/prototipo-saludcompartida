@@ -391,6 +391,8 @@ Equipo SaludCompartida`,
 
 ¡Bienvenido a SaludCompartida! 🎉
 
+${migrantFirstName} ${migrantLastName} (Migrante) te registró para que puedas utilizar los beneficios de SaludCompartida sin costo durante 30 días. Para acceder debes ingresar el código en el link indicado abajo. Te registras y una vez registrado podrás empezar a utilizar los servicios inmediatamente. ¡Empieza a ahorrar! Empieza a utilizar SaludCompartida.
+
 Tu código de acceso es: ${result.familyAccessCode}
 
 Ingresa con tu código en:
@@ -398,9 +400,9 @@ Ingresa con tu código en:
 
 Guarda este código en un lugar seguro. Lo necesitarás para acceder a todos tus servicios de salud.
 
-¿Dudas? Escríbenos al 55 2998 4922 702
+¿Dudas? Escríbenos a contact@saludcompartida.com
 
-¡Estamos para cuidarte! 💙
+¡Estamos para cuidarte! 
 SaludCompartida`,
                 type: 'access-code'
               })
