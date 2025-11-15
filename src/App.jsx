@@ -207,6 +207,13 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
         const cleanMigrantPhone = migrantPhone.replace(/\s/g, '');
         const cleanFamilyPhone = familyPhone.replace(/\s/g, '');
         
+        // DEBUG: Verificar qué se está enviando
+        console.log('🔍 DATOS ANTES DE ENVIAR A SUPABASE:');
+        console.log('Migrante - Teléfono original:', migrantPhone);
+        console.log('Migrante - Teléfono limpio:', cleanMigrantPhone);
+        console.log('Familiar - Teléfono original:', familyPhone);
+        console.log('Familiar - Teléfono limpio:', cleanFamilyPhone);
+        
         // Guardar registro completo (migrante + familiar en una sola fila)
         const result = await insertRegistration(
           {
