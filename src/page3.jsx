@@ -346,9 +346,41 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
   };
 
   // Handler para botón "Otras Consultas"
-  const handleOtrasConsultas = () => {
-    window.scrollTo(0, 0);
-    navigate('/contact', { state: { from: '/page3' } });
+  const handleOtrasConsultas = async () => {
+    try {
+      const emailBody = `
+📋 SOLICITUD DE CONSULTA DESDE ACCESO
+
+Un usuario solicitó realizar una consulta general.
+
+--- INFORMACIÓN ---
+Origen: Página de Acceso (page3.jsx)
+Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+      `.trim();
+
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: 'Usuario',
+          email: 'usuario@saludcompartida.com',
+          message: emailBody,
+          type: 'consulta-general',
+          to: 'contact@saludcompartida.com'
+        }),
+      });
+
+      if (response.ok) {
+        setShowSuccessMessage(true);
+        setTimeout(() => {
+          setShowSuccessMessage(false);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Error al enviar consulta:', error);
+    }
   };
 
   return (
@@ -745,6 +777,17 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
               </svg>
               Otras Consultas
             </button>
+
+            {showSuccessMessage && (
+              <div className="mt-3 p-4 bg-green-50 border-2 border-green-200 rounded-lg animate-fade-in">
+                <p className="text-green-700 font-semibold text-center flex items-center justify-center gap-2">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  ¡Tu mensaje ha sido enviado con éxito!
+                </p>
+              </div>
+            )}
           </div>
           </div>
         </div>
