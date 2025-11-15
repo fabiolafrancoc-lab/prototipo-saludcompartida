@@ -292,80 +292,86 @@ Cupos restantes después de este registro: ${spotsLeft - 1}
             console.log(`✅ Código enviado al migrante por ${migrantNotification.method}`);
           }
 
-          // Enviar Email al migrante
+          // Enviar Email de CONFIRMACIÓN DE REGISTRO al migrante (SIN código aún)
           if (migrantEmail) {
-            console.log('📧 Intentando enviar email a:', migrantEmail);
-            const emailResponse = await fetch('/api/send-email', {
+            console.log('📧 Enviando confirmación de registro a migrante:', migrantEmail);
+            const confirmResponse = await fetch('/api/send-email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 to: migrantEmail,
-                subject: '🎉 Tu código de acceso - SaludCompartida',
+                subject: '✅ Registro Exitoso - SaludCompartida',
                 message: `Hola ${migrantFirstName},
 
-¡Bienvenido a SaludCompartida! 🎉
+¡Gracias por registrarte en SaludCompartida! 🎉
 
-Tu código de acceso es: ${result.migrantAccessCode}
+Tu solicitud ha sido recibida exitosamente. 
 
-Ingresa con tu código en:
-👉 https://prototype.saludcompartida.com
-
-Guarda este código en un lugar seguro. Lo necesitarás para acceder a todos tus servicios de salud.
-
-¿Dudas? Escríbenos al 55 2998 4922 702
-
-¡Estamos para cuidarte! 💙
-SaludCompartida`,
-                type: 'access-code'
-              })
-            });
-            
-            const emailResult = await emailResponse.json();
-            console.log('📧 Respuesta email migrante:', emailResult);
-            
-            if (emailResponse.ok) {
-              console.log('✅ Email enviado al migrante');
-            } else {
-              console.error('❌ Error enviando email al migrante:', emailResult);
-            }
-
-            // Enviar email de confirmación de registro exitoso
-            await fetch('/api/send-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                to: migrantEmail,
-                subject: '✅ Registro Recibido - SaludCompartida',
-                message: `Hola ${migrantFirstName},
-
-¡Tu registro ha sido recibido exitosamente! 🎉
-
-📋 **Estado de tu solicitud:**
-Has sido registrado en nuestro programa piloto. Estamos revisando todas las solicitudes y seleccionaremos a los 1,000 participantes.
+📋 **Estado de tu registro:**
+Has sido registrado en nuestro programa piloto. Estamos revisando todas las solicitudes para seleccionar a los primeros 1,000 participantes.
 
 🔔 **¿Qué sigue?**
-• Recibirás una notificación si eres seleccionado
-• El código de acceso será enviado por WhatsApp
-• Quedan solo ${spotsLeft} cupos disponibles
+En los próximos 3 días recibirás un email con:
+• Tu código de acceso personalizado
+• Instrucciones para activar tu cuenta
+• Acceso inmediato a todos los servicios
 
-⏰ **Plazo de selección:**
-Los participantes serán notificados en los próximos 3 días.
+⏰ **Fecha estimada de respuesta:**
+Recibirás notificación antes del 18 de noviembre de 2025.
 
 👨‍👩‍👧 **Datos registrados:**
-• Tu información: ${migrantFirstName} ${migrantLastName}
-• Familiar en México: ${familyFirstName} ${familyLastName}
-• País: ${familyCountry === 'MX' ? '🇲🇽 México' : familyCountry}
+• Migrante (USA): ${migrantFirstName} ${migrantLastName}
+• Familiar (México): ${familyFirstName} ${familyLastName}
+• Cupos restantes: ${spotsLeft} de 1,000
 
 💡 **Importante:**
-Mantén tu WhatsApp activo en +1 ${migrantPhone} para recibir notificaciones.
+Mantén tu email activo. Te contactaremos a: ${migrantEmail}
 
-¿Dudas? Escríbenos al 55 2998 4922 702
+¿Dudas? Escríbenos a contact@saludcompartida.com
 
-¡Gracias por confiar en SaludCompartida! 💙
+¡Estamos emocionados de tenerte con nosotros! 💙
 Equipo SaludCompartida`,
                 type: 'registration-confirmation'
               })
             });
+            
+            if (confirmResponse.ok) {
+              console.log('✅ Confirmación de registro enviada al migrante');
+            }
+
+            // NOTA: El email con código de acceso se enviará después de la selección
+            // Esto se puede hacer manualmente o mediante un proceso separado en 3 días
+            /*
+            MENSAJE PARA CUANDO SEA SELECCIONADO (enviar después):
+            
+            Subject: 🎉 ¡Felicidades! Has sido seleccionado - SaludCompartida
+            
+            Hola ${migrantFirstName},
+
+            ¡Excelentes noticias! Has sido seleccionado para participar en el programa piloto de SaludCompartida. 🎉
+
+            Tu código de acceso es: ${result.migrantAccessCode}
+
+            � **Activa tu cuenta ahora:**
+            👉 https://prototype.saludcompartida.com
+
+            Ingresa con tu código para empezar a disfrutar de:
+            ✅ Telemedicina 24/7 para tu familiar en México
+            ✅ Descuentos de 40-75% en medicamentos
+            ✅ Sesiones de terapia psicológica semanales
+            ✅ 30 días completamente GRATIS
+
+            � **Guarda este código:** ${result.migrantAccessCode}
+            Lo necesitarás para acceder a todos tus servicios de salud.
+
+            ⏰ **¡Activa tu cuenta hoy!**
+            Los 30 días gratis comienzan desde tu primer acceso.
+
+            ¿Dudas? Escríbenos a contact@saludcompartida.com
+
+            ¡Bienvenido oficialmente a la familia SaludCompartida! 💙
+            Equipo SaludCompartida
+            */
           }
 
           // Enviar WhatsApp/SMS al familiar (México)
@@ -379,81 +385,96 @@ Equipo SaludCompartida`,
             console.log(`✅ Código enviado al familiar por ${familyNotification.method}`);
           }
 
-          // Enviar Email al familiar
+          // Enviar Email de CONFIRMACIÓN DE REGISTRO al familiar (SIN código aún)
           if (familyEmail) {
-            const emailResponse = await fetch('/api/send-email', {
+            console.log('📧 Enviando confirmación de registro a familiar:', familyEmail);
+            const confirmResponse = await fetch('/api/send-email', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 to: familyEmail,
-                subject: '🎉 Tu código de acceso - SaludCompartida',
+                subject: '✅ Registro Exitoso - SaludCompartida',
                 message: `Hola ${familyFirstName},
 
-¡Bienvenido a SaludCompartida! 🎉
+¡Gracias por registrarte en SaludCompartida! 🎉
 
-${migrantFirstName} ${migrantLastName} (Migrante) te registró para que puedas utilizar los beneficios de SaludCompartida sin costo durante 30 días. Para acceder debes ingresar el código en el link indicado abajo. Te registras y una vez registrado podrás empezar a utilizar los servicios inmediatamente. ¡Empieza a ahorrar! Empieza a utilizar SaludCompartida.
+${migrantFirstName} ${migrantLastName} (tu familiar en Estados Unidos) te registró en nuestro programa piloto. Tu solicitud ha sido recibida exitosamente.
 
-Tu código de acceso es: ${result.familyAccessCode}
-
-Ingresa con tu código en:
-👉 https://prototype.saludcompartida.com
-
-Guarda este código en un lugar seguro. Lo necesitarás para acceder a todos tus servicios de salud.
-
-¿Dudas? Escríbenos a contact@saludcompartida.com
-
-¡Estamos para cuidarte! 
-SaludCompartida`,
-                type: 'access-code'
-              })
-            });
-            
-            if (emailResponse.ok) {
-              console.log('✅ Email enviado al familiar');
-            }
-
-            // Enviar email de confirmación de registro exitoso al familiar
-            await fetch('/api/send-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                to: familyEmail,
-                subject: '✅ Registro Recibido - SaludCompartida',
-                message: `Hola ${familyFirstName},
-
-¡Tu registro ha sido recibido exitosamente! 🎉
-
-📋 **Estado de tu solicitud:**
-Has sido registrado en nuestro programa piloto junto con tu familiar en Estados Unidos. Estamos revisando todas las solicitudes.
+📋 **Estado de tu registro:**
+Estamos revisando todas las solicitudes para seleccionar a los primeros 1,000 participantes.
 
 🔔 **¿Qué sigue?**
-• Recibirás una notificación si son seleccionados
-• El código de acceso será enviado por WhatsApp
-• Quedan solo ${spotsLeft} cupos disponibles
+En los próximos 3 días recibirás un email con:
+• Tu código de acceso personalizado
+• Instrucciones para activar tu cuenta
+• Acceso inmediato a todos los servicios
 
-⏰ **Plazo de selección:**
-Los participantes serán notificados en los próximos 3 días.
+⏰ **Fecha estimada de respuesta:**
+Recibirás notificación antes del 18 de noviembre de 2025.
 
 👨‍👩‍👧 **Datos registrados:**
-• Tu información: ${familyFirstName} ${familyLastName}
-• Familiar en USA: ${migrantFirstName} ${migrantLastName}
-• País: 🇲🇽 México
+• Familiar (México): ${familyFirstName} ${familyLastName}
+• Migrante (USA): ${migrantFirstName} ${migrantLastName}
+• Cupos restantes: ${spotsLeft} de 1,000
 
-💡 **Importante:**
-Mantén tu WhatsApp activo en +52 ${familyPhone} para recibir notificaciones.
-
-🏥 **Servicios incluidos:**
+🏥 **Servicios incluidos si eres seleccionado:**
 • Telemedicina 24/7
 • Descuentos en farmacias (40-75%)
 • Sesiones de terapia semanales
+• 30 días completamente GRATIS
 
-¿Dudas? Escríbenos al 55 2998 4922 702
+💡 **Importante:**
+Mantén tu email activo. Te contactaremos a: ${familyEmail}
 
-¡Gracias por confiar en SaludCompartida! 💙
+¿Dudas? Escríbenos a contact@saludcompartida.com
+
+¡Estamos emocionados de tenerte con nosotros! 💙
 Equipo SaludCompartida`,
                 type: 'registration-confirmation'
               })
             });
+            
+            if (confirmResponse.ok) {
+              console.log('✅ Confirmación de registro enviada al familiar');
+            }
+
+            // NOTA: El email con código de acceso se enviará después de la selección
+            // Esto se puede hacer manualmente o mediante un proceso separado en 3 días
+            /*
+            MENSAJE PARA CUANDO SEA SELECCIONADO (enviar después):
+            
+            Subject: 🎉 ¡Felicidades! Has sido seleccionado - SaludCompartida
+            
+            Hola ${familyFirstName},
+
+            ¡Excelentes noticias! Has sido seleccionado para participar en el programa piloto de SaludCompartida. 🎉
+
+            ${migrantFirstName} ${migrantLastName} (Migrante en USA) te registró para que puedas utilizar los beneficios de SaludCompartida sin costo durante 30 días.
+
+            Tu código de acceso es: ${result.familyAccessCode}
+
+            🔗 **Activa tu cuenta ahora:**
+            👉 https://prototype.saludcompartida.com
+
+            Para acceder debes ingresar el código en el link indicado arriba. Te registras y una vez registrado podrás empezar a utilizar los servicios inmediatamente. ¡Empieza a ahorrar! Empieza a utilizar SaludCompartida.
+
+            � **Guarda este código:** ${result.familyAccessCode}
+            Lo necesitarás para acceder a todos tus servicios de salud.
+
+            🏥 **Tus beneficios incluyen:**
+            ✅ Telemedicina 24/7 - Consulta médicos cuando lo necesites
+            ✅ Descuentos de 40-75% en medicamentos
+            ✅ Terapia psicológica semanal
+            ✅ 30 días completamente GRATIS
+
+            ⏰ **¡Activa tu cuenta hoy!**
+            Los 30 días gratis comienzan desde tu primer acceso.
+
+            ¿Dudas? Escríbenos a contact@saludcompartida.com
+
+            ¡Estamos para cuidarte! 💙
+            Equipo SaludCompartida
+            */
           }
         } catch (notifError) {
           console.error('Error enviando notificaciones:', notifError);
