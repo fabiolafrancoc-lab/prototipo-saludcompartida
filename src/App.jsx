@@ -151,10 +151,46 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
     }
     
     if (!migrantPhone || migrantPhone.replace(/\s/g, '').length < 10) missing.push('migrantPhone');
+    
+    // Validar que el teléfono del migrante no sea un número inválido
+    const cleanMigrantPhoneCheck = migrantPhone.replace(/\s/g, '');
+    if (cleanMigrantPhoneCheck) {
+      // Rechazar números repetitivos (1111111111, 2222222222, etc.)
+      if (/^(\d)\1+$/.test(cleanMigrantPhoneCheck)) {
+        setMissingFields(['migrantPhone']);
+        setFormError('Por favor ingresa un número de teléfono válido. No uses números repetitivos (ejemplo: 111 111 1111).');
+        return;
+      }
+      
+      // Rechazar números secuenciales comunes
+      if (cleanMigrantPhoneCheck === '1234567890' || cleanMigrantPhoneCheck === '0123456789') {
+        setMissingFields(['migrantPhone']);
+        setFormError('Por favor ingresa tu número de teléfono real. No uses números secuenciales.');
+        return;
+      }
+    }
     if (!familyCountry) missing.push('familyCountry');
     if (!familyFirstName) missing.push('familyFirstName');
     if (!familyLastName) missing.push('familyLastName');
     if (!familyPhone || familyPhone.replace(/\s/g, '').length < 10) missing.push('familyPhone');
+    
+    // Validar que el teléfono del familiar no sea un número inválido
+    const cleanFamilyPhoneCheck = familyPhone.replace(/\s/g, '');
+    if (cleanFamilyPhoneCheck) {
+      // Rechazar números repetitivos (1111111111, 2222222222, etc.)
+      if (/^(\d)\1+$/.test(cleanFamilyPhoneCheck)) {
+        setMissingFields(['familyPhone']);
+        setFormError('Por favor ingresa un número de teléfono válido para tu familiar. No uses números repetitivos (ejemplo: 111 111 1111).');
+        return;
+      }
+      
+      // Rechazar números secuenciales comunes
+      if (cleanFamilyPhoneCheck === '1234567890' || cleanFamilyPhoneCheck === '0123456789') {
+        setMissingFields(['familyPhone']);
+        setFormError('Por favor ingresa el número de teléfono real de tu familiar. No uses números secuenciales.');
+        return;
+      }
+    }
     
     if (missing.length > 0) {
       setMissingFields(missing);
