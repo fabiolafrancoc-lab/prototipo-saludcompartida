@@ -89,7 +89,7 @@ export default async function handler(req, res) {
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
-      from: 'SaludCompartida <onboarding@resend.dev>',
+      from: 'SaludCompartida <noreply@saludcompartida.com>',
       to: [recipientEmail],
       subject: subject,
       html: isDirectEmail ? 
