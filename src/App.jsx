@@ -211,8 +211,10 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
         console.log('🔍 DATOS ANTES DE ENVIAR A SUPABASE:');
         console.log('Migrante - Teléfono original:', migrantPhone);
         console.log('Migrante - Teléfono limpio:', cleanMigrantPhone);
+        console.log('Migrante - Longitud:', cleanMigrantPhone.length);
         console.log('Familiar - Teléfono original:', familyPhone);
         console.log('Familiar - Teléfono limpio:', cleanFamilyPhone);
+        console.log('Familiar - Longitud:', cleanFamilyPhone.length);
         
         // Guardar registro completo (migrante + familiar en una sola fila)
         const result = await insertRegistration(
