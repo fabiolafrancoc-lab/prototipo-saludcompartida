@@ -63,6 +63,7 @@ export default function Page3() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [useSpecialCode, setUseSpecialCode] = useState(false); // Toggle entre teléfono y código especial
   const [userDataLoaded, setUserDataLoaded] = useState(false); // Indica si ya cargamos datos del localStorage
+  const [codeVerified, setCodeVerified] = useState(false); // Indica si el código fue verificado en Supabase
 
   // Auto-select country code based on geolocation (only for Mexico)
   useEffect(() => {
@@ -177,6 +178,8 @@ export default function Page3() {
       if (result.success && result.data) {
         const dbUser = result.data;
         
+        // Usar SIEMPRE los datos de la base de datos (no los del formulario)
+        // Esto mantiene la consistencia y evita modificaciones no autorizadas
         const userData = {
           firstName: dbUser.first_name,
           lastName: dbUser.last_name,
@@ -189,6 +192,22 @@ export default function Page3() {
           type: dbUser.user_type,
           registeredAt: dbUser.created_at
         };
+        
+        // Si los datos del formulario son diferentes a los de la BD, actualizar los campos
+        if (firstName !== dbUser.first_name || 
+            lastName !== dbUser.last_name || 
+            motherLastName !== (dbUser.mother_last_name || '')) {
+          // Actualizar campos con datos de la base de datos
+          setFirstName(dbUser.first_name);
+          setLastName(dbUser.last_name);
+          setMotherLastName(dbUser.mother_last_name || '');
+          setEmail(dbUser.email);
+          setWhatsappNumber(dbUser.phone.replace(/^(\d{3})(\d{3})(\d{4})$/, '$1 $2 $3'));
+          setCodeVerified(true);
+          
+          // Mostrar mensaje informativo
+          alert(`✅ Código verificado!\n\nSe han cargado tus datos registrados:\n${dbUser.first_name} ${dbUser.last_name} ${dbUser.mother_last_name || ''}`);
+        }
         
         localStorage.setItem('currentUser', JSON.stringify(userData));
         setCurrentUser(userData); // Actualizar contexto
@@ -531,6 +550,24 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
 
           {/* FORMULARIO */}
           <div className="space-y-5">
+            
+            {/* MENSAJE INFORMATIVO SI LOS DATOS FUERON CARGADOS */}
+            {codeVerified && (
+              <div className="bg-green-50 border-2 border-green-300 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <div>
+                    <p className="text-green-800 font-semibold">✅ Código Verificado</p>
+                    <p className="text-green-700 text-sm mt-1">
+                      Se han cargado tus datos registrados. Estos datos son los que registró tu familiar y no se pueden modificar por seguridad.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {/* CÓDIGO DE ACCESO */}
             <div>
               <label className="block text-gray-700 font-semibold mb-2">
@@ -575,10 +612,16 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                   setErrors({ ...errors, firstName: '' });
                 }}
                 placeholder="Ejemplo: María"
+                disabled={codeVerified}
                 className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-cyan-500 text-lg ${
-                  errors.firstName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  errors.firstName ? 'border-red-500 bg-red-50' : codeVerified ? 'border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed' : 'border-gray-300'
                 }`}
               />
+              {codeVerified && (
+                <p className="text-xs text-gray-500 mt-1">
+                  🔒 Dato registrado y verificado - No modificable
+                </p>
+              )}
               {errors.firstName && (
                 <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -602,10 +645,16 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                   setErrors({ ...errors, lastName: '' });
                 }}
                 placeholder="Ejemplo: González"
+                disabled={codeVerified}
                 className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-cyan-500 text-lg ${
-                  errors.lastName ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                  errors.lastName ? 'border-red-500 bg-red-50' : codeVerified ? 'border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed' : 'border-gray-300'
                 }`}
               />
+              {codeVerified && (
+                <p className="text-xs text-gray-500 mt-1">
+                  🔒 Dato registrado y verificado - No modificable
+                </p>
+              )}
               {errors.lastName && (
                 <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -626,8 +675,16 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                 value={motherLastName}
                 onChange={(e) => setMotherLastName(e.target.value)}
                 placeholder="Ejemplo: López"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-cyan-500 text-lg"
+                disabled={codeVerified}
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-cyan-500 text-lg ${
+                  codeVerified ? 'border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed' : 'border-gray-300'
+                }`}
               />
+              {codeVerified && (
+                <p className="text-xs text-gray-500 mt-1">
+                  🔒 Dato registrado y verificado - No modificable
+                </p>
+              )}
             </div>
 
             {/* EMAIL */}
@@ -663,7 +720,9 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                 Número de WhatsApp <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-2">
-                <div className="flex items-center bg-gray-100 border-2 border-gray-300 rounded-lg px-4 py-3">
+                <div className={`flex items-center border-2 rounded-lg px-4 py-3 ${
+                  codeVerified ? 'bg-gray-100 border-gray-300' : 'bg-gray-100 border-gray-300'
+                }`}>
                   <span className="text-gray-700 font-semibold text-lg">+52</span>
                 </div>
                 <input
@@ -680,14 +739,20 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                     }
                   }}
                   placeholder="555 123 4567"
+                  disabled={codeVerified}
                   className={`flex-1 px-4 py-3 border-2 rounded-lg focus:outline-none focus:border-cyan-500 text-lg ${
-                    errors.whatsappNumber ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                    errors.whatsappNumber ? 'border-red-500 bg-red-50' : codeVerified ? 'border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed' : 'border-gray-300'
                   }`}
                 />
               </div>
               <p className="text-xs text-gray-500 mt-1">
                 Formato: +52 XXX XXX XXXX (10 dígitos)
               </p>
+              {codeVerified && (
+                <p className="text-xs text-gray-500 mt-1">
+                  🔒 Dato registrado y verificado - No modificable
+                </p>
+              )}
               {errors.whatsappNumber && (
                 <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
