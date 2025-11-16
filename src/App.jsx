@@ -445,6 +445,9 @@ Equipo SaludCompartida`,
 
           // Enviar Email de CONFIRMACIÓN DE REGISTRO al familiar (SIN código aún)
           if (familyEmail) {
+            // Esperar 2 segundos antes de enviar el segundo email para evitar rate limiting
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
             console.log('📧 Enviando confirmación de registro a familiar:', familyEmail);
             const confirmResponse = await fetch('/api/send-email', {
               method: 'POST',
