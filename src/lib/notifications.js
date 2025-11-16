@@ -2,11 +2,21 @@
 
 /**
  * Envía un mensaje de WhatsApp usando la API de Twilio
+ * ⚠️ TEMPORALMENTE DESHABILITADO - Esperando configuración de WhatsApp Business
  * @param {string} phoneNumber - Número de teléfono (10 dígitos sin +52)
  * @param {string} message - Mensaje a enviar
  * @returns {Promise<{success: boolean, messageSid?: string, error?: string}>}
  */
 export async function sendWhatsAppMessage(phoneNumber, message) {
+  // DESHABILITADO TEMPORALMENTE - Descomentar cuando WhatsApp Business esté configurado
+  console.log('📱 WhatsApp deshabilitado temporalmente. Mensaje que se enviaría:', message.substring(0, 50) + '...');
+  return {
+    success: false,
+    disabled: true,
+    error: 'WhatsApp temporalmente deshabilitado - Esperando configuración de WhatsApp Business'
+  };
+  
+  /* DESCOMENTAR CUANDO WHATSAPP BUSINESS ESTÉ LISTO:
   try {
     const response = await fetch('/api/send-whatsapp', {
       method: 'POST',
@@ -33,15 +43,26 @@ export async function sendWhatsAppMessage(phoneNumber, message) {
       error: error.message
     };
   }
+  */
 }
 
 /**
  * Envía un SMS usando la API de Twilio
+ * ⚠️ TEMPORALMENTE DESHABILITADO - Esperando configuración de Twilio
  * @param {string} phoneNumber - Número de teléfono (10 dígitos sin +52)
  * @param {string} message - Mensaje a enviar
  * @returns {Promise<{success: boolean, messageSid?: string, error?: string}>}
  */
 export async function sendSMS(phoneNumber, message) {
+  // DESHABILITADO TEMPORALMENTE - Descomentar cuando Twilio esté completamente configurado
+  console.log('📩 SMS deshabilitado temporalmente. Mensaje que se enviaría:', message.substring(0, 50) + '...');
+  return {
+    success: false,
+    disabled: true,
+    error: 'SMS temporalmente deshabilitado - Esperando configuración completa de Twilio'
+  };
+  
+  /* DESCOMENTAR CUANDO TWILIO ESTÉ COMPLETAMENTE CONFIGURADO:
   try {
     const response = await fetch('/api/send-sms', {
       method: 'POST',
@@ -68,10 +89,12 @@ export async function sendSMS(phoneNumber, message) {
       error: error.message
     };
   }
+  */
 }
 
 /**
  * Envía notificación de confirmación de cita (WhatsApp + SMS de respaldo)
+ * ⚠️ Actualmente solo envía por email - WhatsApp/SMS deshabilitados temporalmente
  * @param {object} appointmentData - Datos de la cita
  */
 export async function sendAppointmentConfirmation(appointmentData) {
@@ -94,7 +117,7 @@ Te contactaremos 24 horas antes para:
 Gracias por confiar en SaludCompartida 💙
   `.trim();
 
-  // Intentar WhatsApp primero
+  // Intentar WhatsApp primero (actualmente deshabilitado)
   const whatsappResult = await sendWhatsAppMessage(phone, message);
   
   if (whatsappResult.success) {
@@ -102,20 +125,19 @@ Gracias por confiar en SaludCompartida 💙
     return { success: true, method: 'whatsapp', ...whatsappResult };
   }
 
-  // Si WhatsApp falla, enviar SMS de respaldo
-  console.log('⚠️ WhatsApp falló, enviando SMS de respaldo...');
-  const smsResult = await sendSMS(phone, message);
-  
+  // WhatsApp deshabilitado - retornar success con nota
+  console.log('ℹ️ WhatsApp/SMS deshabilitados. Usar email para confirmaciones.');
   return { 
-    success: smsResult.success, 
-    method: 'sms',
-    fallback: true,
-    ...smsResult 
+    success: true, 
+    method: 'disabled',
+    message: 'SMS/WhatsApp temporalmente deshabilitados. Usar email para confirmaciones.',
+    disabled: true
   };
 }
 
 /**
  * Envía código de acceso al usuario
+ * ⚠️ Actualmente solo funciona por email - WhatsApp/SMS deshabilitados temporalmente
  * @param {string} phone - Teléfono del usuario
  * @param {string} accessCode - Código de acceso generado
  * @param {string} firstName - Nombre del usuario
@@ -138,24 +160,20 @@ Guarda este código en un lugar seguro. Lo necesitarás para acceder a todos tus
 ¡Estamos para cuidarte! 💙
   `.trim();
 
-  // Intentar WhatsApp primero, SMS de respaldo
-  const whatsappResult = await sendWhatsAppMessage(phone, message);
+  // WhatsApp/SMS deshabilitados temporalmente
+  console.log('ℹ️ Código de acceso:', accessCode, '- WhatsApp/SMS deshabilitados, enviar por email');
   
-  if (whatsappResult.success) {
-    return { success: true, method: 'whatsapp', ...whatsappResult };
-  }
-
-  const smsResult = await sendSMS(phone, message);
   return { 
-    success: smsResult.success, 
-    method: 'sms',
-    fallback: true,
-    ...smsResult 
+    success: true, 
+    method: 'disabled',
+    message: 'SMS/WhatsApp temporalmente deshabilitados. Código enviado por email.',
+    disabled: true
   };
 }
 
 /**
  * Envía recordatorio 24hrs antes de la cita
+ * ⚠️ Actualmente deshabilitado - usar email para recordatorios
  */
 export async function send24HourReminder(appointmentData) {
   const { phone, firstName, date, time, meetingLink } = appointmentData;
@@ -179,17 +197,13 @@ Nos vemos pronto 💙
 SaludCompartida
   `.trim();
 
-  const whatsappResult = await sendWhatsAppMessage(phone, message);
+  // WhatsApp/SMS deshabilitados temporalmente
+  console.log('ℹ️ Recordatorio de cita - WhatsApp/SMS deshabilitados, enviar por email');
   
-  if (whatsappResult.success) {
-    return { success: true, method: 'whatsapp', ...whatsappResult };
-  }
-
-  const smsResult = await sendSMS(phone, message);
   return { 
-    success: smsResult.success, 
-    method: 'sms',
-    fallback: true,
-    ...smsResult 
+    success: true, 
+    method: 'disabled',
+    message: 'SMS/WhatsApp temporalmente deshabilitados. Enviar recordatorio por email.',
+    disabled: true
   };
 }
