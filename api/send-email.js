@@ -29,15 +29,21 @@ export default async function handler(req, res) {
 
     // Validate required fields
     if (!message) {
-      return res.status(400).json({ error: 'Missing required fields' });
+      return res.status(400).json({ error: 'Missing required field: message' });
     }
 
     // Si se proporciona 'to', es un email directo al usuario (no notificación al admin)
     const isDirectEmail = !!to;
     const recipientEmail = to || 'ffranco@saludcompartida.com';
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(recipientEmail)) {
+      return res.status(400).json({ error: 'Invalid email address format' });
+    }
+
     // Define subject and email styling based on type
-    let subject = customSubject || '';
+    let subject = customSubject || 'Notificación de SaludCompartida';
     let headerColor = '#06B6D4'; // cyan default
     let headerText = '';
     
@@ -45,6 +51,10 @@ export default async function handler(req, res) {
     if (isDirectEmail) {
       headerColor = '#06B6D4';
       headerText = customSubject || 'SaludCompartida';
+      // Asegurar que siempre haya subject para emails directos
+      if (!subject || subject === 'Notificación de SaludCompartida') {
+        subject = '📧 Mensaje de SaludCompartida';
+      }
     } else {
       // Email de notificación al admin
       switch(type) {
