@@ -73,8 +73,23 @@ export async function insertRegistration(migrantData, familyData, trafficSource 
     traffic_source: trafficSource
   };
 
+  console.log('🔄 Intentando guardar en Supabase:', newRegistration);
+  
   try {
     const result = await supabaseRequest('registrations', 'POST', newRegistration);
+    console.log('✅ RESPUESTA REAL DE SUPABASE:', result);
+    
+    // Verificar si realmente se insertó algo
+    if (!result || (Array.isArray(result) && result.length === 0)) {
+      console.error('❌ Supabase retornó vacío - posible problema de RLS o columnas');
+      return { 
+        success: false, 
+        error: 'No se pudo insertar en Supabase (respuesta vacía)',
+        migrantAccessCode,
+        familyAccessCode 
+      };
+    }
+    
     return { 
       success: true, 
       data: result, 
@@ -82,7 +97,8 @@ export async function insertRegistration(migrantData, familyData, trafficSource 
       familyAccessCode 
     };
   } catch (error) {
-    console.error('Error insertando registro:', error);
+    console.error('❌ ERROR REAL insertando registro:', error);
+    console.error('❌ Mensaje de error:', error.message);
     return { success: false, error: error.message };
   }
 }
