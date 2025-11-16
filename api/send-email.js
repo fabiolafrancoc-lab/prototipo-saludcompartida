@@ -27,8 +27,12 @@ export default async function handler(req, res) {
   try {
     const { name, email, phone, message, type, to, subject: customSubject } = req.body;
 
+    // Log para debug
+    console.log('📨 Recibiendo request de email:', { to, subject: customSubject, type, hasMessage: !!message });
+
     // Validate required fields
     if (!message) {
+      console.error('❌ Error: Falta el campo message');
       return res.status(400).json({ error: 'Missing required field: message' });
     }
 
@@ -39,7 +43,8 @@ export default async function handler(req, res) {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(recipientEmail)) {
-      return res.status(400).json({ error: 'Invalid email address format' });
+      console.error('❌ Error: Email inválido:', recipientEmail);
+      return res.status(400).json({ error: 'Invalid email address format: ' + recipientEmail });
     }
 
     // Define subject and email styling based on type
@@ -178,13 +183,17 @@ export default async function handler(req, res) {
     });
 
     if (error) {
-      console.error('Resend error:', error);
-      return res.status(400).json({ error: error.message });
+      console.error('❌ Resend error:', error);
+      console.error('❌ Detalles del error:', JSON.stringify(error, null, 2));
+      console.error('❌ Datos enviados - To:', recipientEmail, 'Subject:', subject);
+      return res.status(400).json({ error: error.message || 'Resend API error', details: error });
     }
 
+    console.log('✅ Email enviado exitosamente a:', recipientEmail);
     return res.status(200).json({ success: true, data });
   } catch (error) {
-    console.error('Server error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('❌ Server error:', error);
+    console.error('❌ Stack:', error.stack);
+    return res.status(500).json({ error: 'Internal server error: ' + error.message });
   }
 }
