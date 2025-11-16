@@ -34,6 +34,9 @@ function App() {
   // Estados para los códigos de acceso generados
   const [migrantAccessCode, setMigrantAccessCode] = useState('');
   const [familyAccessCode, setFamilyAccessCode] = useState('');
+  
+  // Estado para trackear origen de tráfico
+  const [trafficSource, setTrafficSource] = useState('');
 
   const testimonials = [
     "Estoy ahorrando cada mes gracias a SaludCompartida.",
@@ -42,6 +45,24 @@ function App() {
     "Ahora mi familia tiene acceso a terapia cuando la necesita.",
     "Los descuentos en medicinas nos han ayudado muchísimo."
   ];
+
+  // Capturar origen de tráfico desde URL params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const source = params.get('source') || params.get('utm_source') || params.get('ref');
+    
+    if (source) {
+      setTrafficSource(source.toLowerCase());
+      // Guardar en localStorage para persistencia
+      localStorage.setItem('trafficSource', source.toLowerCase());
+    } else {
+      // Intentar recuperar de localStorage si existe
+      const savedSource = localStorage.getItem('trafficSource');
+      if (savedSource) {
+        setTrafficSource(savedSource);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (currentPage === 'register' && spotsLeft > 87) {
@@ -207,15 +228,6 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
         const cleanMigrantPhone = migrantPhone.replace(/\s/g, '');
         const cleanFamilyPhone = familyPhone.replace(/\s/g, '');
         
-        // DEBUG: Verificar qué se está enviando
-        console.log('🔍 DATOS ANTES DE ENVIAR A SUPABASE:');
-        console.log('Migrante - Teléfono original:', migrantPhone);
-        console.log('Migrante - Teléfono limpio:', cleanMigrantPhone);
-        console.log('Migrante - Longitud:', cleanMigrantPhone.length);
-        console.log('Familiar - Teléfono original:', familyPhone);
-        console.log('Familiar - Teléfono limpio:', cleanFamilyPhone);
-        console.log('Familiar - Longitud:', cleanFamilyPhone.length);
-        
         // Guardar registro completo (migrante + familiar en una sola fila)
         const result = await insertRegistration(
           {
@@ -234,7 +246,8 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
             countryCode: '+52',
             phone: cleanFamilyPhone,
             country: familyCountry
-          }
+          },
+          trafficSource || 'direct' // Agregar origen de tráfico
         );
         
         if (!result.success) {

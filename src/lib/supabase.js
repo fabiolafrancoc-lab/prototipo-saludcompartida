@@ -45,14 +45,9 @@ function generateAccessCode() {
 }
 
 // Insertar registro completo (migrante + familiar en una sola fila)
-export async function insertRegistration(migrantData, familyData) {
+export async function insertRegistration(migrantData, familyData, trafficSource = 'direct') {
   const migrantAccessCode = generateAccessCode();
   const familyAccessCode = generateAccessCode();
-  
-  // DEBUG: Verificar datos recibidos
-  console.log('📥 DATOS RECIBIDOS EN insertRegistration:');
-  console.log('migrantData.phone:', migrantData.phone);
-  console.log('familyData.phone:', familyData.phone);
   
   const newRegistration = {
     // Datos del migrante (columnas 1-11)
@@ -72,18 +67,14 @@ export async function insertRegistration(migrantData, familyData) {
     family_country_code: familyData.countryCode || '+52',
     family_phone: familyData.phone,
     family_access_code: familyAccessCode,
-    family_country: familyData.country || null
+    family_country: familyData.country || null,
+    
+    // Origen de tráfico
+    traffic_source: trafficSource
   };
-  
-  // DEBUG: Verificar objeto a enviar
-  console.log('📤 OBJETO A ENVIAR A SUPABASE:');
-  console.log('migrant_phone:', newRegistration.migrant_phone);
-  console.log('family_phone:', newRegistration.family_phone);
-  console.log('Objeto completo:', JSON.stringify(newRegistration, null, 2));
 
   try {
     const result = await supabaseRequest('registrations', 'POST', newRegistration);
-    console.log('✅ RESPUESTA DE SUPABASE:', result);
     return { 
       success: true, 
       data: result, 
@@ -91,7 +82,7 @@ export async function insertRegistration(migrantData, familyData) {
       familyAccessCode 
     };
   } catch (error) {
-    console.error('❌ Error insertando registro:', error);
+    console.error('Error insertando registro:', error);
     return { success: false, error: error.message };
   }
 }

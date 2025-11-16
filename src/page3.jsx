@@ -151,7 +151,7 @@ export default function Page3() {
       } catch (error) {
         console.error('Error verificando código:', error);
       }
-    };
+    }; // <-- Añadir punto y coma aquí
 
     // Ejecutar verificación con un pequeño delay para evitar muchas llamadas
     const timeoutId = setTimeout(verifyCodeAutomatically, 500);
@@ -159,7 +159,7 @@ export default function Page3() {
     return () => clearTimeout(timeoutId);
   }, [specialCode]);
 
-  const handleAccessCode = async () {
+  const handleAccessCode = async () => {
     // Validar campos requeridos
     const newErrors = {};
     
