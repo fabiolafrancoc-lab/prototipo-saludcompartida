@@ -17,10 +17,25 @@ export default function Blog() {
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('accessUser');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed?.accessCode === 'USA2025') {
+      // Check currentUser first (new system)
+      const currentUserStored = localStorage.getItem('currentUser');
+      if (currentUserStored) {
+        const parsed = JSON.parse(currentUserStored);
+        // +1 = migrant (USA), +52 = family (Mexico)
+        if (parsed?.countryCode === '+1') {
+          setReturnPath('/migrant');
+        } else {
+          setReturnPath('/page4');
+        }
+        return;
+      }
+
+      // Fallback to accessUser (old system)
+      const accessUserStored = localStorage.getItem('accessUser');
+      if (accessUserStored) {
+        const parsed = JSON.parse(accessUserStored);
+        // Check countryCode or accessCode
+        if (parsed?.countryCode === '+1' || parsed?.accessCode === 'USA2025') {
           setReturnPath('/migrant');
         } else {
           setReturnPath('/page4');
