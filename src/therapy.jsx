@@ -558,6 +558,28 @@ export default function Therapy() {
     }
   ];
 
+  // Función para verificar si una fecha es día festivo en México
+  const isHoliday = (date) => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // JavaScript months are 0-indexed
+    const year = date.getFullYear();
+    
+    // Días festivos bloqueados:
+    // 24 y 25 de diciembre de 2025
+    // 31 de diciembre de 2025 (nota: usuario dijo "31 de Enero" pero debe ser diciembre)
+    // 1 de enero de 2026
+    const holidays = [
+      { day: 24, month: 12, year: 2025 }, // Nochebuena
+      { day: 25, month: 12, year: 2025 }, // Navidad
+      { day: 31, month: 12, year: 2025 }, // Fin de año
+      { day: 1, month: 1, year: 2026 }     // Año nuevo
+    ];
+    
+    return holidays.some(holiday => 
+      holiday.day === day && holiday.month === month && holiday.year === year
+    );
+  };
+
   const generateDates = () => {
     const dates = [];
     const today = new Date();
@@ -569,8 +591,8 @@ export default function Therapy() {
       const date = new Date(today);
       date.setDate(today.getDate() + currentDay);
       
-      // Excluir domingos (día 0)
-      if (date.getDay() !== 0) {
+      // Excluir domingos (día 0) y días festivos
+      if (date.getDay() !== 0 && !isHoliday(date)) {
         dates.push(date);
         daysAdded++;
       }
@@ -2015,7 +2037,7 @@ SaludCompartida`,
               </p>
             )}
             <p className="text-xs text-gray-500 mt-2">
-              * Fechas disponibles después de 15 días. Cerrado los domingos.
+              * Fechas disponibles después de 15 días. Cerrado los domingos y días festivos (24, 25, 31 Dic / 1 Ene).
             </p>
           </div>
 
