@@ -204,8 +204,8 @@ export default function Page3() {
         motherLastName: motherLastName.trim(),
         email: email.trim(),
         phone: whatsappNumber.replace(/\s/g, ''),
-        countryCode: '+52',
-        phoneId: `+52${whatsappNumber.replace(/\s/g, '')}`,
+        countryCode: countryCode,
+        phoneId: `${countryCode}${whatsappNumber.replace(/\s/g, '')}`,
         accessCode: upperCode,
         accessType: codeData.type,
         isDemo: true
@@ -305,7 +305,7 @@ export default function Page3() {
         motherLastName: originalData.motherLastName || '',
         email: originalData.email || '',
         phone: originalData.phone,
-        countryCode: '+52',
+        countryCode: originalData.countryCode || countryCode,
         phoneId: uniquePhoneId,
         type: originalData.type || 'user',
         registeredAt: originalData.registeredAt
@@ -780,11 +780,17 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                 Número de WhatsApp <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-2">
-                <div className={`flex items-center border-2 rounded-lg px-4 py-3 ${
-                  codeVerified ? 'bg-gray-100 border-gray-300' : 'bg-gray-100 border-gray-300'
-                }`}>
-                  <span className="text-gray-700 font-semibold text-lg">+52</span>
-                </div>
+                <select
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  disabled={codeVerified}
+                  className={`px-4 py-3 border-2 rounded-lg font-semibold text-lg ${
+                    codeVerified ? 'bg-gray-100 border-gray-300 text-gray-600 cursor-not-allowed' : 'bg-white border-gray-300 text-gray-700'
+                  }`}
+                >
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+52">🇲🇽 +52</option>
+                </select>
                 <input
                   type="tel"
                   value={whatsappNumber}
@@ -806,7 +812,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric
                 />
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Formato: +52 XXX XXX XXXX (10 dígitos)
+                {countryCode === '+1' ? 'Formato: +1 XXX XXX XXXX (10 dígitos USA)' : 'Formato: +52 XXX XXX XXXX (10 dígitos México)'}
               </p>
               {codeVerified && (
                 <p className="text-xs text-gray-500 mt-1">
